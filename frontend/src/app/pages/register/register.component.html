@@ -1,0 +1,86 @@
+<div class="page">
+  <div class="card">
+    <h1>Customer Registration</h1>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <h3>1. Personal Information</h3>
+      <div class="form-row">
+        <div>
+          <label>Customer Name</label>
+          <input type="text" formControlName="customerName" />
+          <div class="error" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['required']">Customer Name is required.</div>
+          <div class="error" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['maxlength']">Customer Name must be at most 50 characters.</div>
+        </div>
+
+        <div>
+          <label>Email</label>
+          <input type="email" formControlName="email" />
+          <div class="error" *ngIf="form.controls.email.touched && form.controls.email.errors?.['required']">Email is required.</div>
+          <div class="error" *ngIf="form.controls.email.touched && form.controls.email.errors?.['email']">Enter a valid email.</div>
+        </div>
+
+        <div class="mobile-grid">
+          <div>
+            <label>Country Code</label>
+            <select formControlName="countryCode">
+              <option *ngFor="let code of countryCodes" [value]="code">{{ code }}</option>
+            </select>
+          </div>
+          <div>
+            <label>Mobile Number (10 digits)</label>
+            <input type="text" formControlName="mobileNumber" />
+            <div class="error" *ngIf="form.controls.mobileNumber.touched && form.controls.mobileNumber.errors?.['required']">Mobile number is required.</div>
+            <div class="error" *ngIf="form.controls.mobileNumber.touched && form.controls.mobileNumber.errors?.['pattern']">Enter exactly 10 digits.</div>
+          </div>
+        </div>
+
+        <div>
+          <label>Address</label>
+          <textarea rows="3" formControlName="address"></textarea>
+          <div class="error" *ngIf="form.controls.address.touched && form.controls.address.errors?.['required']">Address is required.</div>
+          <div class="error" *ngIf="form.controls.address.touched && form.controls.address.errors?.['maxlength']">Address is too long.</div>
+        </div>
+      </div>
+
+      <h3>2. Username and Password</h3>
+      <div class="form-row">
+        <div>
+          <label>User ID</label>
+          <input type="text" formControlName="userId" />
+          <div class="error" *ngIf="form.controls.userId.touched && form.controls.userId.errors?.['required']">User ID is required.</div>
+          <div class="error" *ngIf="form.controls.userId.touched && (form.controls.userId.errors?.['minlength'] || form.controls.userId.errors?.['maxlength'])">User ID must be between 5 and 20 characters.</div>
+        </div>
+
+        <div>
+          <label>Password</label>
+          <input type="password" formControlName="password" />
+          <div class="error" *ngIf="form.controls.password.touched && form.controls.password.errors?.['required']">Password is required.</div>
+          <div class="error" *ngIf="form.controls.password.touched && form.controls.password.errors?.['maxlength']">Password must be at most 30 characters.</div>
+          <div class="error" *ngIf="form.controls.password.touched && form.controls.password.errors?.['pattern']">Password must contain upper case, lower case and special character.</div>
+        </div>
+
+        <div>
+          <label>Confirm Password</label>
+          <input type="password" formControlName="confirmPassword" />
+          <div class="error" *ngIf="form.controls.confirmPassword.touched && form.controls.confirmPassword.errors?.['required']">Confirm Password is required.</div>
+        </div>
+      </div>
+
+      <h3>3. Preferences</h3>
+      <div class="form-row">
+        <div>
+          <label>Delivery / Notification Preferences</label>
+          <textarea rows="2" formControlName="preferences" placeholder="Optional"></textarea>
+        </div>
+      </div>
+
+      <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+      <div class="actions">
+        <button type="submit" class="primary">Register</button>
+        <button type="button" class="secondary" (click)="reset()">Reset</button>
+        <button type="button" class="link-btn" (click)="backToLogin()">Back to Login</button>
+      </div>
+    </form>
+  </div>
+</div>

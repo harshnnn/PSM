@@ -1,0 +1,20 @@
+<div class="home-page" *ngIf="session">
+  <header class="top-bar">
+    <nav class="menu">
+      <button *ngFor="let item of menuItems" (click)="navigate(item.path)">{{ item.label }}</button>
+      <button (click)="logout()">Logout</button>
+    </nav>
+    <div class="welcome">Welcome {{ session.username }}</div>
+  </header>
+
+  <main class="content">
+    <h1>{{ session.role === 'CUSTOMER' ? 'Customer Dashboard' : 'Officer Dashboard' }}</h1>
+    <p>
+      {{
+        session.role === 'CUSTOMER'
+          ? 'Use the top menu for booking, tracking, previous bookings, and support.'
+          : 'Use the top menu for tracking, delivery status, pickup scheduling, and previous bookings.'
+      }}
+    </p>
+  </main>
+</div>

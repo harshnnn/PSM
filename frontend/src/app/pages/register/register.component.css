@@ -1,0 +1,7 @@
+@import '../../styles/shared.css';
+
+.mobile-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 12px;
+}

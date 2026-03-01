@@ -1,0 +1,15 @@
+<div class="page">
+  <div class="card" *ngIf="ackData">
+    <h1>Registration Acknowledgment</h1>
+    <p class="success">{{ ackData.message }}</p>
+
+    <p><strong>Customer Username:</strong> {{ ackData.customerUsername }}</p>
+    <p><strong>Customer Name:</strong> {{ ackData.customerName }}</p>
+    <p><strong>Email:</strong> {{ ackData.email }}</p>
+
+    <div class="actions">
+      <button class="primary" (click)="openHome()">Open Home Page</button>
+      <button class="secondary" (click)="openLogin()">Back to Login</button>
+    </div>
+  </div>
+</div>

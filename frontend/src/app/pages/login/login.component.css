@@ -1,0 +1,6 @@
+@import '../../styles/shared.css';
+
+.hint {
+  margin-top: 16px;
+  color: #455a64;
+}

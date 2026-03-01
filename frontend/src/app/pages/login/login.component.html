@@ -1,0 +1,43 @@
+<div class="page">
+  <div class="card">
+    <h1>Login</h1>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form-row">
+        <div>
+          <label>User ID</label>
+          <input type="text" formControlName="userId" placeholder="Enter User ID" />
+          <div class="error" *ngIf="form.controls.userId.touched && form.controls.userId.errors?.['required']">
+            User ID is required.
+          </div>
+          <div class="error" *ngIf="form.controls.userId.touched && (form.controls.userId.errors?.['minlength'] || form.controls.userId.errors?.['maxlength'])">
+            User ID must be between 5 and 20 characters.
+          </div>
+        </div>
+
+        <div>
+          <label>Password</label>
+          <input type="password" formControlName="password" placeholder="Enter Password" />
+          <div class="error" *ngIf="form.controls.password.touched && form.controls.password.errors?.['required']">
+            Password is required.
+          </div>
+          <div class="error" *ngIf="form.controls.password.touched && form.controls.password.errors?.['maxlength']">
+            Password must be at most 30 characters.
+          </div>
+          <div class="error" *ngIf="form.controls.password.touched && form.controls.password.errors?.['pattern']">
+            Password must contain upper case, lower case and special character.
+          </div>
+        </div>
+      </div>
+
+      <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+      <div class="actions">
+        <button type="submit" class="primary">Login</button>
+        <button type="button" class="link-btn" (click)="goToRegister()">New customer? Register</button>
+      </div>
+    </form>
+
+    <p class="hint">Officer login (hardcoded): <strong>officer01 / Officer&#64;123</strong></p>
+  </div>
+</div>
