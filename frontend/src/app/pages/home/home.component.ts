@@ -40,6 +40,7 @@ export class HomeComponent implements OnInit {
     } else {
       this.menuItems = [
         { label: 'Home', path: '/home' },
+        { label: 'Booking Service', path: '/booking' },
         { label: 'Tracking', path: '/tracking' },
         { label: 'Delivery Status', path: '/delivery-status' },
         { label: 'Pickup Scheduling', path: '/pickup-scheduling' },

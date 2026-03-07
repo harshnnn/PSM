@@ -4,6 +4,7 @@ import { RegisterComponent } from './pages/register/register.component';
 import { RegistrationAckComponent } from './pages/registration-ack/registration-ack.component';
 import { HomeComponent } from './pages/home/home.component';
 import { PlaceholderComponent } from './pages/placeholder/placeholder.component';
+import { BookingComponent } from './pages/booking/booking.component';
 import { authGuard } from './services/auth.guard';
 
 export const routes: Routes = [
@@ -12,7 +13,7 @@ export const routes: Routes = [
 	{ path: 'register', component: RegisterComponent },
 	{ path: 'registration-ack', component: RegistrationAckComponent },
 	{ path: 'home', component: HomeComponent, canActivate: [authGuard] },
-	{ path: 'booking', component: PlaceholderComponent, canActivate: [authGuard], data: { title: 'Booking Service' } },
+	{ path: 'booking', component: BookingComponent, canActivate: [authGuard] },
 	{ path: 'tracking', component: PlaceholderComponent, canActivate: [authGuard], data: { title: 'Tracking' } },
 	{ path: 'previous-booking', component: PlaceholderComponent, canActivate: [authGuard], data: { title: 'Previous Booking' } },
 	{ path: 'support', component: PlaceholderComponent, canActivate: [authGuard], data: { title: 'Contact Support' } },
