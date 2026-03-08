@@ -14,18 +14,18 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -90,7 +90,10 @@ public class BookingHistoryController {
         }
         base.append(" ORDER BY created_at DESC LIMIT ? OFFSET ?");
 
-        List<BookingHistory> rows = jdbcTemplate.query(base.toString(), paramsWithPaging(params, pageable), bookingRowMapper());
+        List<BookingHistory> rows = jdbcTemplate.query(
+            Objects.requireNonNull(base.toString()),
+            bookingRowMapper(),
+            paramsWithPaging(params, pageable));
 
         // Count total
         StringBuilder countSql = new StringBuilder("SELECT COUNT(*) FROM bookings WHERE created_at BETWEEN ? AND ?");
@@ -101,9 +104,13 @@ public class BookingHistoryController {
         } else {
             countParams = new Object[]{start, end};
         }
-        long total = jdbcTemplate.queryForObject(countSql.toString(), countParams, Long.class);
+        Long totalCount = jdbcTemplate.queryForObject(
+            Objects.requireNonNull(countSql.toString()),
+            Long.class,
+            (Object[]) countParams);
+        long total = totalCount != null ? totalCount : 0L;
 
-        return new PageImpl<>(rows, pageable, total);
+        return new PageImpl<>(rows, Objects.requireNonNull(pageable), total);
     }
 
     private Object[] paramsWithPaging(Object[] baseParams, Pageable pageable) {
@@ -114,26 +121,23 @@ public class BookingHistoryController {
         return result;
     }
 
-    private RowMapper<BookingHistory> bookingRowMapper() {
-        return new RowMapper<>() {
-            @Override
-            public BookingHistory mapRow(ResultSet rs, int rowNum) throws SQLException {
-                BookingHistory bh = new BookingHistory();
-                bh.setId(rs.getLong("id"));
-                String resolvedCustomerId = rs.getString("customer_id");
-                if (resolvedCustomerId == null || resolvedCustomerId.isBlank()) {
-                    resolvedCustomerId = rs.getString("sender_name");
-                }
-                bh.setCustomerId(resolvedCustomerId);
-                bh.setBookingId("BKG-" + rs.getLong("id"));
-                bh.setBookingDate(rs.getTimestamp("created_at").toLocalDateTime());
-                bh.setReceiverName(rs.getString("receiver_name"));
-                bh.setDeliveredAddress(rs.getString("receiver_address"));
-                bh.setAmount(rs.getBigDecimal("service_cost"));
-                String status = rs.getString("booking_status");
-                bh.setStatus(mapStatus(status));
-                return bh;
+    private @NonNull RowMapper<BookingHistory> bookingRowMapper() {
+        return (rs, rowNum) -> {
+            BookingHistory bh = new BookingHistory();
+            bh.setId(rs.getLong("id"));
+            String resolvedCustomerId = rs.getString("customer_id");
+            if (resolvedCustomerId == null || resolvedCustomerId.isBlank()) {
+                resolvedCustomerId = rs.getString("sender_name");
             }
+            bh.setCustomerId(resolvedCustomerId);
+            bh.setBookingId("BKG-" + rs.getLong("id"));
+            bh.setBookingDate(rs.getTimestamp("created_at").toLocalDateTime());
+            bh.setReceiverName(rs.getString("receiver_name"));
+            bh.setDeliveredAddress(rs.getString("receiver_address"));
+            bh.setAmount(rs.getBigDecimal("service_cost"));
+            String status = rs.getString("booking_status");
+            bh.setStatus(mapStatus(status));
+            return bh;
         };
     }
 

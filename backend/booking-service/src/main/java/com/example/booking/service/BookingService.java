@@ -9,7 +9,7 @@ public interface BookingService {
 
     BookingResponse create(BookingRequest request);
 
-    BookingResponse get(Long id);
+    BookingResponse get(long id);
 
     List<BookingResponse> list();
 }
