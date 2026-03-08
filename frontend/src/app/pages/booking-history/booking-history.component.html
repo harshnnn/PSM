@@ -1,0 +1,74 @@
+<div class="page" *ngIf="session">
+  <div class="card">
+    <header class="top">
+      <div>
+        <h1>Booking History</h1>
+        <p class="subtitle">{{ isCustomer ? 'Customer view' : 'Officer view' }}</p>
+      </div>
+      <div class="user-block">
+        <span>Welcome {{ session.username }}</span>
+        <button class="secondary" (click)="logout()">Logout</button>
+      </div>
+    </header>
+
+    <section *ngIf="!isCustomer" class="filters">
+      <div class="filter-row">
+        <label>Customer ID</label>
+        <input type="text" [(ngModel)]="searchCustomerId" placeholder="Enter customer ID" />
+      </div>
+      <div class="filter-row grid-two">
+        <div>
+          <label>Start Date</label>
+          <input type="date" [(ngModel)]="startDate" />
+        </div>
+        <div>
+          <label>End Date</label>
+          <input type="date" [(ngModel)]="endDate" />
+        </div>
+      </div>
+      <div class="actions">
+        <button class="primary" (click)="search()">Search</button>
+        <button class="secondary" (click)="startDate=null; endDate=null; searchCustomerId=''">Clear</button>
+      </div>
+    </section>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Customer ID</th>
+            <th>Booking ID</th>
+            <th>Booking Date</th>
+            <th>Receiver Name</th>
+            <th>Delivered Address</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let entry of entries">
+            <td>{{ entry.customerId }}</td>
+            <td>{{ entry.bookingId }}</td>
+            <td>{{ entry.bookingDate | date: 'medium' }}</td>
+            <td>{{ entry.receiverName }}</td>
+            <td>{{ entry.deliveredAddress }}</td>
+            <td>{{ entry.amount | currency }}</td>
+            <td><span class="pill">{{ entry.status }}</span></td>
+          </tr>
+          <tr *ngIf="!loading && entries.length === 0">
+            <td colspan="7" class="empty">No records found.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="loading" *ngIf="loading">Loading...</div>
+    </div>
+
+    <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <div class="pager">
+      <button class="secondary" (click)="prev()" [disabled]="page === 0">Previous</button>
+      <span>Page {{ page + 1 }} of {{ totalPages || 1 }}</span>
+      <button class="secondary" (click)="next()" [disabled]="last">Next</button>
+    </div>
+  </div>
+</div>

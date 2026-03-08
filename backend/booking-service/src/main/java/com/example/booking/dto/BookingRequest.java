@@ -17,6 +17,10 @@ import jakarta.validation.constraints.Size;
 
 public class BookingRequest {
 
+    @NotBlank
+    @Size(max = 50)
+    private String customerId;
+
     // Sender info (read-only in UI for customer scenario)
     @NotBlank
     @Size(max = 50)
@@ -83,6 +87,14 @@ public class BookingRequest {
     private boolean trackingEnabled = true;
 
     public BookingRequest() {
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 
     public String getSenderName() {

@@ -1,0 +1,171 @@
+.page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  padding: 32px;
+  color: #e2e8f0;
+}
+
+.card {
+  background: #0b1222;
+  border: 1px solid #233143;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.subtitle {
+  color: #94a3b8;
+  margin: 4px 0 0;
+}
+
+.user-block {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.filters {
+  background: #111827;
+  border: 1px solid #233143;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.filter-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.grid-two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+input {
+  background: #0f172a;
+  border: 1px solid #233143;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #e2e8f0;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid #233143;
+  border-radius: 10px;
+  background: #0f172a;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 12px 10px;
+  text-align: left;
+  border-bottom: 1px solid #1f2937;
+}
+
+th {
+  color: #cbd5e1;
+  font-weight: 600;
+  background: #111827;
+}
+
+td {
+  color: #e2e8f0;
+}
+
+.pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #1d4ed8;
+  color: #e2e8f0;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.empty {
+  text-align: center;
+  color: #94a3b8;
+}
+
+.loading {
+  padding: 12px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.error {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #7f1d1d;
+  color: #fecdd3;
+}
+
+.pager {
+  margin-top: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
+  color: #cbd5e1;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.primary {
+  background: #2563eb;
+  color: #e2e8f0;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+}
+
+.secondary {
+  background: #1f2937;
+  color: #e2e8f0;
+  border: 1px solid #233143;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+@media (max-width: 720px) {
+  .top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pager {
+    justify-content: center;
+  }
+}

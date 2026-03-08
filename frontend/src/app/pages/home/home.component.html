@@ -2,9 +2,9 @@
   <header class="top-bar">
     <nav class="menu">
       <button *ngFor="let item of menuItems" (click)="navigate(item.path)">{{ item.label }}</button>
-      <button (click)="logout()">Logout</button>
+      <!-- <button (click)="logout()">Logout</button> -->
     </nav>
-    <div class="welcome">Welcome {{ session.username }}</div>
+    <!-- <div class="welcome">Welcome {{ session.username }}</div> -->
   </header>
 
   <main class="content">

@@ -1,1 +1,20 @@
-<router-outlet></router-outlet>
+<div class="app-shell" [class.authenticated]="session">
+	<header *ngIf="session" class="navbar">
+		<div class="brand">PSM Logistics</div>
+		<nav class="links">
+			<a routerLink="/home" routerLinkActive="active">Home</a>
+			<a routerLink="/booking" routerLinkActive="active">Booking</a>
+			<a routerLink="/previous-booking" routerLinkActive="active">History</a>
+			<a routerLink="/tracking" routerLinkActive="active">Tracking</a>
+			<a routerLink="/support" routerLinkActive="active">Support</a>
+		</nav>
+		<div class="user">
+			<span>{{ session.username }} ({{ session.role }})</span>
+			<button class="ghost" (click)="logout()">Logout</button>
+		</div>
+	</header>
+
+	<main class="page">
+		<router-outlet></router-outlet>
+	</main>
+</div>

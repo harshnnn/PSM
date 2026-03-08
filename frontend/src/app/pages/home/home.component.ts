@@ -29,24 +29,24 @@ export class HomeComponent implements OnInit {
       return;
     }
 
-    if (this.session.role === 'CUSTOMER') {
-      this.menuItems = [
-        { label: 'Home', path: '/home' },
-        { label: 'Booking Service', path: '/booking' },
-        { label: 'Tracking', path: '/tracking' },
-        { label: 'Previous Booking', path: '/previous-booking' },
-        { label: 'Contact Support', path: '/support' }
-      ];
-    } else {
-      this.menuItems = [
-        { label: 'Home', path: '/home' },
-        { label: 'Booking Service', path: '/booking' },
-        { label: 'Tracking', path: '/tracking' },
-        { label: 'Delivery Status', path: '/delivery-status' },
-        { label: 'Pickup Scheduling', path: '/pickup-scheduling' },
-        { label: 'Previous Booking', path: '/previous-booking' }
-      ];
-    }
+    // if (this.session.role === 'CUSTOMER') {
+    //   this.menuItems = [
+    //     { label: 'Home', path: '/home' },
+    //     { label: 'Booking Service', path: '/booking' },
+    //     { label: 'Tracking', path: '/tracking' },
+    //     { label: 'Previous Booking', path: '/previous-booking' },
+    //     { label: 'Contact Support', path: '/support' }
+    //   ];
+    // } else {
+    //   this.menuItems = [
+    //     { label: 'Home', path: '/home' },
+    //     { label: 'Booking Service', path: '/booking' },
+    //     { label: 'Tracking', path: '/tracking' },
+    //     { label: 'Delivery Status', path: '/delivery-status' },
+    //     { label: 'Pickup Scheduling', path: '/pickup-scheduling' },
+    //     { label: 'Previous Booking', path: '/previous-booking' }
+    //   ];
+    // }
   }
 
   navigate(path: string): void {

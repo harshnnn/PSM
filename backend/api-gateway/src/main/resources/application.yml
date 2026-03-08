@@ -29,6 +29,10 @@ spring:
           uri: lb://booking-service
           predicates:
             - Path=/api/bookings/**
+        - id: booking-history-service
+          uri: lb://booking-history-service
+          predicates:
+            - Path=/api/history/**
 
 eureka:
   client:

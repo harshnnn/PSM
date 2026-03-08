@@ -10,6 +10,7 @@ export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED';
 export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED';
 
 export interface BookingRequest {
+  customerId: string;
   senderName: string;
   senderAddress: string;
   senderContact: string;

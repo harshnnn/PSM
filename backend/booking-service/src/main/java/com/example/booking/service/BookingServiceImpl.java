@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.booking.dto.BookingRequest;
 import com.example.booking.dto.BookingResponse;
 import com.example.booking.entity.Booking;
+import com.example.booking.entity.BookingHistoryRecord;
+import com.example.booking.repository.BookingHistoryRepository;
 import com.example.booking.repository.BookingRepository;
 
 @Service
@@ -15,9 +17,11 @@ import com.example.booking.repository.BookingRepository;
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
+    private final BookingHistoryRepository bookingHistoryRepository;
 
-    public BookingServiceImpl(BookingRepository bookingRepository) {
+    public BookingServiceImpl(BookingRepository bookingRepository, BookingHistoryRepository bookingHistoryRepository) {
         this.bookingRepository = bookingRepository;
+        this.bookingHistoryRepository = bookingHistoryRepository;
     }
 
     @Override
@@ -41,6 +45,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setInsuranceSelected(request.isInsuranceSelected());
         booking.setTrackingEnabled(request.isTrackingEnabled());
         Booking saved = bookingRepository.save(booking);
+        persistHistory(saved, request.getCustomerId());
         return toResponse(saved);
     }
 
@@ -77,5 +82,25 @@ public class BookingServiceImpl implements BookingService {
         dto.setPreferredPickup(booking.getPreferredPickup());
         dto.setCreatedAt(booking.getCreatedAt());
         return dto;
+    }
+
+    private void persistHistory(Booking booking, String customerId) {
+        BookingHistoryRecord record = new BookingHistoryRecord();
+        record.setCustomerId(customerId != null && !customerId.isBlank() ? customerId : booking.getSenderName());
+        record.setBookingId("BKG-" + booking.getId());
+        record.setBookingDate(booking.getCreatedAt());
+        record.setReceiverName(booking.getReceiverName());
+        record.setDeliveredAddress(booking.getReceiverAddress());
+        record.setAmount(booking.getServiceCost());
+        record.setStatus(mapStatus(booking.getBookingStatus()));
+        bookingHistoryRepository.save(record);
+    }
+
+    private BookingHistoryRecord.BookingStatus mapStatus(Booking.BookingStatus status) {
+        return switch (status) {
+            case CONFIRMED -> BookingHistoryRecord.BookingStatus.CONFIRMED;
+            case CANCELLED -> BookingHistoryRecord.BookingStatus.CANCELLED;
+            default -> BookingHistoryRecord.BookingStatus.PENDING;
+        };
     }
 }

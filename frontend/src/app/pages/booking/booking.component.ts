@@ -81,7 +81,10 @@ export class BookingComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const payload = this.form.getRawValue() as BookingRequest;
+    const payload = {
+      ...(this.form.getRawValue() as BookingRequest),
+      customerId: this.session?.username ?? 'anonymous'
+    } satisfies BookingRequest;
     this.bookingApi.create(payload).subscribe({
       next: (res) => {
         this.successMessage = `Booking created with ID ${res.id}. Payment status: ${res.paymentStatus}.`;
