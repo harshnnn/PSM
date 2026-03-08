@@ -30,6 +30,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setSenderName(request.getSenderName());
         booking.setSenderAddress(request.getSenderAddress());
         booking.setSenderContact(request.getSenderContact());
+        booking.setCustomerId(request.getCustomerId());
         booking.setReceiverName(request.getReceiverName());
         booking.setReceiverAddress(request.getReceiverAddress());
         booking.setReceiverPinCode(request.getReceiverPinCode());
@@ -86,7 +87,10 @@ public class BookingServiceImpl implements BookingService {
 
     private void persistHistory(Booking booking, String customerId) {
         BookingHistoryRecord record = new BookingHistoryRecord();
-        record.setCustomerId(customerId != null && !customerId.isBlank() ? customerId : booking.getSenderName());
+        String resolvedCustomerId = customerId != null && !customerId.isBlank()
+            ? customerId
+            : booking.getCustomerId();
+        record.setCustomerId(resolvedCustomerId != null && !resolvedCustomerId.isBlank() ? resolvedCustomerId : booking.getSenderName());
         record.setBookingId("BKG-" + booking.getId());
         record.setBookingDate(booking.getCreatedAt());
         record.setReceiverName(booking.getReceiverName());

@@ -1,7 +1,5 @@
 package com.example.auth.service;
 
-import java.security.SecureRandom;
-
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +19,6 @@ public class AuthService {
 
     private final UserAccountRepository userAccountRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final SecureRandom random = new SecureRandom();
 
     public AuthService(UserAccountRepository userAccountRepository, BCryptPasswordEncoder passwordEncoder) {
         this.userAccountRepository = userAccountRepository;
@@ -37,7 +34,7 @@ public class AuthService {
             throw new IllegalArgumentException("User ID already exists");
         }
 
-        String customerUsername = generateCustomerUsername();
+        String customerUsername = request.getUserId();
 
         UserAccount user = new UserAccount();
         user.setCustomerName(request.getCustomerName());
@@ -81,14 +78,5 @@ public class AuthService {
                 user.getCountryCode(),
                 user.getMobileNumber(),
                 user.getEmail());
-    }
-
-    private String generateCustomerUsername() {
-        String username;
-        do {
-            username = "CUS" + (100000 + random.nextInt(900000));
-        } while (userAccountRepository.existsByCustomerUsername(username));
-
-        return username;
     }
 }

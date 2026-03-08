@@ -80,10 +80,10 @@ public class BookingHistoryController {
     }
 
     private Page<BookingHistory> fallbackFromBookings(String customerId, LocalDateTime start, LocalDateTime end, Pageable pageable) {
-        StringBuilder base = new StringBuilder("SELECT id, sender_name, created_at, receiver_name, receiver_address, service_cost, booking_status FROM bookings WHERE created_at BETWEEN ? AND ?");
+        StringBuilder base = new StringBuilder("SELECT id, customer_id, sender_name, created_at, receiver_name, receiver_address, service_cost, booking_status FROM bookings WHERE created_at BETWEEN ? AND ?");
         Object[] params;
         if (customerId != null && !customerId.isBlank()) {
-            base.append(" AND sender_name = ?");
+            base.append(" AND customer_id = ?");
             params = new Object[]{start, end, customerId};
         } else {
             params = new Object[]{start, end};
@@ -96,7 +96,7 @@ public class BookingHistoryController {
         StringBuilder countSql = new StringBuilder("SELECT COUNT(*) FROM bookings WHERE created_at BETWEEN ? AND ?");
         Object[] countParams;
         if (customerId != null && !customerId.isBlank()) {
-            countSql.append(" AND sender_name = ?");
+            countSql.append(" AND customer_id = ?");
             countParams = new Object[]{start, end, customerId};
         } else {
             countParams = new Object[]{start, end};
@@ -120,7 +120,11 @@ public class BookingHistoryController {
             public BookingHistory mapRow(ResultSet rs, int rowNum) throws SQLException {
                 BookingHistory bh = new BookingHistory();
                 bh.setId(rs.getLong("id"));
-                bh.setCustomerId(rs.getString("sender_name"));
+                String resolvedCustomerId = rs.getString("customer_id");
+                if (resolvedCustomerId == null || resolvedCustomerId.isBlank()) {
+                    resolvedCustomerId = rs.getString("sender_name");
+                }
+                bh.setCustomerId(resolvedCustomerId);
                 bh.setBookingId("BKG-" + rs.getLong("id"));
                 bh.setBookingDate(rs.getTimestamp("created_at").toLocalDateTime());
                 bh.setReceiverName(rs.getString("receiver_name"));
