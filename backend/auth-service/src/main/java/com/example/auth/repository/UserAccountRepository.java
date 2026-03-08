@@ -1,12 +1,14 @@
 package com.example.auth.repository;
 
-import com.example.auth.entity.UserAccount;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
+import com.example.auth.entity.UserAccount;
 
 public interface UserAccountRepository extends JpaRepository<UserAccount, Long> {
     Optional<UserAccount> findByUserId(String userId);
     boolean existsByUserId(String userId);
     boolean existsByCustomerUsername(String customerUsername);
+    Optional<UserAccount> findByCustomerUsername(String customerUsername);
 }

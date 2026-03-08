@@ -1,20 +1,39 @@
-<div class="home-page" *ngIf="session">
-  <header class="top-bar">
-    <nav class="menu">
-      <button *ngFor="let item of menuItems" (click)="navigate(item.path)">{{ item.label }}</button>
-      <!-- <button (click)="logout()">Logout</button> -->
-    </nav>
-    <!-- <div class="welcome">Welcome {{ session.username }}</div> -->
-  </header>
+<div class="home" *ngIf="session">
+  <div class="hero">
+    <div>
+      <p class="eyebrow">{{ session.role === 'CUSTOMER' ? 'Customer Dashboard' : 'Officer Dashboard' }}</p>
+      <h1>Welcome, {{ session.username }}</h1>
+      <p class="lede">
+        Manage bookings, view history, and track deliveries from a single, streamlined workspace.
+      </p>
+      <div class="cta-row">
+        <button class="primary" (click)="navigate('/booking')">Create booking</button>
+        <button class="secondary" (click)="navigate('/previous-booking')">View history</button>
+      </div>
+    </div>
+    <div class="stat-card">
+      <p class="label">Role</p>
+      <h2>{{ session.role }}</h2>
+      <p class="hint">Navigation is available in the top bar for quick access.</p>
+    </div>
+  </div>
 
-  <main class="content">
-    <h1>{{ session.role === 'CUSTOMER' ? 'Customer Dashboard' : 'Officer Dashboard' }}</h1>
-    <p>
-      {{
-        session.role === 'CUSTOMER'
-          ? 'Use the top menu for booking, tracking, previous bookings, and support.'
-          : 'Use the top menu for tracking, delivery status, pickup scheduling, and previous bookings.'
-      }}
-    </p>
-  </main>
+  <div class="tiles">
+    <div class="tile" (click)="navigate('/booking')">
+      <h3>Booking</h3>
+      <p>Create and manage new parcel bookings with live cost updates.</p>
+    </div>
+    <div class="tile" (click)="navigate('/previous-booking')">
+      <h3>History</h3>
+      <p>Search and filter previous bookings {{ session.role === 'CUSTOMER' ? 'for your account' : 'across all customers' }}.</p>
+    </div>
+    <div class="tile" (click)="navigate('/tracking')">
+      <h3>Tracking</h3>
+      <p>Track delivery milestones and statuses (coming soon).</p>
+    </div>
+    <div class="tile" (click)="navigate('/support')">
+      <h3>Support</h3>
+      <p>Contact support for delivery, pickup, or billing queries.</p>
+    </div>
+  </div>
 </div>

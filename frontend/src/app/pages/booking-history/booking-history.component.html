@@ -2,13 +2,11 @@
   <div class="card">
     <header class="top">
       <div>
+        <p class="eyebrow">{{ isCustomer ? 'Customer view' : 'Officer view' }}</p>
         <h1>Booking History</h1>
-        <p class="subtitle">{{ isCustomer ? 'Customer view' : 'Officer view' }}</p>
+        <p class="subtitle">Track every booking with filters and paging.</p>
       </div>
-      <div class="user-block">
-        <span>Welcome {{ session.username }}</span>
-        <button class="secondary" (click)="logout()">Logout</button>
-      </div>
+      <div class="badge">{{ session.username }}</div>
     </header>
 
     <section *ngIf="!isCustomer" class="filters">

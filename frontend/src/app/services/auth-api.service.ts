@@ -32,6 +32,15 @@ export interface LoginResponse {
   username: string;
 }
 
+export interface ProfileResponse {
+  customerUsername: string;
+  customerName: string;
+  address: string;
+  countryCode: string;
+  mobileNumber: string;
+  email: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthApiService {
   private readonly baseUrl = 'http://localhost:8080/auth';
@@ -44,5 +53,9 @@ export class AuthApiService {
 
   login(payload: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.baseUrl}/login`, payload);
+  }
+
+  profile(customerUsername: string): Observable<ProfileResponse> {
+    return this.http.get<ProfileResponse>(`${this.baseUrl}/profile/${customerUsername}`);
   }
 }

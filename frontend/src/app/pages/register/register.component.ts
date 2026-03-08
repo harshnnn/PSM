@@ -56,6 +56,15 @@ export class RegisterComponent {
 
     this.authApi.register(payload as any).subscribe({
       next: (response: RegisterResponse) => {
+        sessionStorage.setItem(
+          'registration-profile',
+          JSON.stringify({
+            customerName: payload.customerName,
+            address: payload.address,
+            countryCode: payload.countryCode,
+            mobileNumber: payload.mobileNumber
+          })
+        );
         this.sessionService.save({ username: response.customerUsername, role: 'CUSTOMER' });
         sessionStorage.setItem('registration-ack', JSON.stringify(response));
         this.router.navigate(['/registration-ack']);

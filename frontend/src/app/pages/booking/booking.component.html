@@ -1,145 +1,126 @@
 <div class="page">
-  <div class="card">
-    <h1>Booking Service</h1>
-    <p class="subtitle">{{ isCustomer ? 'Customer' : 'Officer' }} workflow with validations and cost preview.</p>
+  <div class="hero">
+    <div>
+      <p class="eyebrow">{{ isCustomer ? 'Customer' : 'Officer' }} workflow</p>
+      <h1>Create a Booking</h1>
+      <p class="lede">Collect sender, receiver, parcel, and payment details with instant cost estimation.</p>
+    </div>
+    <div class="cost-card">
+      <p class="label">Estimated Cost</p>
+      <h2>{{ form.get('serviceCost')?.value | currency:'USD' }}</h2>
+      <p class="hint">Auto-updates as you change parcel and shipping options.</p>
+    </div>
+  </div>
 
-    <form [formGroup]="form" (ngSubmit)="submit()">
-      <h3>1. Sender Information</h3>
-      <div class="form-row">
-        <div>
-          <label>Sender Name</label>
-          <input type="text" formControlName="senderName" [readonly]="isCustomer" />
-          <div class="error" *ngIf="form.get('senderName')?.touched && form.get('senderName')?.errors?.['required']">Sender Name is required.</div>
-          <div class="error" *ngIf="form.get('senderName')?.touched && form.get('senderName')?.errors?.['maxlength']">Max 50 characters.</div>
+  <form class="grid" [formGroup]="form" (ngSubmit)="submit()">
+    <section class="panel">
+      <header><span>1</span><h3>Sender</h3></header>
+      <div class="field">
+        <label>Sender Name</label>
+        <input type="text" formControlName="senderName" [readonly]="isCustomer" />
+        <div class="error" *ngIf="form.get('senderName')?.touched && form.get('senderName')?.errors?.['required']">Required.</div>
+      </div>
+      <div class="field">
+        <label>Sender Address</label>
+        <textarea rows="2" formControlName="senderAddress"></textarea>
+        <div class="error" *ngIf="form.get('senderAddress')?.touched && form.get('senderAddress')?.errors?.['required']">Required.</div>
+      </div>
+      <div class="field">
+        <label>Sender Contact</label>
+        <input type="text" formControlName="senderContact" />
+        <div class="error" *ngIf="form.get('senderContact')?.touched && form.get('senderContact')?.errors?.['pattern']">7-15 digits, optional +.</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <header><span>2</span><h3>Receiver</h3></header>
+      <div class="field">
+        <label>Receiver Name</label>
+        <input type="text" formControlName="receiverName" />
+      </div>
+      <div class="field">
+        <label>Receiver Address</label>
+        <textarea rows="2" formControlName="receiverAddress"></textarea>
+      </div>
+      <div class="columns">
+        <div class="field">
+          <label>Pin Code</label>
+          <input type="text" formControlName="receiverPinCode" />
         </div>
-        <div>
-          <label>Sender Address</label>
-          <textarea rows="2" formControlName="senderAddress"></textarea>
-          <div class="error" *ngIf="form.get('senderAddress')?.touched && form.get('senderAddress')?.errors?.['required']">Address is required.</div>
-          <div class="error" *ngIf="form.get('senderAddress')?.touched && form.get('senderAddress')?.errors?.['maxlength']">Max 200 characters.</div>
-        </div>
-        <div>
-          <label>Sender Contact</label>
-          <input type="text" formControlName="senderContact" />
-          <div class="error" *ngIf="form.get('senderContact')?.touched && form.get('senderContact')?.errors?.['required']">Contact is required.</div>
-          <div class="error" *ngIf="form.get('senderContact')?.touched && form.get('senderContact')?.errors?.['pattern']">Enter 7-15 digits (optional +).</div>
+        <div class="field">
+          <label>Receiver Contact</label>
+          <input type="text" formControlName="receiverContact" />
         </div>
       </div>
+    </section>
 
-      <h3>2. Receiver Information</h3>
-      <div class="form-row">
-        <div>
-          <label>Receiver Name</label>
-          <input type="text" formControlName="receiverName" />
-          <div class="error" *ngIf="form.get('receiverName')?.touched && form.get('receiverName')?.errors?.['required']">Receiver Name is required.</div>
-          <div class="error" *ngIf="form.get('receiverName')?.touched && form.get('receiverName')?.errors?.['maxlength']">Max 50 characters.</div>
-        </div>
-        <div>
-          <label>Receiver Address</label>
-          <textarea rows="2" formControlName="receiverAddress"></textarea>
-          <div class="error" *ngIf="form.get('receiverAddress')?.touched && form.get('receiverAddress')?.errors?.['required']">Address is required.</div>
-          <div class="error" *ngIf="form.get('receiverAddress')?.touched && form.get('receiverAddress')?.errors?.['maxlength']">Max 200 characters.</div>
-        </div>
-        <div class="grid-two">
-          <div>
-            <label>Pin Code</label>
-            <input type="text" formControlName="receiverPinCode" />
-            <div class="error" *ngIf="form.get('receiverPinCode')?.touched && form.get('receiverPinCode')?.errors?.['required']">Pin Code is required.</div>
-            <div class="error" *ngIf="form.get('receiverPinCode')?.touched && form.get('receiverPinCode')?.errors?.['pattern']">Enter 5-6 digits.</div>
-          </div>
-          <div>
-            <label>Receiver Contact</label>
-            <input type="text" formControlName="receiverContact" />
-            <div class="error" *ngIf="form.get('receiverContact')?.touched && form.get('receiverContact')?.errors?.['required']">Contact is required.</div>
-            <div class="error" *ngIf="form.get('receiverContact')?.touched && form.get('receiverContact')?.errors?.['pattern']">Enter 7-15 digits (optional +).</div>
-          </div>
-        </div>
-      </div>
-
-      <h3>3. Parcel Details</h3>
-      <div class="form-row grid-two">
-        <div>
+    <section class="panel">
+      <header><span>3</span><h3>Parcel & Shipping</h3></header>
+      <div class="columns">
+        <div class="field">
           <label>Parcel Size</label>
           <select formControlName="parcelSize">
             <option *ngFor="let size of parcelSizes" [value]="size">{{ size }}</option>
           </select>
         </div>
-        <div>
+        <div class="field">
           <label>Weight (kg)</label>
           <input type="number" formControlName="weightKg" step="0.1" min="0.1" />
-          <div class="error" *ngIf="form.get('weightKg')?.touched && form.get('weightKg')?.errors?.['required']">Weight is required.</div>
-          <div class="error" *ngIf="form.get('weightKg')?.touched && form.get('weightKg')?.errors?.['min']">Minimum 0.1 kg.</div>
-          <div class="error" *ngIf="form.get('weightKg')?.touched && form.get('weightKg')?.errors?.['pattern']">Up to 2 decimals allowed.</div>
         </div>
       </div>
-      <div class="form-row">
-        <div>
-          <label>Contents Description</label>
-          <textarea rows="2" formControlName="contentsDescription"></textarea>
-          <div class="error" *ngIf="form.get('contentsDescription')?.touched && form.get('contentsDescription')?.errors?.['required']">Description is required.</div>
-          <div class="error" *ngIf="form.get('contentsDescription')?.touched && form.get('contentsDescription')?.errors?.['maxlength']">Max 255 characters.</div>
-        </div>
+      <div class="field">
+        <label>Contents Description</label>
+        <textarea rows="2" formControlName="contentsDescription"></textarea>
       </div>
-
-      <h3>4. Shipping Options</h3>
-      <div class="form-row grid-two">
-        <div>
+      <div class="columns">
+        <div class="field">
           <label>Delivery Speed</label>
           <select formControlName="deliverySpeed">
             <option *ngFor="let speed of deliverySpeeds" [value]="speed">{{ speed }}</option>
           </select>
         </div>
-        <div>
+        <div class="field">
           <label>Packaging Preference</label>
           <select formControlName="packagingPreference">
             <option *ngFor="let pref of packagingPreferences" [value]="pref">{{ pref }}</option>
           </select>
         </div>
       </div>
-
-      <h3>5. Date and Time Selection</h3>
-      <div class="form-row">
-        <div>
-          <label>Preferred Pickup / Drop-off</label>
-          <input type="datetime-local" formControlName="preferredPickup" [min]="minPickup" />
-          <div class="error" *ngIf="form.get('preferredPickup')?.touched && form.get('preferredPickup')?.errors?.['required']">Pickup time is required.</div>
-        </div>
+      <div class="field">
+        <label>Preferred Pickup / Drop-off</label>
+        <input type="datetime-local" formControlName="preferredPickup" [min]="minPickup" />
       </div>
-
-      <h3>6. Service Cost and Payment</h3>
-      <div class="form-row grid-two">
-        <div>
-          <label>Calculated Cost (auto)</label>
-          <input type="number" formControlName="serviceCost" readonly />
-        </div>
-        <div>
+      <div class="columns">
+        <div class="field">
           <label>Payment Method</label>
           <select formControlName="paymentMethod">
             <option *ngFor="let method of paymentMethods" [value]="method">{{ method }}</option>
           </select>
         </div>
+        <div class="field toggles">
+          <label class="checkbox-row">
+            <input type="checkbox" formControlName="insuranceSelected" />
+            <span>Add Insurance</span>
+          </label>
+          <label class="checkbox-row">
+            <input type="checkbox" formControlName="trackingEnabled" />
+            <span>Enable Tracking</span>
+          </label>
+        </div>
       </div>
+    </section>
 
-      <h3>7. Additional Services</h3>
-      <div class="form-row grid-two">
-        <label class="checkbox-row">
-          <input type="checkbox" formControlName="insuranceSelected" />
-          <span>Add Insurance</span>
-        </label>
-        <label class="checkbox-row">
-          <input type="checkbox" formControlName="trackingEnabled" />
-          <span>Enable Tracking</span>
-        </label>
+    <section class="panel callout">
+      <header><span>4</span><h3>Review & Submit</h3></header>
+      <p class="muted">Validate inputs and confirm the booking. Cost is derived from parcel size, weight, speed, packaging, and extras.</p>
+      <div class="messages">
+        <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+        <div class="success" *ngIf="successMessage">{{ successMessage }}</div>
       </div>
-
-      <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
-      <div class="success" *ngIf="successMessage">{{ successMessage }}</div>
-
       <div class="actions">
         <button type="submit" class="primary">Submit Booking</button>
         <button type="button" class="secondary" (click)="reset()">Reset</button>
-        <button type="button" class="link-btn" (click)="goHome()">Back to Home</button>
       </div>
-    </form>
-  </div>
+    </section>
+  </form>
 </div>

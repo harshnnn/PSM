@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.auth.dto.LoginRequest;
 import com.example.auth.dto.LoginResponse;
+import com.example.auth.dto.ProfileResponse;
 import com.example.auth.dto.RegisterRequest;
 import com.example.auth.dto.RegisterResponse;
 import com.example.auth.entity.UserAccount;
@@ -67,6 +68,19 @@ public class AuthService {
         }
 
         return new LoginResponse("Login successful", user.getRole(), user.getCustomerUsername());
+    }
+
+    public ProfileResponse getProfile(String customerUsername) {
+        UserAccount user = userAccountRepository.findByCustomerUsername(customerUsername)
+                .orElseThrow(() -> new IllegalArgumentException("User profile not found"));
+
+        return new ProfileResponse(
+                user.getCustomerUsername(),
+                user.getCustomerName(),
+                user.getAddress(),
+                user.getCountryCode(),
+                user.getMobileNumber(),
+                user.getEmail());
     }
 
     private String generateCustomerUsername() {

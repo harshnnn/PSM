@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BookingApiService, BookingRequest, DeliverySpeed, PackagingPreference, ParcelSize, PaymentMethod } from '../../services/booking-api.service';
+import { AuthApiService, ProfileResponse } from '../../services/auth-api.service';
 import { SessionData, SessionService } from '../../services/session.service';
 import { Subscription } from 'rxjs';
 
@@ -25,10 +26,12 @@ export class BookingComponent implements OnInit, OnDestroy {
   successMessage = '';
   errorMessage = '';
   private valueChangeSub?: Subscription;
+  private profileSub?: Subscription;
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly bookingApi: BookingApiService,
+    private readonly authApi: AuthApiService,
     private readonly sessionService: SessionService,
     private readonly router: Router
   ) {}
@@ -69,6 +72,7 @@ export class BookingComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.valueChangeSub?.unsubscribe();
+    this.profileSub?.unsubscribe();
   }
 
   submit(): void {
@@ -152,12 +156,51 @@ export class BookingComponent implements OnInit, OnDestroy {
   }
 
   private prefillSender(): void {
-    if (!this.session) {
+    if (!this.session) return;
+
+    const stored = sessionStorage.getItem('registration-profile');
+    const profile = stored
+      ? (JSON.parse(stored) as { customerName: string; address: string; countryCode: string; mobileNumber: string })
+      : null;
+
+    const applyProfile = (data: { customerName: string; address: string; countryCode: string; mobileNumber: string }) => {
+      this.form.patchValue({
+        senderName: data.customerName,
+        senderAddress: data.address,
+        senderContact: `${data.countryCode}${data.mobileNumber}`
+      });
+    };
+
+    if (profile) {
+      applyProfile(profile);
+    } else {
+      this.form.patchValue({
+        senderName: this.session.username,
+        senderAddress: '',
+        senderContact: ''
+      });
+    }
+
+    if (this.session.role !== 'CUSTOMER') {
       return;
     }
 
-    this.form.patchValue({
-      senderName: this.session.username
+    this.profileSub = this.authApi.profile(this.session.username).subscribe({
+      next: (res: ProfileResponse) => {
+        sessionStorage.setItem(
+          'registration-profile',
+          JSON.stringify({
+            customerName: res.customerName,
+            address: res.address,
+            countryCode: res.countryCode,
+            mobileNumber: res.mobileNumber
+          })
+        );
+        applyProfile(res);
+      },
+      error: () => {
+        // Keep existing fallback values when profile fetch fails.
+      }
     });
   }
 
