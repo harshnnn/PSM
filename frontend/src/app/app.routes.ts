@@ -6,13 +6,13 @@ import { HomeComponent } from './pages/home/home.component';
 import { PlaceholderComponent } from './pages/placeholder/placeholder.component';
 import { BookingComponent } from './pages/booking/booking.component';
 import { BookingHistoryComponent } from './pages/booking-history/booking-history.component';
-import { authGuard } from './services/auth.guard';
+import { authGuard, redirectIfLoggedInGuard } from './services/auth.guard';
 
 export const routes: Routes = [
 	{ path: '', redirectTo: 'login', pathMatch: 'full' },
-	{ path: 'login', component: LoginComponent },
-	{ path: 'register', component: RegisterComponent },
-	{ path: 'registration-ack', component: RegistrationAckComponent },
+	{ path: 'login', component: LoginComponent, canActivate: [redirectIfLoggedInGuard] },
+	{ path: 'register', component: RegisterComponent, canActivate: [redirectIfLoggedInGuard] },
+	{ path: 'registration-ack', component: RegistrationAckComponent, canActivate: [redirectIfLoggedInGuard] },
 	{ path: 'home', component: HomeComponent, canActivate: [authGuard] },
 	{ path: 'booking', component: BookingComponent, canActivate: [authGuard] },
 	{ path: 'tracking', component: PlaceholderComponent, canActivate: [authGuard], data: { title: 'Tracking' } },

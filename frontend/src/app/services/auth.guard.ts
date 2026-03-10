@@ -13,3 +13,15 @@ export const authGuard: CanActivateFn = () => {
   router.navigate(['/login']);
   return false;
 };
+
+// If a user is already logged in, block access to login/register screens and push them home.
+export const redirectIfLoggedInGuard: CanActivateFn = () => {
+  const sessionService = inject(SessionService);
+  const router = inject(Router);
+
+  if (sessionService.isLoggedIn()) {
+    return router.createUrlTree(['/home']);
+  }
+
+  return true;
+};
