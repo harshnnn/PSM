@@ -9,10 +9,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.booking.dto.BookingRequest;
 import com.example.booking.dto.BookingResponse;
+import com.example.booking.dto.PaymentUpdateRequest;
 import com.example.booking.service.BookingService;
 
 import jakarta.validation.Valid;
@@ -36,6 +38,12 @@ public class BookingController {
     @GetMapping("/{id}")
     public ResponseEntity<BookingResponse> get(@PathVariable long id) {
         return ResponseEntity.ok(bookingService.get(id));
+    }
+
+    @PutMapping("/{id}/payment")
+    public ResponseEntity<BookingResponse> updatePayment(@PathVariable long id,
+                                                         @Valid @RequestBody PaymentUpdateRequest request) {
+        return ResponseEntity.ok(bookingService.updatePaymentStatus(id, request));
     }
 
     @GetMapping

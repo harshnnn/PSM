@@ -25,6 +25,8 @@ export class BookingComponent implements OnInit, OnDestroy {
   isCustomer = false;
   successMessage = '';
   errorMessage = '';
+  lastBookingId: number | null = null;
+  lastBookingAmount = 0;
   private valueChangeSub?: Subscription;
   private profileSub?: Subscription;
 
@@ -92,6 +94,8 @@ export class BookingComponent implements OnInit, OnDestroy {
     this.bookingApi.create(payload).subscribe({
       next: (res) => {
         this.successMessage = `Booking created with ID ${res.id}. Payment status: ${res.paymentStatus}.`;
+        this.lastBookingId = res.id;
+        this.lastBookingAmount = res.serviceCost;
         this.form.reset({
           senderName: this.form.get('senderName')?.value,
           senderAddress: this.form.get('senderAddress')?.value,
@@ -110,14 +114,17 @@ export class BookingComponent implements OnInit, OnDestroy {
         const payloadError = error?.error;
         if (typeof payloadError === 'string') {
           this.errorMessage = payloadError;
+          this.lastBookingId = null;
           return;
         }
         if (payloadError && typeof payloadError === 'object') {
           const first = Object.values(payloadError)[0];
           this.errorMessage = typeof first === 'string' ? first : 'Booking failed. Please try again.';
+          this.lastBookingId = null;
           return;
         }
         this.errorMessage = 'Booking failed. Please try again.';
+        this.lastBookingId = null;
       }
     });
   }
@@ -147,6 +154,15 @@ export class BookingComponent implements OnInit, OnDestroy {
 
   goHome(): void {
     this.router.navigate(['/home']);
+  }
+
+  goToPayBill(): void {
+    if (!this.lastBookingId) return;
+    this.router.navigate(['/pay-bill'], {
+      queryParams: {
+        bookingId: this.lastBookingId
+      }
+    });
   }
 
   get minPickup(): string {

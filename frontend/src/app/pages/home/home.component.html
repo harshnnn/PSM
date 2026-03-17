@@ -23,6 +23,10 @@
       <h3>Booking</h3>
       <p>Create and manage new parcel bookings with live cost updates.</p>
     </div>
+    <div class="tile" (click)="navigate('/pay-bill')">
+      <h3>Pay Bill</h3>
+      <p>Settle booking payments securely using debit or credit cards.</p>
+    </div>
     <div class="tile" (click)="navigate('/previous-booking')">
       <h3>History</h3>
       <p>Search and filter previous bookings {{ session.role === 'CUSTOMER' ? 'for your account' : 'across all customers' }}.</p>

@@ -1,0 +1,29 @@
+<div class="invoice">
+  <div class="card">
+    <p class="eyebrow">Payment Successful</p>
+    <h1>Thank you!</h1>
+    <p class="lede">Your payment has been processed. Below are your details.</p>
+
+    <div class="summary">
+      <div>
+        <p class="label">Booking ID</p>
+        <h3 *ngIf="bookingId; else missing">{{ bookingId }}</h3>
+        <ng-template #missing><span>Not provided</span></ng-template>
+      </div>
+      <div>
+        <p class="label">Amount</p>
+        <h3 *ngIf="amount !== null; else missingAmount">{{ amount | currency }}</h3>
+        <ng-template #missingAmount><span>Not provided</span></ng-template>
+      </div>
+      <div>
+        <p class="label">Transaction Ref</p>
+        <h3>{{ transactionRef || 'N/A' }}</h3>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="primary" (click)="goHome()">Back to Home</button>
+      <button class="secondary" (click)="viewHistory()">View Booking History</button>
+    </div>
+  </div>
+</div>

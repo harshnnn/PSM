@@ -115,7 +115,10 @@
       <p class="muted">Validate inputs and confirm the booking. Cost is derived from parcel size, weight, speed, packaging, and extras.</p>
       <div class="messages">
         <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
-        <div class="success" *ngIf="successMessage">{{ successMessage }}</div>
+        <div class="success" *ngIf="successMessage">
+          {{ successMessage }}
+          <button class="link" *ngIf="lastBookingId" type="button" (click)="goToPayBill()">Pay this bill</button>
+        </div>
       </div>
       <div class="actions">
         <button type="submit" class="primary">Submit Booking</button>

@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.booking.dto.BookingRequest;
 import com.example.booking.dto.BookingResponse;
+import com.example.booking.dto.PaymentUpdateRequest;
 import com.example.booking.entity.Booking;
 import com.example.booking.entity.BookingHistoryRecord;
 import com.example.booking.repository.BookingHistoryRepository;
@@ -65,6 +66,26 @@ public class BookingServiceImpl implements BookingService {
                 .stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    @Override
+    public BookingResponse updatePaymentStatus(long id, PaymentUpdateRequest request) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
+
+        if (request.getPaymentStatus() != null) {
+            booking.setPaymentStatus(request.getPaymentStatus());
+        }
+
+        if (request.getBookingStatus() != null) {
+            booking.setBookingStatus(request.getBookingStatus());
+        } else if (request.getPaymentStatus() == Booking.PaymentStatus.PAID
+                && booking.getBookingStatus() == Booking.BookingStatus.PENDING) {
+            booking.setBookingStatus(Booking.BookingStatus.CONFIRMED);
+        }
+
+        Booking saved = bookingRepository.save(booking);
+        return toResponse(saved);
     }
 
     private BookingResponse toResponse(Booking booking) {

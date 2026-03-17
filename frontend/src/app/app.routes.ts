@@ -6,6 +6,8 @@ import { HomeComponent } from './pages/home/home.component';
 import { PlaceholderComponent } from './pages/placeholder/placeholder.component';
 import { BookingComponent } from './pages/booking/booking.component';
 import { BookingHistoryComponent } from './pages/booking-history/booking-history.component';
+import { PayBillComponent } from './pages/pay-bill/pay-bill.component';
+import { InvoiceComponent } from './pages/invoice/invoice.component';
 import { authGuard, redirectIfLoggedInGuard } from './services/auth.guard';
 
 export const routes: Routes = [
@@ -15,6 +17,8 @@ export const routes: Routes = [
 	{ path: 'registration-ack', component: RegistrationAckComponent, canActivate: [redirectIfLoggedInGuard] },
 	{ path: 'home', component: HomeComponent, canActivate: [authGuard] },
 	{ path: 'booking', component: BookingComponent, canActivate: [authGuard] },
+	{ path: 'pay-bill', component: PayBillComponent, canActivate: [authGuard] },
+	{ path: 'invoice', component: InvoiceComponent, canActivate: [authGuard] },
 	{ path: 'tracking', component: PlaceholderComponent, canActivate: [authGuard], data: { title: 'Tracking' } },
 	{ path: 'previous-booking', component: BookingHistoryComponent, canActivate: [authGuard] },
 	{ path: 'previous-bookings', redirectTo: 'previous-booking', pathMatch: 'full' },

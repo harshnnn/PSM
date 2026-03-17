@@ -1,0 +1,140 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 18px;
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+}
+
+.user {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.ghost {
+  background: transparent;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.panel {
+  background: #0f172a;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+header h3 {
+  margin: 0 0 8px 0;
+}
+
+.bill-form label,
+.card-form label {
+  display: block;
+  color: #cbd5e1;
+  margin: 10px 0 4px;
+}
+
+.bill-form input,
+.card-form input,
+.bill-form select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #1f2937;
+  background: #111827;
+  color: #e2e8f0;
+}
+
+.inline {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.inline input {
+  flex: 1;
+}
+
+.actions {
+  margin-top: 14px;
+  display: flex;
+  gap: 10px;
+}
+
+.primary {
+  background: linear-gradient(120deg, #3b82f6, #22d3ee);
+  color: #0b1020;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.secondary {
+  background: #1e293b;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.radio-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 6px;
+}
+
+.amount {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #111827;
+  border: 1px solid #1f2937;
+}
+
+.messages {
+  margin-top: 12px;
+}
+
+.error {
+  color: #fca5a5;
+  background: #450a0a;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.success {
+  color: #a7f3d0;
+  background: #064e3b;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.muted {
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
+
+.mt { margin-top: 10px; }

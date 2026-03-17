@@ -1,0 +1,66 @@
+<div class="page" *ngIf="session">
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Pay Bill</p>
+      <h1>Booking Payment</h1>
+      <p class="lede">Review your bill, choose payment mode, and complete the card payment securely.</p>
+    </div>
+    <div class="user">
+      <span>Welcome {{ session.username }}</span>
+      <button class="ghost" (click)="logout()">Logout</button>
+    </div>
+  </header>
+
+  <section class="grid">
+    <div class="panel">
+      <header><h3>Bill Details</h3></header>
+      <form [formGroup]="billForm" class="bill-form" (ngSubmit)="loadBill()">
+        <label>Booking ID</label>
+        <div class="inline">
+          <input type="number" formControlName="bookingId" placeholder="Enter booking ID" />
+          <button class="secondary" type="submit" [disabled]="loadingBill">{{ loadingBill ? 'Loading...' : 'Fetch Bill' }}</button>
+        </div>
+        <label class="mt">Mode of Payment</label>
+        <div class="radio-row">
+          <label><input type="radio" value="DEBIT" formControlName="paymentMode" /> Debit</label>
+          <label><input type="radio" value="CREDIT" formControlName="paymentMode" /> Credit</label>
+        </div>
+        <div class="amount" *ngIf="bill">
+          <p class="label">Bill Amount</p>
+          <h2>{{ bill.amount | currency }}</h2>
+          <p class="hint">Payment status: {{ bill.paymentStatus }} | Booking status: {{ bill.bookingStatus }}</p>
+        </div>
+        <div class="actions">
+          <button class="primary" type="button" (click)="proceedToCard()" [disabled]="!bill">Pay Now</button>
+          <button class="ghost" type="button" (click)="goHome()">Back to Home</button>
+        </div>
+      </form>
+      <div class="messages">
+        <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+        <div class="success" *ngIf="successMessage">{{ successMessage }}</div>
+      </div>
+    </div>
+
+    <div class="panel" *ngIf="showCardForm">
+      <header><h3>Card Details</h3></header>
+      <p class="muted">Credit Card</p>
+      <form [formGroup]="cardForm" (ngSubmit)="makePayment()" class="card-form">
+        <label>Card Number</label>
+        <input type="text" formControlName="cardNumber" placeholder="16 digits" />
+        <label>Card Holder Name</label>
+        <input type="text" formControlName="cardHolderName" />
+        <div class="inline">
+          <div>
+            <label>Expiry (MM/YY)</label>
+            <input type="text" formControlName="expiry" placeholder="MM/YY" />
+          </div>
+          <div>
+            <label>CVV</label>
+            <input type="password" formControlName="cvv" placeholder="123" />
+          </div>
+        </div>
+        <button class="primary" type="submit" [disabled]="loadingPayment">{{ loadingPayment ? 'Processing...' : 'Make Payment' }}</button>
+      </form>
+    </div>
+  </section>
+</div>

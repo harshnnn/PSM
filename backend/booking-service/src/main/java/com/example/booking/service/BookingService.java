@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.booking.dto.BookingRequest;
 import com.example.booking.dto.BookingResponse;
+import com.example.booking.dto.PaymentUpdateRequest;
 
 public interface BookingService {
 
@@ -12,4 +13,6 @@ public interface BookingService {
     BookingResponse get(long id);
 
     List<BookingResponse> list();
+
+    BookingResponse updatePaymentStatus(long id, PaymentUpdateRequest request);
 }

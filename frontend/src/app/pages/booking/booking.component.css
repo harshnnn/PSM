@@ -145,6 +145,15 @@ textarea {
   margin-top: 8px;
 }
 
+.link {
+  margin-left: 8px;
+  background: transparent;
+  color: #67e8f9;
+  border: 1px dashed #22d3ee;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
 .muted {
   color: #94a3b8;
 }
