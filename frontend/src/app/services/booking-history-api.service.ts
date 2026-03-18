@@ -6,6 +6,7 @@ export interface BookingHistoryEntry {
   id: number;
   customerId: string;
   bookingId: string;
+  trackingBookingId?: string | null;
   bookingDate: string;
   receiverName: string;
   deliveredAddress: string;

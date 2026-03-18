@@ -35,7 +35,8 @@
         <thead>
           <tr>
             <th>Customer ID</th>
-            <th>Booking ID</th>
+            <th>Booking Number</th>
+            <th>Booking ID (Tracking)</th>
             <th>Booking Date</th>
             <th>Receiver Name</th>
             <th>Delivered Address</th>
@@ -47,6 +48,7 @@
           <tr *ngFor="let entry of entries">
             <td>{{ entry.customerId }}</td>
             <td>{{ entry.bookingId }}</td>
+            <td>{{ entry.trackingBookingId || 'Not generated yet' }}</td>
             <td>{{ entry.bookingDate | date: 'medium' }}</td>
             <td>{{ entry.receiverName }}</td>
             <td>{{ entry.deliveredAddress }}</td>
@@ -54,7 +56,7 @@
             <td><span class="pill">{{ entry.status }}</span></td>
           </tr>
           <tr *ngIf="!loading && entries.length === 0">
-            <td colspan="7" class="empty">No records found.</td>
+            <td colspan="8" class="empty">No records found.</td>
           </tr>
         </tbody>
       </table>

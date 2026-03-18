@@ -8,6 +8,7 @@ public class BookingHistoryDto {
     private Long id;
     private String customerId;
     private String bookingId;
+    private String trackingBookingId;
     private LocalDateTime bookingDate;
     private String receiverName;
     private String deliveredAddress;
@@ -36,6 +37,14 @@ public class BookingHistoryDto {
 
     public void setBookingId(String bookingId) {
         this.bookingId = bookingId;
+    }
+
+    public String getTrackingBookingId() {
+        return trackingBookingId;
+    }
+
+    public void setTrackingBookingId(String trackingBookingId) {
+        this.trackingBookingId = trackingBookingId;
     }
 
     public LocalDateTime getBookingDate() {

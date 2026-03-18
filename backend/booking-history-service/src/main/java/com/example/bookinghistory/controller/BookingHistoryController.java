@@ -1,5 +1,6 @@
 package com.example.bookinghistory.controller;
 
+import com.example.bookinghistory.client.TrackingLookupClient;
 import com.example.bookinghistory.dto.BookingHistoryDto;
 import com.example.bookinghistory.dto.PageResponse;
 import com.example.bookinghistory.entity.BookingHistory;
@@ -34,10 +35,15 @@ public class BookingHistoryController {
 
     private final BookingHistoryRepository repository;
     private final JdbcTemplate jdbcTemplate;
+    private final TrackingLookupClient trackingLookupClient;
 
-    public BookingHistoryController(BookingHistoryRepository repository, JdbcTemplate jdbcTemplate) {
+    public BookingHistoryController(
+            BookingHistoryRepository repository,
+            JdbcTemplate jdbcTemplate,
+            TrackingLookupClient trackingLookupClient) {
         this.repository = repository;
         this.jdbcTemplate = jdbcTemplate;
+        this.trackingLookupClient = trackingLookupClient;
     }
 
     @GetMapping("/customer/{customerId}")
@@ -162,11 +168,45 @@ public class BookingHistoryController {
         dto.setId(entity.getId());
         dto.setCustomerId(entity.getCustomerId());
         dto.setBookingId(entity.getBookingId());
+        String trackingBookingId = resolveTrackingBookingId(entity);
+        dto.setTrackingBookingId(trackingBookingId);
         dto.setBookingDate(entity.getBookingDate());
         dto.setReceiverName(entity.getReceiverName());
         dto.setDeliveredAddress(entity.getDeliveredAddress());
         dto.setAmount(entity.getAmount());
         dto.setStatus(entity.getStatus());
         return dto;
+    }
+
+    private String resolveTrackingBookingId(BookingHistory entity) {
+        String existing = entity.getTrackingBookingId();
+        if (existing != null && !existing.isBlank()) {
+            return existing;
+        }
+
+        Long originalBookingId = extractOriginalBookingId(entity.getBookingId());
+        if (originalBookingId == null) {
+            return null;
+        }
+
+        String resolved = trackingLookupClient.findTrackingBookingId(originalBookingId);
+        return resolved;
+    }
+
+    private Long extractOriginalBookingId(String bookingId) {
+        if (bookingId == null || bookingId.isBlank()) {
+            return null;
+        }
+
+        String normalized = bookingId.trim().toUpperCase();
+        if (normalized.startsWith("BKG-")) {
+            normalized = normalized.substring(4);
+        }
+
+        try {
+            return Long.valueOf(normalized);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 }

@@ -25,6 +25,9 @@ public class BookingHistory {
     @Column(nullable = false, length = 50)
     private String bookingId;
 
+    @Column(length = 12)
+    private String trackingBookingId;
+
     @Column(nullable = false)
     private LocalDateTime bookingDate;
 
@@ -74,6 +77,14 @@ public class BookingHistory {
 
     public void setBookingId(String bookingId) {
         this.bookingId = bookingId;
+    }
+
+    public String getTrackingBookingId() {
+        return trackingBookingId;
+    }
+
+    public void setTrackingBookingId(String trackingBookingId) {
+        this.trackingBookingId = trackingBookingId;
     }
 
     public LocalDateTime getBookingDate() {
