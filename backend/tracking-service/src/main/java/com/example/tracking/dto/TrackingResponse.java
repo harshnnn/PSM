@@ -12,6 +12,7 @@ public class TrackingResponse {
     private BigDecimal amount;
     private String trackingStatus;
     private LocalDateTime shippedAt;
+    private LocalDateTime pickupScheduledAt;
     private LocalDateTime lastUpdatedAt;
 
     public String getBookingId() { return bookingId; }
@@ -28,6 +29,8 @@ public class TrackingResponse {
     public void setTrackingStatus(String trackingStatus) { this.trackingStatus = trackingStatus; }
     public LocalDateTime getShippedAt() { return shippedAt; }
     public void setShippedAt(LocalDateTime shippedAt) { this.shippedAt = shippedAt; }
+    public LocalDateTime getPickupScheduledAt() { return pickupScheduledAt; }
+    public void setPickupScheduledAt(LocalDateTime pickupScheduledAt) { this.pickupScheduledAt = pickupScheduledAt; }
     public LocalDateTime getLastUpdatedAt() { return lastUpdatedAt; }
     public void setLastUpdatedAt(LocalDateTime lastUpdatedAt) { this.lastUpdatedAt = lastUpdatedAt; }
 }

@@ -1,0 +1,49 @@
+<div class="page" *ngIf="session">
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Officer Tool</p>
+      <h1>Pickup Scheduling</h1>
+      <p class="lede">Search by Booking ID, set pickup date/time, and save.</p>
+    </div>
+  </header>
+
+  <section class="panel">
+    <form [formGroup]="searchForm" (ngSubmit)="search()" class="search-row">
+      <div class="field">
+        <label>Booking ID</label>
+        <input type="text" formControlName="bookingId" placeholder="Tracking ID or original booking ID" />
+      </div>
+      <button class="primary" type="submit" [disabled]="loadingSearch">{{ loadingSearch ? 'Searching...' : 'Search' }}</button>
+    </form>
+
+    <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+    <div class="success" *ngIf="successMessage">{{ successMessage }}</div>
+
+    <div class="result" *ngIf="result">
+      <div>
+        <p class="label">Booking ID</p>
+        <h3>{{ result.bookingId }}</h3>
+      </div>
+      <div>
+        <p class="label">Customer</p>
+        <h3>{{ result.customerId }}</h3>
+      </div>
+      <div>
+        <p class="label">Current Status</p>
+        <h3>{{ result.trackingStatus }}</h3>
+      </div>
+      <div>
+        <p class="label">Scheduled Pickup</p>
+        <h3>{{ result.pickupScheduledAt ? (result.pickupScheduledAt | date: 'medium') : 'Not set' }}</h3>
+      </div>
+    </div>
+
+    <form [formGroup]="scheduleForm" (ngSubmit)="saveSchedule()" class="search-row" *ngIf="result">
+      <div class="field">
+        <label>Date and Time</label>
+        <input type="datetime-local" formControlName="pickupDateTime" [attr.min]="minPickupDateTime" />
+      </div>
+      <button class="primary" type="submit" [disabled]="loadingSave">{{ loadingSave ? 'Saving...' : 'Save' }}</button>
+    </form>
+  </section>
+</div>

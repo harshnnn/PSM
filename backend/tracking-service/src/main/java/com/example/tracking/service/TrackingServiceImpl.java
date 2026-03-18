@@ -3,6 +3,7 @@ package com.example.tracking.service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.stereotype.Service;
@@ -14,11 +15,18 @@ import com.example.tracking.dto.TrackingCreateRequest;
 import com.example.tracking.dto.TrackingResponse;
 import com.example.tracking.entity.TrackingRecord;
 import com.example.tracking.entity.TrackingRecord.TrackingStatus;
+import com.example.tracking.exception.BookingNotFoundException;
 import com.example.tracking.repository.TrackingRecordRepository;
 
 @Service
 @Transactional
 public class TrackingServiceImpl implements TrackingService {
+
+    private static final Set<TrackingStatus> OFFICER_ALLOWED_STATUSES = Set.of(
+            TrackingStatus.PICKED_UP,
+            TrackingStatus.IN_TRANSIT,
+            TrackingStatus.DELIVERED,
+            TrackingStatus.RETURNED);
 
     private final TrackingRecordRepository repository;
     private final BookingClient bookingClient;
@@ -55,10 +63,10 @@ public class TrackingServiceImpl implements TrackingService {
             throw new IllegalArgumentException("Customer ID is required");
         }
         TrackingRecord record = repository.findByTrackingNumber(bookingId)
-                .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
+                .orElseThrow(() -> new BookingNotFoundException("Booking not found"));
 
         if (!record.getCustomerId().equalsIgnoreCase(customerId.trim())) {
-            throw new IllegalArgumentException("Booking not found");
+            throw new BookingNotFoundException("Booking not found");
         }
 
         return toResponse(record);
@@ -73,6 +81,35 @@ public class TrackingServiceImpl implements TrackingService {
                 .filter(record -> matchBooking(record, bookingId))
                 .map(this::toResponse)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TrackingResponse findForOfficer(String bookingId) {
+        return toResponse(findByBookingIdentifier(bookingId));
+    }
+
+    @Override
+    public TrackingResponse schedulePickup(String bookingId, LocalDateTime pickupDateTime) {
+        TrackingRecord record = findByBookingIdentifier(bookingId);
+        if (pickupDateTime == null) {
+            throw new IllegalArgumentException("Pickup date and time are required");
+        }
+        if (pickupDateTime.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Pickup date and time cannot be in the past");
+        }
+        record.setPickupScheduledAt(pickupDateTime);
+        TrackingRecord saved = repository.save(record);
+        return toResponse(saved);
+    }
+
+    @Override
+    public TrackingResponse updateDeliveryStatus(String bookingId, String status) {
+        TrackingRecord record = findByBookingIdentifier(bookingId);
+        TrackingStatus parsedStatus = parseOfficerStatus(status);
+        record.setStatus(parsedStatus);
+        TrackingRecord saved = repository.save(record);
+        return toResponse(saved);
     }
 
     @Override
@@ -129,8 +166,43 @@ public class TrackingServiceImpl implements TrackingService {
         response.setAmount(record.getAmount());
         response.setTrackingStatus(record.getStatus().name());
         response.setShippedAt(record.getShippedAt());
+        response.setPickupScheduledAt(record.getPickupScheduledAt());
         response.setLastUpdatedAt(record.getUpdatedAt());
         return response;
+    }
+
+    private TrackingRecord findByBookingIdentifier(String bookingId) {
+        if (bookingId == null || bookingId.isBlank()) {
+            throw new IllegalArgumentException("Booking ID is required");
+        }
+        String normalized = bookingId.trim();
+
+        TrackingRecord byTracking = repository.findByTrackingNumber(normalized).orElse(null);
+        if (byTracking != null) {
+            return byTracking;
+        }
+
+        try {
+            return repository.findByOriginalBookingId(Long.parseLong(normalized))
+                    .orElseThrow(() -> new BookingNotFoundException("Booking not found"));
+        } catch (NumberFormatException ex) {
+            throw new BookingNotFoundException("Booking not found");
+        }
+    }
+
+    private TrackingStatus parseOfficerStatus(String status) {
+        if (status == null || status.isBlank()) {
+            throw new IllegalArgumentException("Delivery status is required");
+        }
+        try {
+            TrackingStatus parsed = TrackingStatus.valueOf(status.trim().toUpperCase());
+            if (!OFFICER_ALLOWED_STATUSES.contains(parsed)) {
+                throw new IllegalArgumentException("Unsupported delivery status");
+            }
+            return parsed;
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Unsupported delivery status");
+        }
     }
 
     private String generateBookingId() {

@@ -33,7 +33,15 @@
     </div>
     <div class="tile" (click)="navigate('/tracking')">
       <h3>Tracking</h3>
-      <p>Track delivery milestones and statuses (coming soon).</p>
+      <p>Track delivery milestones and statuses in real time.</p>
+    </div>
+    <div class="tile" *ngIf="session.role === 'OFFICER'" (click)="navigate('/pickup-scheduling')">
+      <h3>Pickup Scheduling</h3>
+      <p>Search booking IDs and schedule package pickup date/time.</p>
+    </div>
+    <div class="tile" *ngIf="session.role === 'OFFICER'" (click)="navigate('/delivery-status')">
+      <h3>Delivery Update</h3>
+      <p>Update status as Picked up, In Transit, Delivered, or Returned.</p>
     </div>
     <div class="tile" (click)="navigate('/support')">
       <h3>Support</h3>

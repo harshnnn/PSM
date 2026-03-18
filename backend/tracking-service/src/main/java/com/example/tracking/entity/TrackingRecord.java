@@ -20,10 +20,10 @@ public class TrackingRecord {
 
     public enum TrackingStatus {
         SHIPPED,
+        PICKED_UP,
         IN_TRANSIT,
-        OUT_FOR_DELIVERY,
         DELIVERED,
-        DELAYED
+        RETURNED
     }
 
     @Id
@@ -51,6 +51,9 @@ public class TrackingRecord {
 
     @Column(nullable = false)
     private LocalDateTime shippedAt;
+
+    @Column
+    private LocalDateTime pickupScheduledAt;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -89,6 +92,8 @@ public class TrackingRecord {
     public void setStatus(TrackingStatus status) { this.status = status; }
     public LocalDateTime getShippedAt() { return shippedAt; }
     public void setShippedAt(LocalDateTime shippedAt) { this.shippedAt = shippedAt; }
+    public LocalDateTime getPickupScheduledAt() { return pickupScheduledAt; }
+    public void setPickupScheduledAt(LocalDateTime pickupScheduledAt) { this.pickupScheduledAt = pickupScheduledAt; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }

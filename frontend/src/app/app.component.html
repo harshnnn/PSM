@@ -8,6 +8,8 @@
 			<a routerLink="/invoices" routerLinkActive="active">Invoices</a>
 			<a routerLink="/previous-booking" routerLinkActive="active">History</a>
 			<a routerLink="/tracking" routerLinkActive="active">Tracking</a>
+			<a *ngIf="session.role === 'OFFICER'" routerLink="/pickup-scheduling" routerLinkActive="active">Pickup Scheduling</a>
+			<a *ngIf="session.role === 'OFFICER'" routerLink="/delivery-status" routerLinkActive="active">Delivery Update</a>
 			<a routerLink="/support" routerLinkActive="active">Support</a>
 		</nav>
 		<div class="user">

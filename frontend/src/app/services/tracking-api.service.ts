@@ -10,6 +10,7 @@ export interface TrackingResponse {
   amount: number;
   trackingStatus: string;
   shippedAt: string;
+  pickupScheduledAt?: string | null;
   lastUpdatedAt: string;
 }
 
@@ -34,5 +35,21 @@ export class TrackingApiService {
       params['bookingId'] = bookingId;
     }
     return this.http.get<TrackingResponse[]>(`${this.baseUrl}/officer/shipments`, { params });
+  }
+
+  officerLookup(bookingId: string): Observable<TrackingResponse> {
+    return this.http.get<TrackingResponse>(`${this.baseUrl}/officer/booking/${bookingId}`);
+  }
+
+  schedulePickup(bookingId: string, pickupDateTime: string): Observable<TrackingResponse> {
+    return this.http.put<TrackingResponse>(`${this.baseUrl}/officer/booking/${bookingId}/pickup`, {
+      pickupDateTime
+    });
+  }
+
+  updateDeliveryStatus(bookingId: string, status: string): Observable<TrackingResponse> {
+    return this.http.put<TrackingResponse>(`${this.baseUrl}/officer/booking/${bookingId}/status`, {
+      status
+    });
   }
 }

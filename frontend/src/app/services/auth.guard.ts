@@ -14,6 +14,18 @@ export const authGuard: CanActivateFn = () => {
   return false;
 };
 
+export const officerGuard: CanActivateFn = () => {
+  const sessionService = inject(SessionService);
+  const router = inject(Router);
+  const session = sessionService.get();
+
+  if (session?.role === 'OFFICER') {
+    return true;
+  }
+
+  return router.createUrlTree(['/home']);
+};
+
 // If a user is already logged in, block access to login/register screens and push them home.
 export const redirectIfLoggedInGuard: CanActivateFn = () => {
   const sessionService = inject(SessionService);

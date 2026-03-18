@@ -10,7 +10,9 @@ import { PayBillComponent } from './pages/pay-bill/pay-bill.component';
 import { InvoiceComponent } from './pages/invoice/invoice.component';
 import { InvoiceListComponent } from './pages/invoice-list/invoice-list.component';
 import { TrackingComponent } from './pages/tracking/tracking.component';
-import { authGuard, redirectIfLoggedInGuard } from './services/auth.guard';
+import { PickupSchedulingComponent } from './pages/pickup-scheduling/pickup-scheduling.component';
+import { DeliveryStatusComponent } from './pages/delivery-status/delivery-status.component';
+import { authGuard, officerGuard, redirectIfLoggedInGuard } from './services/auth.guard';
 
 export const routes: Routes = [
 	{ path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -26,7 +28,7 @@ export const routes: Routes = [
 	{ path: 'previous-booking', component: BookingHistoryComponent, canActivate: [authGuard] },
 	{ path: 'previous-bookings', redirectTo: 'previous-booking', pathMatch: 'full' },
 	{ path: 'support', component: PlaceholderComponent, canActivate: [authGuard], data: { title: 'Contact Support' } },
-	{ path: 'delivery-status', component: PlaceholderComponent, canActivate: [authGuard], data: { title: 'Delivery Status' } },
-	{ path: 'pickup-scheduling', component: PlaceholderComponent, canActivate: [authGuard], data: { title: 'Pickup Scheduling' } },
+	{ path: 'delivery-status', component: DeliveryStatusComponent, canActivate: [authGuard, officerGuard] },
+	{ path: 'pickup-scheduling', component: PickupSchedulingComponent, canActivate: [authGuard, officerGuard] },
 	{ path: '**', redirectTo: 'home' }
 ];
