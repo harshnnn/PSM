@@ -8,6 +8,8 @@ import com.example.payment.entity.Payment.PaymentStatus;
 public class PaymentResponse {
 
     private Long bookingId;
+    private Long invoiceId;
+    private String invoiceNumber;
     private String customerId;
     private BigDecimal amount;
     private PaymentMode paymentMode;
@@ -17,9 +19,11 @@ public class PaymentResponse {
 
     public PaymentResponse() {}
 
-    public PaymentResponse(Long bookingId, String customerId, BigDecimal amount, PaymentMode paymentMode,
+    public PaymentResponse(Long bookingId, Long invoiceId, String invoiceNumber, String customerId, BigDecimal amount, PaymentMode paymentMode,
                            PaymentStatus status, String transactionRef, String message) {
         this.bookingId = bookingId;
+        this.invoiceId = invoiceId;
+        this.invoiceNumber = invoiceNumber;
         this.customerId = customerId;
         this.amount = amount;
         this.paymentMode = paymentMode;
@@ -30,6 +34,10 @@ public class PaymentResponse {
 
     public Long getBookingId() { return bookingId; }
     public void setBookingId(Long bookingId) { this.bookingId = bookingId; }
+    public Long getInvoiceId() { return invoiceId; }
+    public void setInvoiceId(Long invoiceId) { this.invoiceId = invoiceId; }
+    public String getInvoiceNumber() { return invoiceNumber; }
+    public void setInvoiceNumber(String invoiceNumber) { this.invoiceNumber = invoiceNumber; }
     public String getCustomerId() { return customerId; }
     public void setCustomerId(String customerId) { this.customerId = customerId; }
     public BigDecimal getAmount() { return amount; }

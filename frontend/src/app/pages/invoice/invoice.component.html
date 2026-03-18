@@ -1,29 +1,65 @@
 <div class="invoice">
   <div class="card">
-    <p class="eyebrow">Payment Successful</p>
-    <h1>Thank you!</h1>
-    <p class="lede">Your payment has been processed. Below are your details.</p>
+    <p class="eyebrow">Invoice</p>
+    <h1 *ngIf="invoice; else loadingState">Payment Receipt</h1>
+    <p class="lede" *ngIf="invoice">Thank you for your payment. Below is your invoice.</p>
 
-    <div class="summary">
-      <div>
-        <p class="label">Booking ID</p>
-        <h3 *ngIf="bookingId; else missing">{{ bookingId }}</h3>
-        <ng-template #missing><span>Not provided</span></ng-template>
-      </div>
-      <div>
-        <p class="label">Amount</p>
-        <h3 *ngIf="amount !== null; else missingAmount">{{ amount | currency }}</h3>
-        <ng-template #missingAmount><span>Not provided</span></ng-template>
-      </div>
-      <div>
-        <p class="label">Transaction Ref</p>
-        <h3>{{ transactionRef || 'N/A' }}</h3>
-      </div>
+    <div class="messages">
+      <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
     </div>
 
-    <div class="actions">
-      <button class="primary" (click)="goHome()">Back to Home</button>
-      <button class="secondary" (click)="viewHistory()">View Booking History</button>
-    </div>
+    <ng-container *ngIf="invoice">
+      <div class="summary">
+        <div>
+          <p class="label">Invoice #</p>
+          <h3>{{ invoice.invoiceNumber }}</h3>
+        </div>
+        <div>
+          <p class="label">Booking ID</p>
+          <h3>{{ invoice.bookingId }}</h3>
+        </div>
+        <div>
+          <p class="label">Payment</p>
+          <h3>{{ invoice.parcelServiceCost | currency }}</h3>
+          <p class="muted">Paid at {{ invoice.paymentTime | date: 'medium' }}</p>
+        </div>
+        <div>
+          <p class="label">Transaction Ref</p>
+          <h3>{{ invoice.transactionRef }}</h3>
+        </div>
+      </div>
+
+      <div class="grid">
+        <section>
+          <h4>Receiver</h4>
+          <p><span class="label">Name:</span> {{ invoice.receiverName }}</p>
+          <p><span class="label">Address:</span> {{ invoice.receiverAddress }}</p>
+          <p><span class="label">Pin:</span> {{ invoice.receiverPin }}</p>
+          <p><span class="label">Mobile:</span> {{ invoice.receiverMobile }}</p>
+        </section>
+        <section>
+          <h4>Parcel</h4>
+          <p><span class="label">Weight:</span> {{ invoice.parcelWeightGrams }} g</p>
+          <p><span class="label">Contents:</span> {{ invoice.contentsDescription }}</p>
+          <p><span class="label">Delivery:</span> {{ invoice.parcelDeliveryType }}</p>
+          <p><span class="label">Packing:</span> {{ invoice.parcelPackingPreference }}</p>
+        </section>
+        <section>
+          <h4>Schedule</h4>
+          <p><span class="label">Pickup:</span> {{ invoice.parcelPickupTime | date: 'medium' }}</p>
+          <p><span class="label">Dropoff:</span> {{ invoice.parcelDropoffTime ? (invoice.parcelDropoffTime | date: 'medium') : 'Not provided' }}</p>
+        </section>
+      </div>
+
+      <div class="actions">
+        <button class="primary" (click)="print()">Print</button>
+        <button class="secondary" (click)="goHome()">Back to Home</button>
+        <button class="ghost" (click)="viewHistory()">View Booking History</button>
+      </div>
+    </ng-container>
   </div>
 </div>
+
+<ng-template #loadingState>
+  <p *ngIf="loading">Loading invoice...</p>
+</ng-template>

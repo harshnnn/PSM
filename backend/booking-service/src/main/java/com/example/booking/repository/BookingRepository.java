@@ -14,5 +14,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByReceiverPinCode(String receiverPinCode);
     List<Booking> findByBookingStatus(BookingStatus status);
     List<Booking> findByPaymentStatus(PaymentStatus status);
+    List<Booking> findByCustomerIdAndPaymentStatus(String customerId, PaymentStatus status);
     List<Booking> findByPreferredPickupBetween(LocalDateTime start, LocalDateTime end);
 }

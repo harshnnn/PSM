@@ -20,6 +20,7 @@ public class PaymentServiceApplication {
 
     @Bean
     @LoadBalanced
+    @SuppressWarnings("unused")
     RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder
                 .setConnectTimeout(Duration.ofSeconds(5))

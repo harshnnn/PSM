@@ -1,0 +1,37 @@
+<div class="page">
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Billing</p>
+      <h1>Invoices</h1>
+      <p class="lede">View your generated invoices. {{ isCustomer ? 'Showing only your invoices.' : 'Showing all invoices.' }}</p>
+    </div>
+    <div class="actions">
+      <button class="secondary" type="button" (click)="loadInvoices()">Refresh</button>
+      <button class="ghost" type="button" (click)="backToPayments()">Back to Payments</button>
+    </div>
+  </header>
+
+  <section class="panel">
+    <div class="messages">
+      <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+      <div class="muted" *ngIf="loading">Loading invoices...</div>
+    </div>
+
+    <div *ngIf="!loading && invoices.length === 0" class="empty">No invoices yet.</div>
+
+    <div class="invoice-list" *ngIf="!loading && invoices.length > 0">
+      <div class="invoice-card" *ngFor="let inv of invoices; trackBy: trackById">
+        <div class="card-head">
+          <div>
+            <p class="label">Invoice #{{ inv.invoiceNumber }}</p>
+            <h3>{{ inv.parcelServiceCost | currency }}</h3>
+          </div>
+          <button class="link" type="button" (click)="viewInvoice(inv)">View</button>
+        </div>
+        <p class="meta">Booking #{{ inv.bookingId }} • Txn {{ inv.transactionRef }}</p>
+        <p class="meta">Paid at {{ inv.paymentTime | date: 'medium' }}</p>
+        <p class="meta">Receiver: {{ inv.receiverName }} • {{ inv.receiverPin }}</p>
+      </div>
+    </div>
+  </section>
+</div>

@@ -25,6 +25,8 @@ export interface PaymentRequest {
 
 export interface PaymentResponse {
   bookingId: number;
+  invoiceId?: number;
+  invoiceNumber?: string;
   customerId: string;
   amount: number;
   paymentMode: PaymentMode;

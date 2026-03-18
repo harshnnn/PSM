@@ -3,7 +3,7 @@
     <div>
       <p class="eyebrow">Pay Bill</p>
       <h1>Booking Payment</h1>
-      <p class="lede">Review your bill, choose payment mode, and complete the card payment securely.</p>
+      <p class="lede">Pick an unpaid booking, confirm details, and finish payment securely.</p>
     </div>
     <div class="user">
       <span>Welcome {{ session.username }}</span>
@@ -13,37 +13,76 @@
 
   <section class="grid">
     <div class="panel">
-      <header><h3>Bill Details</h3></header>
-      <form [formGroup]="billForm" class="bill-form" (ngSubmit)="loadBill()">
-        <label>Booking ID</label>
-        <div class="inline">
-          <input type="number" formControlName="bookingId" placeholder="Enter booking ID" />
-          <button class="secondary" type="submit" [disabled]="loadingBill">{{ loadingBill ? 'Loading...' : 'Fetch Bill' }}</button>
+      <header><h3>Unpaid bookings</h3></header>
+      <div class="messages">
+        <div class="error" *ngIf="listError">{{ listError }}</div>
+        <div class="success" *ngIf="successMessage">{{ successMessage }}</div>
+        <div class="error" *ngIf="errorMessage && !listError">{{ errorMessage }}</div>
+        <button class="link" type="button" (click)="goInvoices()">View invoices</button>
+      </div>
+
+      <div *ngIf="listLoading" class="loading">Loading unpaid bookings...</div>
+      <div *ngIf="!listLoading && unpaidBookings.length === 0" class="empty">
+        All caught up — no unpaid bookings.
+      </div>
+
+      <div class="booking-list" *ngIf="!listLoading && unpaidBookings.length > 0">
+        <div class="booking-card" *ngFor="let booking of unpaidBookings">
+          <div class="card-head">
+            <div>
+              <p class="label">Booking #{{ booking.id }}</p>
+              <h3>{{ booking.serviceCost | currency }}</h3>
+            </div>
+            <span class="pill">{{ booking.paymentStatus }}</span>
+          </div>
+          <p class="meta">Created: {{ booking.createdAt | date: 'medium' }}</p>
+          <p class="meta">To: {{ booking.receiverName }} • {{ booking.receiverPinCode }}</p>
+          <p class="meta">Parcel: {{ booking.parcelSize }} • {{ booking.deliverySpeed }}</p>
+          <div class="actions">
+            <button class="secondary" type="button" (click)="selectBooking(booking)">Review</button>
+            <button class="primary" type="button" (click)="selectBooking(booking); proceedToCard()">Pay Now</button>
+          </div>
         </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <header><h3>Payment summary</h3></header>
+      <ng-container *ngIf="bill; else noSelection">
+        <div class="summary">
+          <div>
+            <p class="label">Booking ID</p>
+            <h3>{{ bill.bookingId }}</h3>
+          </div>
+          <div>
+            <p class="label">Amount</p>
+            <h3>{{ bill.amount | currency }}</h3>
+          </div>
+          <div>
+            <p class="label">Status</p>
+            <span class="pill">{{ bill.paymentStatus }}</span>
+          </div>
+        </div>
+
         <label class="mt">Mode of Payment</label>
         <div class="radio-row">
-          <label><input type="radio" value="DEBIT" formControlName="paymentMode" /> Debit</label>
-          <label><input type="radio" value="CREDIT" formControlName="paymentMode" /> Credit</label>
+          <label><input type="radio" name="mode" value="DEBIT" [(ngModel)]="paymentMode" /> Debit</label>
+          <label><input type="radio" name="mode" value="CREDIT" [(ngModel)]="paymentMode" /> Credit</label>
         </div>
-        <div class="amount" *ngIf="bill">
-          <p class="label">Bill Amount</p>
-          <h2>{{ bill.amount | currency }}</h2>
-          <p class="hint">Payment status: {{ bill.paymentStatus }} | Booking status: {{ bill.bookingStatus }}</p>
-        </div>
+
         <div class="actions">
-          <button class="primary" type="button" (click)="proceedToCard()" [disabled]="!bill">Pay Now</button>
+          <button class="primary" type="button" (click)="proceedToCard()" [disabled]="!bill">Enter card details</button>
           <button class="ghost" type="button" (click)="goHome()">Back to Home</button>
         </div>
-      </form>
-      <div class="messages">
-        <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
-        <div class="success" *ngIf="successMessage">{{ successMessage }}</div>
-      </div>
+      </ng-container>
+      <ng-template #noSelection>
+        <p class="muted">Select an unpaid booking to review and pay.</p>
+      </ng-template>
     </div>
 
     <div class="panel" *ngIf="showCardForm">
       <header><h3>Card Details</h3></header>
-      <p class="muted">Credit Card</p>
+      <p class="muted">Card details are used only for this payment.</p>
       <form [formGroup]="cardForm" (ngSubmit)="makePayment()" class="card-form">
         <label>Card Number</label>
         <input type="text" formControlName="cardNumber" placeholder="16 digits" />

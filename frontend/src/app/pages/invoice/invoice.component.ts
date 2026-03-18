@@ -1,26 +1,53 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { InvoiceApiService, InvoiceResponse } from '../../services/invoice-api.service';
+import { SessionService } from '../../services/session.service';
 
 @Component({
   selector: 'app-invoice',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DatePipe, CurrencyPipe],
   templateUrl: './invoice.component.html',
   styleUrl: './invoice.component.css'
 })
 export class InvoiceComponent implements OnInit {
-  bookingId: number | null = null;
-  amount: number | null = null;
-  transactionRef = '';
+  invoice: InvoiceResponse | null = null;
+  loading = false;
+  errorMessage = '';
 
-  constructor(private readonly route: ActivatedRoute, private readonly router: Router) {}
+  constructor(
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly invoiceApi: InvoiceApiService,
+    private readonly sessionService: SessionService
+  ) {}
 
   ngOnInit(): void {
     const params = this.route.snapshot.queryParamMap;
-    this.bookingId = Number(params.get('bookingId')) || null;
-    this.amount = Number(params.get('amount')) || null;
-    this.transactionRef = params.get('transactionRef') || '';
+    const invoiceId = Number(params.get('invoiceId')) || null;
+    if (!invoiceId) {
+      this.errorMessage = 'No invoice specified.';
+      return;
+    }
+
+    this.loading = true;
+    const customerId = this.sessionService.get()?.username;
+    this.invoiceApi.get(invoiceId).subscribe({
+      next: (inv) => {
+        if (customerId && inv.customerId !== customerId) {
+          this.errorMessage = 'You are not authorized to view this invoice.';
+          this.loading = false;
+          return;
+        }
+        this.invoice = inv;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage = typeof err?.error === 'string' ? err.error : 'Unable to load invoice.';
+      }
+    });
   }
 
   goHome(): void {
@@ -29,5 +56,9 @@ export class InvoiceComponent implements OnInit {
 
   viewHistory(): void {
     this.router.navigate(['/previous-booking']);
+  }
+
+  print(): void {
+    window.print();
   }
 }

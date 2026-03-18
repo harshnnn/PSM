@@ -80,7 +80,7 @@ public class BookingHistoryController {
     }
 
     private Page<BookingHistory> fallbackFromBookings(String customerId, LocalDateTime start, LocalDateTime end, Pageable pageable) {
-        StringBuilder base = new StringBuilder("SELECT id, customer_id, sender_name, created_at, receiver_name, receiver_address, service_cost, booking_status FROM bookings WHERE created_at BETWEEN ? AND ?");
+        StringBuilder base = new StringBuilder("SELECT id, customer_id, sender_name, created_at, receiver_name, receiver_address, service_cost, booking_status FROM bookings WHERE payment_status = 'PAID' AND created_at BETWEEN ? AND ?");
         Object[] params;
         if (customerId != null && !customerId.isBlank()) {
             base.append(" AND customer_id = ?");
@@ -96,7 +96,7 @@ public class BookingHistoryController {
             paramsWithPaging(params, pageable));
 
         // Count total
-        StringBuilder countSql = new StringBuilder("SELECT COUNT(*) FROM bookings WHERE created_at BETWEEN ? AND ?");
+        StringBuilder countSql = new StringBuilder("SELECT COUNT(*) FROM bookings WHERE payment_status = 'PAID' AND created_at BETWEEN ? AND ?");
         Object[] countParams;
         if (customerId != null && !customerId.isBlank()) {
             countSql.append(" AND customer_id = ?");

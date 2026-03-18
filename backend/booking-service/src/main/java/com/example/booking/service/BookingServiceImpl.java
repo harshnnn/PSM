@@ -1,6 +1,7 @@
 package com.example.booking.service;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +48,6 @@ public class BookingServiceImpl implements BookingService {
         booking.setInsuranceSelected(request.isInsuranceSelected());
         booking.setTrackingEnabled(request.isTrackingEnabled());
         Booking saved = bookingRepository.save(booking);
-        persistHistory(saved, request.getCustomerId());
         return toResponse(saved);
     }
 
@@ -69,9 +69,27 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<BookingResponse> listUnpaidForCustomer(String customerId) {
+        if (customerId == null || customerId.isBlank()) {
+            return List.of();
+        }
+
+        return bookingRepository.findByCustomerIdAndPaymentStatus(customerId, Booking.PaymentStatus.PENDING)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Override
     public BookingResponse updatePaymentStatus(long id, PaymentUpdateRequest request) {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
+
+        if (booking.getPaymentStatus() == Booking.PaymentStatus.PAID
+                && request.getPaymentStatus() == Booking.PaymentStatus.PAID) {
+            throw new IllegalStateException("Booking is already marked as paid");
+        }
 
         if (request.getPaymentStatus() != null) {
             booking.setPaymentStatus(request.getPaymentStatus());
@@ -85,39 +103,56 @@ public class BookingServiceImpl implements BookingService {
         }
 
         Booking saved = bookingRepository.save(booking);
-        return toResponse(saved);
+        persistHistoryIfPaid(saved);
+        return toResponse(Objects.requireNonNull(saved, "saved booking"));
     }
 
     private BookingResponse toResponse(Booking booking) {
+        Booking safe = Objects.requireNonNull(booking, "booking");
         BookingResponse dto = new BookingResponse();
-        dto.setId(booking.getId());
-        dto.setSenderName(booking.getSenderName());
-        dto.setReceiverName(booking.getReceiverName());
-        dto.setReceiverPinCode(booking.getReceiverPinCode());
-        dto.setParcelSize(booking.getParcelSize());
-        dto.setWeightKg(booking.getWeightKg());
-        dto.setDeliverySpeed(booking.getDeliverySpeed());
-        dto.setPackagingPreference(booking.getPackagingPreference());
-        dto.setPaymentStatus(booking.getPaymentStatus());
-        dto.setBookingStatus(booking.getBookingStatus());
-        dto.setServiceCost(booking.getServiceCost());
-        dto.setPreferredPickup(booking.getPreferredPickup());
-        dto.setCreatedAt(booking.getCreatedAt());
+        dto.setId(safe.getId());
+        dto.setCustomerId(safe.getCustomerId());
+        dto.setSenderName(safe.getSenderName());
+        dto.setReceiverName(safe.getReceiverName());
+        dto.setReceiverAddress(safe.getReceiverAddress());
+        dto.setReceiverPinCode(safe.getReceiverPinCode());
+        dto.setReceiverContact(safe.getReceiverContact());
+        dto.setParcelSize(safe.getParcelSize());
+        dto.setWeightKg(safe.getWeightKg());
+        dto.setDeliverySpeed(safe.getDeliverySpeed());
+        dto.setPackagingPreference(safe.getPackagingPreference());
+        dto.setContentsDescription(safe.getContentsDescription());
+        dto.setPaymentStatus(safe.getPaymentStatus());
+        dto.setBookingStatus(safe.getBookingStatus());
+        dto.setServiceCost(safe.getServiceCost());
+        dto.setPreferredPickup(safe.getPreferredPickup());
+        dto.setCreatedAt(safe.getCreatedAt());
         return dto;
     }
 
-    private void persistHistory(Booking booking, String customerId) {
+    private void persistHistoryIfPaid(Booking booking) {
+        Booking safe = Objects.requireNonNull(booking, "booking");
+        if (safe.getPaymentStatus() != Booking.PaymentStatus.PAID) {
+            return;
+        }
+
+        String bookingKey = "BKG-" + safe.getId();
+        if (bookingHistoryRepository.existsByBookingId(bookingKey)) {
+            return;
+        }
+
         BookingHistoryRecord record = new BookingHistoryRecord();
-        String resolvedCustomerId = customerId != null && !customerId.isBlank()
-            ? customerId
-            : booking.getCustomerId();
-        record.setCustomerId(resolvedCustomerId != null && !resolvedCustomerId.isBlank() ? resolvedCustomerId : booking.getSenderName());
-        record.setBookingId("BKG-" + booking.getId());
-        record.setBookingDate(booking.getCreatedAt());
-        record.setReceiverName(booking.getReceiverName());
-        record.setDeliveredAddress(booking.getReceiverAddress());
-        record.setAmount(booking.getServiceCost());
-        record.setStatus(mapStatus(booking.getBookingStatus()));
+        String resolvedCustomerId = safe.getCustomerId();
+        if (resolvedCustomerId == null || resolvedCustomerId.isBlank()) {
+            resolvedCustomerId = safe.getSenderName();
+        }
+        record.setCustomerId(resolvedCustomerId);
+        record.setBookingId(bookingKey);
+        record.setBookingDate(safe.getCreatedAt());
+        record.setReceiverName(safe.getReceiverName());
+        record.setDeliveredAddress(safe.getReceiverAddress());
+        record.setAmount(safe.getServiceCost());
+        record.setStatus(mapStatus(safe.getBookingStatus()));
         bookingHistoryRepository.save(record);
     }
 

@@ -1,7 +1,7 @@
 package com.example.payment.client;
 
-import com.example.payment.dto.BookingPaymentUpdateRequest;
-import com.example.payment.dto.BookingSummary;
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
+import com.example.payment.dto.BookingPaymentUpdateRequest;
+import com.example.payment.dto.BookingSummary;
 
 @Component
 public class BookingClient {
@@ -31,7 +34,16 @@ public class BookingClient {
             ResponseEntity<BookingSummary> response = restTemplate.getForEntity(
                     bookingBaseUrl + "/api/bookings/" + bookingId,
                     BookingSummary.class);
-            return response.getBody();
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                log.warn("Non-success when fetching booking {}: {}", bookingId, response.getStatusCode());
+                return null;
+            }
+            BookingSummary body = response.getBody();
+            if (body == null) {
+                log.warn("Empty body when fetching booking {}", bookingId);
+                return null;
+            }
+            return body;
         } catch (RestClientException ex) {
             log.warn("Failed to fetch booking {}: {}", bookingId, ex.getMessage());
             return null;
@@ -40,10 +52,11 @@ public class BookingClient {
 
     public boolean markPaid(Long bookingId, BookingPaymentUpdateRequest request) {
         try {
+            HttpMethod method = Objects.requireNonNull(HttpMethod.PUT, "HttpMethod.PUT");
             ResponseEntity<Void> response = restTemplate.exchange(
                     bookingBaseUrl + "/api/bookings/" + bookingId + "/payment",
-                    HttpMethod.PUT,
-                    new HttpEntity<>(request),
+                    method,
+                    new HttpEntity<>(Objects.requireNonNull(request, "request")),
                     Void.class);
             return response.getStatusCode().is2xxSuccessful();
         } catch (RestClientException ex) {

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,6 +39,11 @@ public class BookingController {
     @GetMapping("/{id}")
     public ResponseEntity<BookingResponse> get(@PathVariable long id) {
         return ResponseEntity.ok(bookingService.get(id));
+    }
+
+    @GetMapping("/unpaid")
+    public ResponseEntity<List<BookingResponse>> listUnpaid(@RequestParam String customerId) {
+        return ResponseEntity.ok(bookingService.listUnpaidForCustomer(customerId));
     }
 
     @PutMapping("/{id}/payment")

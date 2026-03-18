@@ -12,6 +12,7 @@ import com.example.booking.entity.Booking.PaymentStatus;
 public class BookingResponse {
 
     private Long id;
+    private String customerId;
     private String senderName;
     private String receiverName;
     private String receiverPinCode;
@@ -19,11 +20,14 @@ public class BookingResponse {
     private BigDecimal weightKg;
     private DeliverySpeed deliverySpeed;
     private PackagingPreference packagingPreference;
+    private String contentsDescription;
     private PaymentStatus paymentStatus;
     private BookingStatus bookingStatus;
     private BigDecimal serviceCost;
     private LocalDateTime preferredPickup;
     private LocalDateTime createdAt;
+    private String receiverAddress; // Expose receiver address
+    private String receiverContact; // Expose receiver contact
 
     public BookingResponse() {
     }
@@ -34,6 +38,14 @@ public class BookingResponse {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 
     public String getSenderName() {
@@ -52,12 +64,28 @@ public class BookingResponse {
         this.receiverName = receiverName;
     }
 
+    public String getReceiverAddress() {
+        return receiverAddress;
+    }
+
+    public void setReceiverAddress(String receiverAddress) {
+        this.receiverAddress = receiverAddress;
+    }
+
     public String getReceiverPinCode() {
         return receiverPinCode;
     }
 
     public void setReceiverPinCode(String receiverPinCode) {
         this.receiverPinCode = receiverPinCode;
+    }
+
+    public String getReceiverContact() {
+        return receiverContact;
+    }
+
+    public void setReceiverContact(String receiverContact) {
+        this.receiverContact = receiverContact;
     }
 
     public ParcelSize getParcelSize() {
@@ -90,6 +118,14 @@ public class BookingResponse {
 
     public void setPackagingPreference(PackagingPreference packagingPreference) {
         this.packagingPreference = packagingPreference;
+    }
+
+    public String getContentsDescription() {
+        return contentsDescription;
+    }
+
+    public void setContentsDescription(String contentsDescription) {
+        this.contentsDescription = contentsDescription;
     }
 
     public PaymentStatus getPaymentStatus() {

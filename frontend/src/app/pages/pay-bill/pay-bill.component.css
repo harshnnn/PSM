@@ -48,22 +48,72 @@ header h3 {
   margin: 0 0 8px 0;
 }
 
-.bill-form label,
-.card-form label {
+.card-form label,
+.summary .label,
+.label {
   display: block;
   color: #cbd5e1;
   margin: 10px 0 4px;
 }
 
-.bill-form input,
 .card-form input,
-.bill-form select {
+.radio-row input {
   width: 100%;
   padding: 10px;
   border-radius: 8px;
   border: 1px solid #1f2937;
   background: #111827;
   color: #e2e8f0;
+}
+
+.radio-row input {
+  width: auto;
+  padding: 0;
+  margin-right: 6px;
+}
+
+.booking-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.booking-card {
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  padding: 12px;
+  background: #0b1224;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pill {
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  border: 1px solid #334155;
+}
+
+.meta {
+  color: #94a3b8;
+  margin: 0;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .inline {
@@ -104,6 +154,12 @@ header h3 {
   display: flex;
   gap: 16px;
   margin-top: 6px;
+}
+
+.loading,
+.empty {
+  color: #cbd5e1;
+  padding: 10px 0;
 }
 
 .amount {

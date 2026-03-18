@@ -35,10 +35,11 @@ public class BookingHistoryBackfill {
                         WHEN 'CANCELLED' THEN 'CANCELLED'
                         ELSE 'PENDING'
                    END
-            FROM bookings b
-            WHERE NOT EXISTS (
-                SELECT 1 FROM booking_history h WHERE h.booking_id = CONCAT('BKG-', b.id)
-            )
+                        FROM bookings b
+                        WHERE b.payment_status = 'PAID'
+                            AND NOT EXISTS (
+                                SELECT 1 FROM booking_history h WHERE h.booking_id = CONCAT('BKG-', b.id)
+                        )
             """;
         try {
             int inserted = jdbcTemplate.update(sql);

@@ -14,5 +14,7 @@ public interface BookingService {
 
     List<BookingResponse> list();
 
+    List<BookingResponse> listUnpaidForCustomer(String customerId);
+
     BookingResponse updatePaymentStatus(long id, PaymentUpdateRequest request);
 }

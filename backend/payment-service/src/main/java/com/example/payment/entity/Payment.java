@@ -50,6 +50,7 @@ public class Payment {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @SuppressWarnings("unused")
     @PrePersist
     void prePersist() {
         createdAt = LocalDateTime.now();

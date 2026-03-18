@@ -1,34 +1,38 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { BookingApiService, BookingResponse } from '../../services/booking-api.service';
 import { PaymentApiService, PaymentBillResponse, PaymentMode } from '../../services/payment-api.service';
 import { SessionData, SessionService } from '../../services/session.service';
 
 @Component({
   selector: 'app-pay-bill',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './pay-bill.component.html',
   styleUrl: './pay-bill.component.css'
 })
 export class PayBillComponent implements OnInit, OnDestroy {
   session: SessionData | null = null;
-  billForm!: FormGroup;
   cardForm!: FormGroup;
   bill: PaymentBillResponse | null = null;
-  loadingBill = false;
+  unpaidBookings: BookingResponse[] = [];
+  listLoading = false;
+  listError = '';
   loadingPayment = false;
   showCardForm = false;
   successMessage = '';
   errorMessage = '';
+  paymentMode: PaymentMode = 'DEBIT';
 
-  private billSub?: Subscription;
   private paySub?: Subscription;
 
   constructor(
     private readonly fb: FormBuilder,
+    private readonly bookingApi: BookingApiService,
     private readonly paymentApi: PaymentApiService,
     private readonly sessionService: SessionService,
     private readonly router: Router,
@@ -42,11 +46,6 @@ export class PayBillComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.billForm = this.fb.group({
-      bookingId: [null, [Validators.required, Validators.min(1)]],
-      paymentMode: ['DEBIT' as PaymentMode, Validators.required]
-    });
-
     this.cardForm = this.fb.group({
       cardNumber: ['', [Validators.required, Validators.pattern(/^\d{16}$/)]],
       cardHolderName: ['', [Validators.required, Validators.maxLength(60)]],
@@ -54,42 +53,54 @@ export class PayBillComponent implements OnInit, OnDestroy {
       cvv: ['', [Validators.required, Validators.pattern(/^\d{3}$/)]]
     });
 
-    const bookingIdParam = Number(this.route.snapshot.queryParamMap.get('bookingId'));
-    if (bookingIdParam) {
-      this.billForm.patchValue({ bookingId: bookingIdParam });
-      this.loadBill();
-    }
+    const bookingIdParam = Number(this.route.snapshot.queryParamMap.get('bookingId')) || null;
+    this.loadUnpaidBookings(bookingIdParam);
   }
 
   ngOnDestroy(): void {
-    this.billSub?.unsubscribe();
     this.paySub?.unsubscribe();
   }
 
-  loadBill(): void {
-    this.errorMessage = '';
-    this.successMessage = '';
+  private loadUnpaidBookings(preselectId: number | null): void {
+    this.listLoading = true;
+    this.listError = '';
+    this.paymentMode = 'DEBIT';
     this.showCardForm = false;
-    if (this.billForm.invalid) {
-      this.billForm.markAllAsTouched();
-      this.errorMessage = 'Enter a valid booking ID to fetch the bill.';
-      return;
-    }
+    this.bill = null;
 
-    const bookingId = this.billForm.value.bookingId;
-    this.loadingBill = true;
-    this.billSub?.unsubscribe();
-    this.billSub = this.paymentApi.bill(bookingId).subscribe({
-      next: (bill) => {
-        this.bill = bill;
-        this.loadingBill = false;
+    this.bookingApi.getUnpaid(this.session?.username ?? '').subscribe({
+      next: (bookings) => {
+        this.unpaidBookings = bookings;
+        this.listLoading = false;
+
+        if (preselectId) {
+          const match = bookings.find((b) => b.id === preselectId);
+          if (match) {
+            this.selectBooking(match);
+          }
+        }
       },
       error: (err) => {
-        this.bill = null;
-        this.loadingBill = false;
-        this.errorMessage = typeof err?.error === 'string' ? err.error : 'Unable to fetch bill. Check the booking ID.';
+        this.unpaidBookings = [];
+        this.listLoading = false;
+        this.listError = typeof err?.error === 'string' ? err.error : 'Unable to load unpaid bookings.';
       }
     });
+  }
+
+  selectBooking(booking: BookingResponse): void {
+    this.bill = {
+      bookingId: booking.id,
+      customerId: booking.customerId ?? this.session?.username ?? 'customer',
+      amount: booking.serviceCost,
+      paymentStatus: booking.paymentStatus,
+      bookingStatus: booking.bookingStatus,
+      createdAt: booking.createdAt
+    };
+    this.paymentMode = 'DEBIT';
+    this.showCardForm = false;
+    this.successMessage = '';
+    this.errorMessage = '';
   }
 
   proceedToCard(): void {
@@ -117,7 +128,7 @@ export class PayBillComponent implements OnInit, OnDestroy {
     const payload = {
       bookingId: this.bill.bookingId,
       amount: this.bill.amount,
-      paymentMode: this.billForm.value.paymentMode as PaymentMode,
+      paymentMode: this.paymentMode,
       ...(this.cardForm.getRawValue())
     };
 
@@ -129,13 +140,18 @@ export class PayBillComponent implements OnInit, OnDestroy {
         this.successMessage = `${res.message} (Booking #${res.bookingId}, Txn ${res.transactionRef})`;
         this.errorMessage = '';
         this.showCardForm = false;
-        this.router.navigate(['/invoice'], {
-          queryParams: {
-            bookingId: res.bookingId,
-            amount: res.amount,
-            transactionRef: res.transactionRef
-          }
-        });
+        this.loadUnpaidBookings(null);
+        if (res.invoiceId) {
+          this.router.navigate(['/invoice'], {
+            queryParams: {
+              invoiceId: res.invoiceId,
+              invoiceNumber: res.invoiceNumber ?? undefined
+            }
+          });
+        } else {
+          // Fallback if invoice was not created
+          this.errorMessage = 'Payment succeeded but invoice was not generated. Please check invoice history.';
+        }
       },
       error: (err) => {
         this.loadingPayment = false;
@@ -147,6 +163,10 @@ export class PayBillComponent implements OnInit, OnDestroy {
 
   goHome(): void {
     this.router.navigate(['/home']);
+  }
+
+  goInvoices(): void {
+    this.router.navigate(['/invoices']);
   }
 
   logout(): void {

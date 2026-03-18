@@ -32,6 +32,7 @@ export interface BookingRequest {
 
 export interface BookingResponse {
   id: number;
+  customerId?: string;
   senderName: string;
   receiverName: string;
   receiverPinCode: string;
@@ -63,5 +64,11 @@ export class BookingApiService {
 
   get(id: number): Observable<BookingResponse> {
     return this.http.get<BookingResponse>(`${this.baseUrl}/${id}`);
+  }
+
+  getUnpaid(customerId: string): Observable<BookingResponse[]> {
+    return this.http.get<BookingResponse[]>(`${this.baseUrl}/unpaid`, {
+      params: { customerId }
+    });
   }
 }

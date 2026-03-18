@@ -2,6 +2,7 @@ package com.example.payment.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.UUID;
 
@@ -9,13 +10,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.payment.client.BookingClient;
+import com.example.payment.client.InvoiceClient;
 import com.example.payment.dto.BookingPaymentUpdateRequest;
 import com.example.payment.dto.BookingSummary;
+import com.example.payment.dto.InvoiceCreateRequest;
+import com.example.payment.dto.InvoiceCreateResponse;
 import com.example.payment.dto.PaymentBillResponse;
 import com.example.payment.dto.PaymentRequest;
 import com.example.payment.dto.PaymentResponse;
 import com.example.payment.entity.Payment;
-import com.example.payment.entity.Payment.PaymentMode;
 import com.example.payment.entity.Payment.PaymentStatus;
 import com.example.payment.repository.PaymentRepository;
 
@@ -24,10 +27,12 @@ public class PaymentProcessor {
 
     private final PaymentRepository repository;
     private final BookingClient bookingClient;
+    private final InvoiceClient invoiceClient;
 
-    public PaymentProcessor(PaymentRepository repository, BookingClient bookingClient) {
+    public PaymentProcessor(PaymentRepository repository, BookingClient bookingClient, InvoiceClient invoiceClient) {
         this.repository = repository;
         this.bookingClient = bookingClient;
+        this.invoiceClient = invoiceClient;
     }
 
     @Transactional(readOnly = true)
@@ -64,14 +69,11 @@ public class PaymentProcessor {
         String paymentStatus = booking.getPaymentStatus() != null ? booking.getPaymentStatus() : "PENDING";
 
         if ("PAID".equalsIgnoreCase(paymentStatus)) {
-            return new PaymentResponse(
-                    booking.getId(),
-                    booking.getCustomerId(),
-                    expectedAmount,
-                    request.getPaymentMode(),
-                    PaymentStatus.SUCCESS,
-                    lastTransactionRef(booking.getId()),
-                    "Payment already completed for this booking.");
+            throw new IllegalStateException("Payment already completed for this booking.");
+        }
+
+        if ("CANCELLED".equalsIgnoreCase(booking.getBookingStatus())) {
+            throw new IllegalStateException("Booking is cancelled and cannot be paid.");
         }
 
         validateExpiry(request.getExpiry());
@@ -86,10 +88,17 @@ public class PaymentProcessor {
         payment.setCardLast4(request.getCardNumber().substring(request.getCardNumber().length() - 4));
         Payment saved = repository.save(payment);
 
-        bookingClient.markPaid(booking.getId(), new BookingPaymentUpdateRequest("PAID", "CONFIRMED"));
+        boolean updated = bookingClient.markPaid(booking.getId(), new BookingPaymentUpdateRequest("PAID", "CONFIRMED"));
+        if (!updated) {
+            throw new IllegalStateException("Payment captured but booking could not be marked as paid. Please retry.");
+        }
+
+        InvoiceCreateResponse invoice = createInvoice(booking, saved.getTransactionRef(), request.getPaymentMode(), expectedAmount);
 
         return new PaymentResponse(
                 saved.getBookingId(),
+            invoice != null ? invoice.getId() : null,
+            invoice != null ? invoice.getInvoiceNumber() : null,
                 saved.getCustomerId(),
                 saved.getAmount(),
                 saved.getPaymentMode(),
@@ -111,6 +120,41 @@ public class PaymentProcessor {
         if (provided.isBefore(current)) {
             throw new IllegalArgumentException("Card is expired");
         }
+    }
+
+    private InvoiceCreateResponse createInvoice(BookingSummary booking, String transactionRef, Payment.PaymentMode paymentMode, BigDecimal amount) {
+        InvoiceCreateRequest req = new InvoiceCreateRequest();
+        req.setBookingId(booking.getId());
+        req.setCustomerId(resolveCustomerId(booking));
+        req.setReceiverName(defaultString(booking.getReceiverName(), "Receiver"));
+        req.setReceiverAddress(defaultString(booking.getReceiverAddress(), "Unknown address"));
+        req.setReceiverPin(defaultString(booking.getReceiverPinCode(), "000000"));
+        req.setReceiverMobile(defaultString(booking.getReceiverContact(), "0000000000"));
+
+        BigDecimal grams = null;
+        if (booking.getWeightKg() != null) {
+            grams = booking.getWeightKg().multiply(BigDecimal.valueOf(1000));
+        }
+        if (grams == null || grams.compareTo(BigDecimal.valueOf(1)) < 0) {
+            grams = BigDecimal.valueOf(100); // sensible default to satisfy validation
+        }
+        req.setParcelWeightGrams(grams);
+
+        req.setContentsDescription(defaultString(booking.getContentsDescription(), "Parcel"));
+        req.setParcelDeliveryType(defaultString(booking.getDeliverySpeed(), "STANDARD"));
+        req.setParcelPackingPreference(defaultString(booking.getPackagingPreference(), "STANDARD"));
+
+        req.setParcelPickupTime(booking.getPreferredPickup() != null ? booking.getPreferredPickup() : LocalDateTime.now());
+        req.setParcelDropoffTime(null);
+        req.setParcelServiceCost(amount);
+        req.setPaymentTime(LocalDateTime.now());
+        req.setPaymentMode(paymentMode.name());
+        req.setTransactionRef(transactionRef);
+        return invoiceClient.createInvoice(req);
+    }
+
+    private String defaultString(String value, String fallback) {
+        return (value == null || value.isBlank()) ? fallback : value;
     }
 
     private String generateRef() {
