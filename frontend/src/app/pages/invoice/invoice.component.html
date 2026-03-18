@@ -27,6 +27,10 @@
           <p class="label">Transaction Ref</p>
           <h3>{{ invoice.transactionRef }}</h3>
         </div>
+        <div *ngIf="trackingNumber">
+          <p class="label">Tracking Booking ID</p>
+          <h3>{{ trackingNumber }}</h3>
+        </div>
       </div>
 
       <div class="grid">
@@ -53,6 +57,7 @@
 
       <div class="actions">
         <button class="primary" (click)="print()">Print</button>
+        <button class="secondary" (click)="openTracking()">Track Parcel</button>
         <button class="secondary" (click)="goHome()">Back to Home</button>
         <button class="ghost" (click)="viewHistory()">View Booking History</button>
       </div>

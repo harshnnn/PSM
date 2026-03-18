@@ -1,0 +1,62 @@
+<div class="page" *ngIf="session">
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Tracking</p>
+      <h1 *ngIf="session.role === 'CUSTOMER'">Track Your Parcel</h1>
+      <h1 *ngIf="session.role === 'OFFICER'">Shipped Packages</h1>
+      <p class="lede" *ngIf="session.role === 'CUSTOMER'">Enter your 12-digit Booking ID to view parcel status.</p>
+      <p class="lede" *ngIf="session.role === 'OFFICER'">Search and monitor shipped packages by Customer ID or Booking ID.</p>
+    </div>
+  </header>
+
+  <section class="panel" *ngIf="session.role === 'CUSTOMER'">
+    <form [formGroup]="customerForm" (ngSubmit)="searchCustomer()" class="search-row">
+      <div class="field">
+        <label>Booking ID (12 digits)</label>
+        <input type="text" formControlName="bookingId" placeholder="e.g. 184502907341" />
+      </div>
+      <button class="primary" type="submit" [disabled]="loadingCustomer">{{ loadingCustomer ? 'Searching...' : 'Search' }}</button>
+    </form>
+
+    <div class="error" *ngIf="customerError">{{ customerError }}</div>
+
+    <div class="result" *ngIf="customerResult">
+      <div><p class="label">Booking ID</p><h3>{{ customerResult.bookingId }}</h3></div>
+      <div><p class="label">Original Booking</p><h3>#{{ customerResult.originalBookingId }}</h3></div>
+      <div><p class="label">Status</p><h3>{{ customerResult.trackingStatus }}</h3></div>
+      <div><p class="label">Amount</p><h3>{{ customerResult.amount | currency }}</h3></div>
+      <div><p class="label">Receiver</p><h3>{{ customerResult.receiverName }}</h3></div>
+      <div><p class="label">Shipped At</p><h3>{{ customerResult.shippedAt | date: 'medium' }}</h3></div>
+    </div>
+  </section>
+
+  <section class="panel" *ngIf="session.role === 'OFFICER'">
+    <form [formGroup]="officerForm" (ngSubmit)="searchOfficer()" class="search-row officer-search">
+      <div class="field">
+        <label>Customer ID</label>
+        <input type="text" formControlName="customerId" placeholder="harsh" />
+      </div>
+      <div class="field">
+        <label>Booking ID</label>
+        <input type="text" formControlName="bookingId" placeholder="12-digit booking ID" />
+      </div>
+      <button class="primary" type="submit" [disabled]="loadingOfficer">{{ loadingOfficer ? 'Searching...' : 'Search' }}</button>
+      <button class="ghost" type="button" (click)="clearOfficerFilters()">Clear</button>
+    </form>
+
+    <div class="error" *ngIf="officerError">{{ officerError }}</div>
+    <p class="muted" *ngIf="!loadingOfficer && officerResults.length === 0">No shipped packages found.</p>
+
+    <div class="list" *ngIf="officerResults.length > 0">
+      <div class="item" *ngFor="let row of officerResults">
+        <div class="head">
+          <h3>{{ row.bookingId }}</h3>
+          <span class="pill">{{ row.trackingStatus }}</span>
+        </div>
+        <p>Customer: {{ row.customerId }} | Receiver: {{ row.receiverName }}</p>
+        <p>Original Booking: #{{ row.originalBookingId }}</p>
+        <p>Amount: {{ row.amount | currency }} | Shipped: {{ row.shippedAt | date: 'medium' }}</p>
+      </div>
+    </div>
+  </section>
+</div>

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.payment.client.BookingClient;
 import com.example.payment.client.InvoiceClient;
+import com.example.payment.client.TrackingClient;
 import com.example.payment.dto.BookingPaymentUpdateRequest;
 import com.example.payment.dto.BookingSummary;
 import com.example.payment.dto.InvoiceCreateRequest;
@@ -18,6 +19,8 @@ import com.example.payment.dto.InvoiceCreateResponse;
 import com.example.payment.dto.PaymentBillResponse;
 import com.example.payment.dto.PaymentRequest;
 import com.example.payment.dto.PaymentResponse;
+import com.example.payment.dto.TrackingCreateRequest;
+import com.example.payment.dto.TrackingCreateResponse;
 import com.example.payment.entity.Payment;
 import com.example.payment.entity.Payment.PaymentStatus;
 import com.example.payment.repository.PaymentRepository;
@@ -28,11 +31,13 @@ public class PaymentProcessor {
     private final PaymentRepository repository;
     private final BookingClient bookingClient;
     private final InvoiceClient invoiceClient;
+    private final TrackingClient trackingClient;
 
-    public PaymentProcessor(PaymentRepository repository, BookingClient bookingClient, InvoiceClient invoiceClient) {
+    public PaymentProcessor(PaymentRepository repository, BookingClient bookingClient, InvoiceClient invoiceClient, TrackingClient trackingClient) {
         this.repository = repository;
         this.bookingClient = bookingClient;
         this.invoiceClient = invoiceClient;
+        this.trackingClient = trackingClient;
     }
 
     @Transactional(readOnly = true)
@@ -94,11 +99,13 @@ public class PaymentProcessor {
         }
 
         InvoiceCreateResponse invoice = createInvoice(booking, saved.getTransactionRef(), request.getPaymentMode(), expectedAmount);
+        TrackingCreateResponse tracking = registerTracking(booking, expectedAmount);
 
         return new PaymentResponse(
                 saved.getBookingId(),
             invoice != null ? invoice.getId() : null,
             invoice != null ? invoice.getInvoiceNumber() : null,
+            tracking != null ? tracking.getBookingId() : null,
                 saved.getCustomerId(),
                 saved.getAmount(),
                 saved.getPaymentMode(),
@@ -153,6 +160,15 @@ public class PaymentProcessor {
         return invoiceClient.createInvoice(req);
     }
 
+    private TrackingCreateResponse registerTracking(BookingSummary booking, BigDecimal amount) {
+        TrackingCreateRequest request = new TrackingCreateRequest();
+        request.setOriginalBookingId(booking.getId());
+        request.setCustomerId(resolveCustomerId(booking));
+        request.setReceiverName(defaultString(booking.getReceiverName(), "Receiver"));
+        request.setAmount(amount);
+        return trackingClient.registerShipment(request);
+    }
+
     private String defaultString(String value, String fallback) {
         return (value == null || value.isBlank()) ? fallback : value;
     }
@@ -161,9 +177,4 @@ public class PaymentProcessor {
         return "TXN-" + UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase();
     }
 
-    private String lastTransactionRef(Long bookingId) {
-        return repository.findTopByBookingIdOrderByCreatedAtDesc(bookingId)
-                .map(Payment::getTransactionRef)
-                .orElse("TXN-PAID");
-    }
 }

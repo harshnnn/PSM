@@ -137,7 +137,7 @@ export class PayBillComponent implements OnInit, OnDestroy {
     this.paySub = this.paymentApi.pay(payload).subscribe({
       next: (res) => {
         this.loadingPayment = false;
-        this.successMessage = `${res.message} (Booking #${res.bookingId}, Txn ${res.transactionRef})`;
+        this.successMessage = `${res.message} (Booking #${res.bookingId}, Txn ${res.transactionRef}${res.trackingNumber ? `, Track ID ${res.trackingNumber}` : ''})`;
         this.errorMessage = '';
         this.showCardForm = false;
         this.loadUnpaidBookings(null);
@@ -145,7 +145,8 @@ export class PayBillComponent implements OnInit, OnDestroy {
           this.router.navigate(['/invoice'], {
             queryParams: {
               invoiceId: res.invoiceId,
-              invoiceNumber: res.invoiceNumber ?? undefined
+              invoiceNumber: res.invoiceNumber ?? undefined,
+              trackingNumber: res.trackingNumber ?? undefined
             }
           });
         } else {

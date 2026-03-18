@@ -9,6 +9,7 @@ import { BookingHistoryComponent } from './pages/booking-history/booking-history
 import { PayBillComponent } from './pages/pay-bill/pay-bill.component';
 import { InvoiceComponent } from './pages/invoice/invoice.component';
 import { InvoiceListComponent } from './pages/invoice-list/invoice-list.component';
+import { TrackingComponent } from './pages/tracking/tracking.component';
 import { authGuard, redirectIfLoggedInGuard } from './services/auth.guard';
 
 export const routes: Routes = [
@@ -21,7 +22,7 @@ export const routes: Routes = [
 	{ path: 'pay-bill', component: PayBillComponent, canActivate: [authGuard] },
 	{ path: 'invoices', component: InvoiceListComponent, canActivate: [authGuard] },
 	{ path: 'invoice', component: InvoiceComponent, canActivate: [authGuard] },
-	{ path: 'tracking', component: PlaceholderComponent, canActivate: [authGuard], data: { title: 'Tracking' } },
+	{ path: 'tracking', component: TrackingComponent, canActivate: [authGuard] },
 	{ path: 'previous-booking', component: BookingHistoryComponent, canActivate: [authGuard] },
 	{ path: 'previous-bookings', redirectTo: 'previous-booking', pathMatch: 'full' },
 	{ path: 'support', component: PlaceholderComponent, canActivate: [authGuard], data: { title: 'Contact Support' } },

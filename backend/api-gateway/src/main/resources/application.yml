@@ -41,6 +41,10 @@ spring:
           uri: lb://invoice-service
           predicates:
             - Path=/api/invoices/**
+        - id: tracking-service
+          uri: lb://tracking-service
+          predicates:
+            - Path=/api/tracking/**
 
 eureka:
   client:
