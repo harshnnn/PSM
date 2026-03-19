@@ -21,6 +21,42 @@ spring:
             allowed-headers: "*"
             allow-credentials: true
       routes:
+        - id: auth-h2-console
+          uri: lb://auth-service
+          predicates:
+            - Path=/h2/auth/**
+          filters:
+            - RewritePath=/h2/auth/?(?<segment>.*), /h2-console/$\{segment}
+        - id: booking-h2-console
+          uri: lb://booking-service
+          predicates:
+            - Path=/h2/booking/**
+          filters:
+            - RewritePath=/h2/booking/?(?<segment>.*), /h2-console/$\{segment}
+        - id: booking-history-h2-console
+          uri: lb://booking-history-service
+          predicates:
+            - Path=/h2/booking-history/**
+          filters:
+            - RewritePath=/h2/booking-history/?(?<segment>.*), /h2-console/$\{segment}
+        - id: payment-h2-console
+          uri: lb://payment-service
+          predicates:
+            - Path=/h2/payment/**
+          filters:
+            - RewritePath=/h2/payment/?(?<segment>.*), /h2-console/$\{segment}
+        - id: invoice-h2-console
+          uri: lb://invoice-service
+          predicates:
+            - Path=/h2/invoice/**
+          filters:
+            - RewritePath=/h2/invoice/?(?<segment>.*), /h2-console/$\{segment}
+        - id: tracking-h2-console
+          uri: lb://tracking-service
+          predicates:
+            - Path=/h2/tracking/**
+          filters:
+            - RewritePath=/h2/tracking/?(?<segment>.*), /h2-console/$\{segment}
         - id: auth-service
           uri: lb://auth-service
           predicates:

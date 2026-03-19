@@ -49,7 +49,7 @@ public class TrackingServiceImpl implements TrackingService {
         record.setCustomerId(request.getCustomerId().trim());
         record.setReceiverName(request.getReceiverName());
         record.setAmount(request.getAmount());
-        record.setStatus(TrackingStatus.SHIPPED);
+        record.setStatus(TrackingStatus.CONFIRMED);
         record.setShippedAt(LocalDateTime.now());
 
         TrackingRecord saved = repository.save(record);
@@ -133,7 +133,7 @@ public class TrackingServiceImpl implements TrackingService {
             record.setCustomerId(defaultString(booking.getCustomerId(), "customer"));
             record.setReceiverName(defaultString(booking.getReceiverName(), "Receiver"));
             record.setAmount(booking.getServiceCost() != null ? booking.getServiceCost() : BigDecimal.ZERO);
-            record.setStatus(TrackingStatus.SHIPPED);
+            record.setStatus(TrackingStatus.CONFIRMED);
             record.setShippedAt(booking.getCreatedAt() != null ? booking.getCreatedAt() : LocalDateTime.now());
             repository.save(record);
             inserted++;
@@ -164,11 +164,23 @@ public class TrackingServiceImpl implements TrackingService {
         response.setCustomerId(record.getCustomerId());
         response.setReceiverName(record.getReceiverName());
         response.setAmount(record.getAmount());
-        response.setTrackingStatus(record.getStatus().name());
+        response.setTrackingStatus(mapStatusForResponse(record.getStatus()));
         response.setShippedAt(record.getShippedAt());
         response.setPickupScheduledAt(record.getPickupScheduledAt());
         response.setLastUpdatedAt(record.getUpdatedAt());
         return response;
+    }
+
+    private String mapStatusForResponse(TrackingStatus status) {
+        if (status == null) {
+            return "CONFIRMED";
+        }
+        return switch (status) {
+            case CONFIRMED, SHIPPED -> "CONFIRMED";
+            case PICKED_UP, IN_TRANSIT -> "IN_TRANSIT";
+            case DELIVERED -> "DELIVERED";
+            case RETURNED -> "CANCELLED";
+        };
     }
 
     private TrackingRecord findByBookingIdentifier(String bookingId) {

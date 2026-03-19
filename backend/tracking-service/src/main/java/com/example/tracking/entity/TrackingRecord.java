@@ -19,6 +19,7 @@ import jakarta.persistence.Table;
 public class TrackingRecord {
 
     public enum TrackingStatus {
+        CONFIRMED,
         SHIPPED,
         PICKED_UP,
         IN_TRANSIT,

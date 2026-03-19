@@ -5,7 +5,7 @@ spring:
   application:
     name: tracking-service
   datasource:
-    url: jdbc:h2:mem:trackingdb
+    url: jdbc:h2:mem:trackingdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -17,6 +17,8 @@ spring:
     console:
       enabled: true
       path: /h2-console
+      settings:
+        web-allow-others: true
 
 booking:
   service:

@@ -3,6 +3,7 @@ package com.example.bookinghistory.controller;
 import com.example.bookinghistory.client.TrackingLookupClient;
 import com.example.bookinghistory.dto.BookingHistoryDto;
 import com.example.bookinghistory.dto.PageResponse;
+import com.example.bookinghistory.dto.TrackingLookupResponse;
 import com.example.bookinghistory.entity.BookingHistory;
 import com.example.bookinghistory.repository.BookingHistoryRepository;
 import jakarta.validation.constraints.Max;
@@ -150,10 +151,10 @@ public class BookingHistoryController {
     private BookingHistory.BookingStatus mapStatus(String status) {
         if (status == null) return BookingHistory.BookingStatus.PENDING;
         return switch (status) {
-            case "CONFIRMED" -> BookingHistory.BookingStatus.CONFIRMED;
-            case "IN_TRANSIT" -> BookingHistory.BookingStatus.IN_TRANSIT;
+            case "CONFIRMED", "SHIPPED" -> BookingHistory.BookingStatus.CONFIRMED;
+            case "PICKED_UP", "IN_TRANSIT" -> BookingHistory.BookingStatus.IN_TRANSIT;
             case "DELIVERED" -> BookingHistory.BookingStatus.DELIVERED;
-            case "CANCELLED" -> BookingHistory.BookingStatus.CANCELLED;
+            case "RETURNED", "CANCELLED" -> BookingHistory.BookingStatus.CANCELLED;
             default -> BookingHistory.BookingStatus.PENDING;
         };
     }
@@ -168,29 +169,31 @@ public class BookingHistoryController {
         dto.setId(entity.getId());
         dto.setCustomerId(entity.getCustomerId());
         dto.setBookingId(entity.getBookingId());
-        String trackingBookingId = resolveTrackingBookingId(entity);
-        dto.setTrackingBookingId(trackingBookingId);
+        Long originalBookingId = extractOriginalBookingId(entity.getBookingId());
+        TrackingLookupResponse tracking = trackingLookupClient.findTrackingDetails(originalBookingId);
+        dto.setTrackingBookingId(resolveTrackingBookingId(entity, tracking));
         dto.setBookingDate(entity.getBookingDate());
         dto.setReceiverName(entity.getReceiverName());
         dto.setDeliveredAddress(entity.getDeliveredAddress());
         dto.setAmount(entity.getAmount());
-        dto.setStatus(entity.getStatus());
+        dto.setStatus(resolveStatus(entity, tracking));
         return dto;
     }
 
-    private String resolveTrackingBookingId(BookingHistory entity) {
+    private String resolveTrackingBookingId(BookingHistory entity, TrackingLookupResponse tracking) {
         String existing = entity.getTrackingBookingId();
         if (existing != null && !existing.isBlank()) {
             return existing;
         }
 
-        Long originalBookingId = extractOriginalBookingId(entity.getBookingId());
-        if (originalBookingId == null) {
-            return null;
-        }
+        return tracking != null ? tracking.getBookingId() : null;
+    }
 
-        String resolved = trackingLookupClient.findTrackingBookingId(originalBookingId);
-        return resolved;
+    private BookingHistory.BookingStatus resolveStatus(BookingHistory entity, TrackingLookupResponse tracking) {
+        if (tracking == null || tracking.getTrackingStatus() == null || tracking.getTrackingStatus().isBlank()) {
+            return entity.getStatus();
+        }
+        return mapStatus(tracking.getTrackingStatus().trim().toUpperCase());
     }
 
     private Long extractOriginalBookingId(String bookingId) {
