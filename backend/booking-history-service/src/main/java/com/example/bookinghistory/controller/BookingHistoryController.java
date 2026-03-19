@@ -168,8 +168,10 @@ public class BookingHistoryController {
         dto.setId(entity.getId());
         dto.setCustomerId(entity.getCustomerId());
         dto.setBookingId(entity.getBookingId());
+        Long originalBookingId = extractOriginalBookingId(entity.getBookingId());
         String trackingBookingId = resolveTrackingBookingId(entity);
         dto.setTrackingBookingId(trackingBookingId);
+        dto.setTrackingStatus(trackingLookupClient.findTrackingStatus(originalBookingId));
         dto.setBookingDate(entity.getBookingDate());
         dto.setReceiverName(entity.getReceiverName());
         dto.setDeliveredAddress(entity.getDeliveredAddress());

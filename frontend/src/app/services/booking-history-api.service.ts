@@ -12,6 +12,7 @@ export interface BookingHistoryEntry {
   deliveredAddress: string;
   amount: number;
   status: string;
+  trackingStatus?: string | null;
 }
 
 export interface PageResponse<T> {
