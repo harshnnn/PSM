@@ -26,6 +26,16 @@ public class TrackingLookupClient {
     }
 
     public String findTrackingBookingId(Long originalBookingId) {
+        TrackingLookupResponse body = findTrackingRecord(originalBookingId);
+        return body != null ? body.getBookingId() : null;
+    }
+
+    public String findTrackingStatus(Long originalBookingId) {
+        TrackingLookupResponse body = findTrackingRecord(originalBookingId);
+        return body != null ? body.getTrackingStatus() : null;
+    }
+
+    private TrackingLookupResponse findTrackingRecord(Long originalBookingId) {
         if (originalBookingId == null) {
             return null;
         }
@@ -38,7 +48,7 @@ public class TrackingLookupClient {
             if (!response.getStatusCode().is2xxSuccessful() || body == null) {
                 return null;
             }
-            return body.getBookingId();
+            return body;
         } catch (RestClientException ex) {
             log.debug("Tracking ID lookup failed for booking {}: {}", originalBookingId, ex.getMessage());
             return null;

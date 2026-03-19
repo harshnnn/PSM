@@ -14,6 +14,7 @@ public class BookingHistoryDto {
     private String deliveredAddress;
     private BigDecimal amount;
     private BookingStatus status;
+    private String trackingStatus;
 
     public Long getId() {
         return id;
@@ -85,5 +86,13 @@ public class BookingHistoryDto {
 
     public void setStatus(BookingStatus status) {
         this.status = status;
+    }
+
+    public String getTrackingStatus() {
+        return trackingStatus;
+    }
+
+    public void setTrackingStatus(String trackingStatus) {
+        this.trackingStatus = trackingStatus;
     }
 }
