@@ -1,0 +1,23 @@
+& {
+  $ports = 8761,8080,8081,8082,8083,8085,8086,8087
+  Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue |
+    Where-Object { $ports -contains $_.LocalPort } |
+    Select-Object -ExpandProperty OwningProcess -Unique |
+    ForEach-Object {
+      try {
+        $p = Get-Process -Id $_ -ErrorAction Stop
+        if ($p.ProcessName -match '^(java|javaw)$') {
+          Stop-Process -Id $_ -Force -ErrorAction Stop
+          Write-Host "Stopped PID $_ on port(s) in list"
+        }
+      } catch {}
+    }
+
+  Start-Sleep -Seconds 2
+
+  Get-ChildItem $HOME -Filter "psm_shared_db*.db" -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+  Get-ChildItem $HOME -Filter "psm_shared_db*.lock.db" -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+  Get-ChildItem $HOME -Filter "psm_shared_db*.trace.db" -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+
+  Write-Host "Done. Now run VS Code task: Start backend microservices (VS Code terminals)"
+}

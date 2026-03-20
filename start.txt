@@ -1,0 +1,46 @@
+$Root = "C:\Users\HARSH\Desktop\SpringBoot\PSM\backend"
+
+$ServicesInOrder = @(
+    "service-registry",
+    "auth-service",
+    "booking-service",
+    "payment-service",
+    "invoice-service",
+    "tracking-service",
+    "booking-history-service",
+    "api-gateway"
+)
+
+function Start-Microservice {
+    param(
+        [string]$ServiceName
+    )
+
+    $servicePath = Join-Path $Root $ServiceName
+    if (-not (Test-Path $servicePath)) {
+        Write-Warning "Skipping $ServiceName (path not found: $servicePath)"
+        return
+    }
+
+    $mvnw = Join-Path $servicePath "mvnw.cmd"
+    $runner = if (Test-Path $mvnw) { ".\mvnw.cmd" } else { "mvn" }
+
+    $cmd = "Set-Location '$servicePath'; $runner spring-boot:run"
+    Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd | Out-Null
+    Write-Host "Started $ServiceName"
+}
+
+Write-Host "Starting service-registry first..."
+Start-Microservice "service-registry"
+
+Write-Host "Waiting 12 seconds for registry startup..."
+Start-Sleep -Seconds 12
+
+foreach ($svc in $ServicesInOrder[1..($ServicesInOrder.Count - 1)]) {
+    Start-Microservice $svc
+    Start-Sleep -Seconds 2
+}
+
+Write-Host ""
+Write-Host "All microservices launch commands sent."
+Write-Host "Close each service window to stop that service."

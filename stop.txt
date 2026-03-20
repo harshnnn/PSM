@@ -1,0 +1,48 @@
+$ports = @(8761, 8080, 8081, 8082, 8083, 8085, 8086, 8087)
+$killed = @()
+$seenProcIds = @{}
+
+foreach ($port in $ports) {
+    $listeners = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue
+    if (-not $listeners) {
+        Write-Host "No listener on port $port"
+        continue
+    }
+
+    $procIds = $listeners | Select-Object -ExpandProperty OwningProcess -Unique
+    foreach ($procId in $procIds) {
+        if ($seenProcIds.ContainsKey($procId)) {
+            continue
+        }
+
+        try {
+            $proc = Get-Process -Id $procId -ErrorAction Stop
+            if ($proc.ProcessName -match '^(java|javaw)$') {
+                Stop-Process -Id $procId -Force -ErrorAction Stop
+                $seenProcIds[$procId] = $true
+                $killed += [pscustomobject]@{
+                    Port    = $port
+                    PID     = $procId
+                    Process = $proc.ProcessName
+                }
+                Write-Host "Stopped Java PID $procId on port $port"
+            }
+            else {
+                Write-Host "Skipped non-Java PID $procId ($($proc.ProcessName)) on port $port"
+            }
+        }
+        catch {
+            Write-Host "Could not stop PID $procId on port $port : $($_.Exception.Message)"
+        }
+    }
+}
+
+if ($killed.Count -eq 0) {
+    Write-Host ""
+    Write-Host "No Java microservice processes were stopped."
+}
+else {
+    Write-Host ""
+    Write-Host "Stopped processes summary:"
+    $killed | Sort-Object Port | Format-Table -AutoSize
+}
