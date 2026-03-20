@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthApiService } from '../../services/auth-api.service';
 import { SessionService } from '../../services/session.service';
+import { markAndFocusFirstInvalidControl } from '../../utils/form-validation';
 
 @Component({
   selector: 'app-login',
@@ -38,7 +39,7 @@ export class LoginComponent {
   submit(): void {
     this.errorMessage = '';
     if (this.form.invalid) {
-      this.form.markAllAsTouched();
+      markAndFocusFirstInvalidControl(this.form);
       this.errorMessage = 'Please fix validation errors before login.';
       return;
     }

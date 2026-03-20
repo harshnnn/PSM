@@ -1,9 +1,21 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthApiService, RegisterResponse } from '../../services/auth-api.service';
 import { SessionService } from '../../services/session.service';
+import { markAndFocusFirstInvalidControl } from '../../utils/form-validation';
+
+function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
+  const password = control.get('password')?.value;
+  const confirmPassword = control.get('confirmPassword')?.value;
+
+  if (!password || !confirmPassword) {
+    return null;
+  }
+
+  return password === confirmPassword ? null : { passwordMismatch: true };
+}
 
 @Component({
   selector: 'app-register',
@@ -15,6 +27,8 @@ import { SessionService } from '../../services/session.service';
 export class RegisterComponent {
   errorMessage = '';
   readonly form;
+  private readonly personNamePattern = /^[A-Za-z][A-Za-z .'-]*$/;
+  private readonly userIdPattern = /^[A-Za-z0-9._-]{5,20}$/;
 
   readonly countryCodes = ['+1', '+44', '+61', '+91'];
 
@@ -25,34 +39,38 @@ export class RegisterComponent {
     private readonly router: Router
   ) {
     this.form = this.formBuilder.group({
-      customerName: ['', [Validators.required, Validators.maxLength(50)]],
+      customerName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(this.personNamePattern)]],
       email: ['', [Validators.required, Validators.email]],
       countryCode: ['+91', [Validators.required]],
       mobileNumber: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
-      address: ['', [Validators.required, Validators.maxLength(200)]],
-      userId: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(20)]],
+      address: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(200)]],
+      userId: ['', [Validators.required, Validators.pattern(this.userIdPattern)]],
       password: [
         '',
-        [Validators.required, Validators.maxLength(30), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{6,30}$/)]
+        [Validators.required, Validators.minLength(6), Validators.maxLength(30), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{6,30}$/)]
       ],
-      confirmPassword: ['', [Validators.required, Validators.maxLength(30)]],
-      preferences: ['']
-    });
+      confirmPassword: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(30)]],
+      preferences: ['', [Validators.maxLength(200)]]
+    }, { validators: passwordMatchValidator });
   }
 
   submit(): void {
     this.errorMessage = '';
     if (this.form.invalid) {
-      this.form.markAllAsTouched();
+      markAndFocusFirstInvalidControl(this.form);
       this.errorMessage = 'Please fix validation errors before registration.';
       return;
     }
 
-    const payload = this.form.getRawValue();
-    if (payload.password !== payload.confirmPassword) {
-      this.errorMessage = 'Password and Confirm Password must match.';
-      return;
-    }
+    const raw = this.form.getRawValue();
+    const payload = {
+      ...raw,
+      customerName: this.normalizeText(raw.customerName),
+      address: this.normalizeText(raw.address),
+      userId: String(raw.userId ?? '').trim(),
+      email: String(raw.email ?? '').trim().toLowerCase(),
+      preferences: this.normalizeText(raw.preferences)
+    };
 
     this.authApi.register(payload as any).subscribe({
       next: (response: RegisterResponse) => {
@@ -94,5 +112,9 @@ export class RegisterComponent {
 
   backToLogin(): void {
     this.router.navigate(['/login']);
+  }
+
+  private normalizeText(value: unknown): string {
+    return String(value ?? '').trim().replace(/\s+/g, ' ');
   }
 }

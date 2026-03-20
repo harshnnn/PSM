@@ -7,14 +7,16 @@
       <div class="form-row">
         <div>
           <label>Customer Name</label>
-          <input type="text" formControlName="customerName" />
+          <input type="text" formControlName="customerName" placeholder="e.g. Harsh Verma" />
           <div class="error" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['required']">Customer Name is required.</div>
+          <div class="error" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['minlength']">Customer Name must be at least 2 characters.</div>
           <div class="error" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['maxlength']">Customer Name must be at most 50 characters.</div>
+          <div class="error" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['pattern']">Customer Name cannot include numbers or invalid symbols.</div>
         </div>
 
         <div>
           <label>Email</label>
-          <input type="email" formControlName="email" />
+          <input type="email" formControlName="email" placeholder="name@example.com" />
           <div class="error" *ngIf="form.controls.email.touched && form.controls.email.errors?.['required']">Email is required.</div>
           <div class="error" *ngIf="form.controls.email.touched && form.controls.email.errors?.['email']">Enter a valid email.</div>
         </div>
@@ -28,7 +30,7 @@
           </div>
           <div>
             <label>Mobile Number (10 digits)</label>
-            <input type="text" formControlName="mobileNumber" />
+            <input type="text" formControlName="mobileNumber" inputmode="numeric" maxlength="10" placeholder="9876543210" />
             <div class="error" *ngIf="form.controls.mobileNumber.touched && form.controls.mobileNumber.errors?.['required']">Mobile number is required.</div>
             <div class="error" *ngIf="form.controls.mobileNumber.touched && form.controls.mobileNumber.errors?.['pattern']">Enter exactly 10 digits.</div>
           </div>
@@ -36,8 +38,9 @@
 
         <div>
           <label>Address</label>
-          <textarea rows="3" formControlName="address"></textarea>
+          <textarea rows="3" formControlName="address" placeholder="House no, street, city"></textarea>
           <div class="error" *ngIf="form.controls.address.touched && form.controls.address.errors?.['required']">Address is required.</div>
+          <div class="error" *ngIf="form.controls.address.touched && form.controls.address.errors?.['minlength']">Address must be at least 5 characters.</div>
           <div class="error" *ngIf="form.controls.address.touched && form.controls.address.errors?.['maxlength']">Address is too long.</div>
         </div>
       </div>
@@ -46,15 +49,16 @@
       <div class="form-row">
         <div>
           <label>User ID</label>
-          <input type="text" formControlName="userId" />
+          <input type="text" formControlName="userId" placeholder="letters, numbers, . _ -" />
           <div class="error" *ngIf="form.controls.userId.touched && form.controls.userId.errors?.['required']">User ID is required.</div>
-          <div class="error" *ngIf="form.controls.userId.touched && (form.controls.userId.errors?.['minlength'] || form.controls.userId.errors?.['maxlength'])">User ID must be between 5 and 20 characters.</div>
+          <div class="error" *ngIf="form.controls.userId.touched && form.controls.userId.errors?.['pattern']">User ID must be 5-20 chars and only letters, numbers, dot, underscore, or hyphen.</div>
         </div>
 
         <div>
           <label>Password</label>
           <input type="password" formControlName="password" />
           <div class="error" *ngIf="form.controls.password.touched && form.controls.password.errors?.['required']">Password is required.</div>
+          <div class="error" *ngIf="form.controls.password.touched && form.controls.password.errors?.['minlength']">Password must be at least 6 characters.</div>
           <div class="error" *ngIf="form.controls.password.touched && form.controls.password.errors?.['maxlength']">Password must be at most 30 characters.</div>
           <div class="error" *ngIf="form.controls.password.touched && form.controls.password.errors?.['pattern']">Password must contain upper case, lower case and special character.</div>
         </div>
@@ -63,6 +67,8 @@
           <label>Confirm Password</label>
           <input type="password" formControlName="confirmPassword" />
           <div class="error" *ngIf="form.controls.confirmPassword.touched && form.controls.confirmPassword.errors?.['required']">Confirm Password is required.</div>
+          <div class="error" *ngIf="form.controls.confirmPassword.touched && form.controls.confirmPassword.errors?.['minlength']">Confirm Password must be at least 6 characters.</div>
+          <div class="error" *ngIf="(form.touched || form.controls.confirmPassword.touched) && form.errors?.['passwordMismatch']">Password and Confirm Password must match.</div>
         </div>
       </div>
 
@@ -71,6 +77,7 @@
         <div>
           <label>Delivery / Notification Preferences</label>
           <textarea rows="2" formControlName="preferences" placeholder="Optional"></textarea>
+          <div class="error" *ngIf="form.controls.preferences.touched && form.controls.preferences.errors?.['maxlength']">Preferences must be at most 200 characters.</div>
         </div>
       </div>
 

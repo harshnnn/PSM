@@ -1,9 +1,67 @@
-<div class="page">
-  <div class="card">
-    <h1>{{ title }}</h1>
-    <p>This page is ready for the next microservice implementation.</p>
-    <div class="actions">
-      <button class="primary" (click)="goHome()">Back to Home</button>
+<div class="page" *ngIf="isSupportPage; else genericView">
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Need Help</p>
+      <h1>{{ title }}</h1>
+      <p class="lede">Our support team can help with bookings, invoices, payment issues, and shipment updates.</p>
+    </div>
+    <button class="ghost" (click)="goHome()">Back to Home</button>
+  </header>
+
+  <section class="grid">
+    <article class="panel">
+      <h3>Support Channels</h3>
+      <div class="channel-list">
+        <div class="channel" *ngFor="let channel of supportChannels">
+          <p class="label">{{ channel.label }}</p>
+          <p class="value">{{ channel.value }}</p>
+          <p class="note">{{ channel.note }}</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="panel">
+      <h3>Response Targets</h3>
+      <div class="sla-row" *ngFor="let slot of supportHours">
+        <p class="label">{{ slot.team }}</p>
+        <p class="value">{{ slot.hours }}</p>
+        <p class="note">{{ slot.target }}</p>
+      </div>
+    </article>
+
+    <article class="panel wide">
+      <h3>Before You Raise a Ticket</h3>
+      <ul class="checklist">
+        <li>Include Booking ID or Tracking Booking ID.</li>
+        <li>Mention transaction reference for payment and invoice issues.</li>
+        <li>Add clear issue summary and exact error message, if any.</li>
+        <li>Share expected outcome so we can resolve faster.</li>
+      </ul>
+      <div class="ticket-sample">
+        <p class="label">Suggested Ticket Format</p>
+        <p class="sample">Subject: Invoice not generated for Booking #417</p>
+        <p class="sample">Description: Payment completed at 10:47 PM with Txn TXN-32FD533091, but invoice is not visible in Invoices page.</p>
+      </div>
+    </article>
+
+    <article class="panel wide">
+      <h3>Frequently Asked Questions</h3>
+      <div class="faq-item" *ngFor="let faq of faqItems">
+        <p class="question">{{ faq.question }}</p>
+        <p class="answer">{{ faq.answer }}</p>
+      </div>
+    </article>
+  </section>
+</div>
+
+<ng-template #genericView>
+  <div class="page">
+    <div class="card">
+      <h1>{{ title }}</h1>
+      <p>This page is ready for the next microservice implementation.</p>
+      <div class="actions">
+        <button class="primary" (click)="goHome()">Back to Home</button>
+      </div>
     </div>
   </div>
-</div>
+</ng-template>

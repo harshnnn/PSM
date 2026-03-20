@@ -1,51 +1,224 @@
-<div class="home" *ngIf="session">
-  <div class="hero">
+<div class="dashboard" *ngIf="session as s">
+  <header class="hero">
     <div>
-      <p class="eyebrow">{{ session.role === 'CUSTOMER' ? 'Customer Dashboard' : 'Officer Dashboard' }}</p>
-      <h1>Welcome, {{ session.username }}</h1>
+      <p class="eyebrow">{{ s.role === 'CUSTOMER' ? 'Customer Dashboard' : 'Officer Operations Dashboard' }}</p>
+      <h1>{{ s.role === 'CUSTOMER' ? 'Delivery portfolio summary' : 'Logistics command snapshot' }}</h1>
       <p class="lede">
-        Manage bookings, view history, and track deliveries from a single, streamlined workspace.
+        {{
+          s.role === 'CUSTOMER'
+            ? 'Monitor your bookings, payments, and delivery progress from one consolidated view.'
+            : 'Track shipment flow, operational load, and exception queues in real time.'
+        }}
       </p>
-      <div class="cta-row">
-        <button class="primary" (click)="navigate('/booking')">Create booking</button>
-        <button class="secondary" (click)="navigate('/previous-booking')">View history</button>
-      </div>
     </div>
-    <div class="stat-card">
-      <p class="label">Role</p>
-      <h2>{{ session.role }}</h2>
-      <p class="hint">Navigation is available in the top bar for quick access.</p>
-    </div>
-  </div>
 
-  <div class="tiles">
-    <div class="tile" (click)="navigate('/booking')">
-      <h3>Booking</h3>
-      <p>Create and manage new parcel bookings with live cost updates.</p>
-    </div>
-    <div class="tile" (click)="navigate('/pay-bill')">
-      <h3>Pay Bill</h3>
-      <p>Settle booking payments securely using debit or credit cards.</p>
-    </div>
-    <div class="tile" (click)="navigate('/previous-booking')">
-      <h3>History</h3>
-      <p>Search and filter previous bookings {{ session.role === 'CUSTOMER' ? 'for your account' : 'across all customers' }}.</p>
-    </div>
-    <div class="tile" (click)="navigate('/tracking')">
-      <h3>Tracking</h3>
-      <p>Track delivery milestones and statuses in real time.</p>
-    </div>
-    <div class="tile" *ngIf="session.role === 'OFFICER'" (click)="navigate('/pickup-scheduling')">
-      <h3>Pickup Scheduling</h3>
-      <p>Search booking IDs and schedule package pickup date/time.</p>
-    </div>
-    <div class="tile" *ngIf="session.role === 'OFFICER'" (click)="navigate('/delivery-status')">
-      <h3>Delivery Update</h3>
-      <p>Update status as Picked up, In Transit, Delivered, or Returned.</p>
-    </div>
-    <div class="tile" (click)="navigate('/support')">
-      <h3>Support</h3>
-      <p>Contact support for delivery, pickup, or billing queries.</p>
-    </div>
-  </div>
+    <aside class="hero-meta">
+      <p class="meta-label">Last refreshed</p>
+      <p class="meta-value">{{ lastUpdatedAt ? (lastUpdatedAt | date: 'medium') : 'Not loaded yet' }}</p>
+      <button class="refresh-btn" type="button" (click)="refreshDashboard()" [disabled]="loading">
+        {{ loading ? 'Refreshing...' : 'Refresh Dashboard' }}
+      </button>
+    </aside>
+  </header>
+
+  <p class="error-banner" *ngIf="loadError">{{ loadError }}</p>
+
+  <section class="loading-state" *ngIf="loading">
+    <p>Loading live dashboard metrics...</p>
+  </section>
+
+  <ng-container *ngIf="!loading">
+    <ng-container *ngIf="s.role === 'CUSTOMER'; else officerView">
+      <section class="metrics-grid">
+        <article class="metric-card" *ngFor="let metric of customerMetrics" [ngClass]="metric.tone">
+          <p class="metric-label">{{ metric.label }}</p>
+          <p class="metric-value">{{ metric.value }}</p>
+          <p class="metric-hint">{{ metric.hint }}</p>
+        </article>
+      </section>
+
+      <section class="content-grid customer-grid">
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Booking status distribution</h2>
+            <p>Based on your latest booking history records.</p>
+          </div>
+
+          <div class="status-list">
+            <div class="status-item" *ngFor="let item of customerStatusInsights">
+              <div class="status-meta">
+                <span>{{ item.label }}</span>
+                <span>{{ item.count }} ({{ item.percent }}%)</span>
+              </div>
+              <div class="status-track">
+                <span class="status-fill" [style.width.%]="item.percent"></span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel span-2">
+          <div class="panel-head">
+            <h2>Recent bookings</h2>
+            <p>Your latest booking and delivery activity.</p>
+          </div>
+
+          <div class="table-wrap">
+            <table class="dashboard-table">
+              <thead>
+                <tr>
+                  <th>Booking ID</th>
+                  <th>Receiver</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let entry of customerRecentBookings; trackBy: trackByHistoryEntry">
+                  <td>{{ entry.bookingId }}</td>
+                  <td>{{ entry.receiverName }}</td>
+                  <td>{{ entry.amount | currency: 'INR' : 'symbol' : '1.0-0' }}</td>
+                  <td>
+                    <span class="status-pill" [ngClass]="statusClass(entry.status)">
+                      {{ entry.status | titlecase }}
+                    </span>
+                  </td>
+                  <td>{{ entry.bookingDate | date: 'mediumDate' }}</td>
+                </tr>
+                <tr *ngIf="customerRecentBookings.length === 0">
+                  <td colspan="5" class="empty-row">No booking activity found yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Upcoming pickups</h2>
+            <p>Nearest scheduled pickup windows for your bookings.</p>
+          </div>
+
+          <div class="timeline" *ngIf="customerUpcomingPickups.length > 0; else noPickupTemplate">
+            <div class="timeline-item" *ngFor="let booking of customerUpcomingPickups">
+              <div>
+                <p class="timeline-title">Booking #{{ booking.id }} for {{ booking.receiverName }}</p>
+                <p class="timeline-sub">{{ booking.receiverPinCode }} • {{ booking.deliverySpeed | titlecase }}</p>
+              </div>
+              <p class="timeline-time">{{ booking.preferredPickup | date: 'medium' }}</p>
+            </div>
+          </div>
+
+          <ng-template #noPickupTemplate>
+            <p class="empty-text">No upcoming pickup schedules are available right now.</p>
+          </ng-template>
+        </article>
+      </section>
+    </ng-container>
+
+    <ng-template #officerView>
+      <section class="metrics-grid">
+        <article class="metric-card" *ngFor="let metric of officerMetrics" [ngClass]="metric.tone">
+          <p class="metric-label">{{ metric.label }}</p>
+          <p class="metric-value">{{ metric.value }}</p>
+          <p class="metric-hint">{{ metric.hint }}</p>
+        </article>
+      </section>
+
+      <section class="content-grid officer-grid">
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Shipment status pipeline</h2>
+            <p>Current distribution across logistics states.</p>
+          </div>
+
+          <div class="status-list">
+            <div class="status-item" *ngFor="let item of officerStatusInsights">
+              <div class="status-meta">
+                <span>{{ item.label }}</span>
+                <span>{{ item.count }} ({{ item.percent }}%)</span>
+              </div>
+              <div class="status-track">
+                <span class="status-fill" [style.width.%]="item.percent"></span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Operational action board</h2>
+            <p>Priority queues requiring officer attention.</p>
+          </div>
+
+          <div class="action-list">
+            <div class="action-item" *ngFor="let item of officerActionItems" [ngClass]="item.tone">
+              <p class="action-title">{{ item.label }}</p>
+              <p class="action-count">{{ item.count }}</p>
+              <p class="action-detail">{{ item.detail }}</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel span-2">
+          <div class="panel-head">
+            <h2>Latest shipment updates</h2>
+            <p>Most recently updated records from tracking operations.</p>
+          </div>
+
+          <div class="table-wrap">
+            <table class="dashboard-table">
+              <thead>
+                <tr>
+                  <th>Tracking ID</th>
+                  <th>Receiver</th>
+                  <th>Status</th>
+                  <th>Pickup</th>
+                  <th>Updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let shipment of officerRecentShipments; trackBy: trackByShipment">
+                  <td>{{ shipment.bookingId }}</td>
+                  <td>{{ shipment.receiverName }}</td>
+                  <td>
+                    <span class="status-pill" [ngClass]="statusClass(shipment.trackingStatus)">
+                      {{ shipment.trackingStatus | titlecase }}
+                    </span>
+                  </td>
+                  <td>{{ shipment.pickupScheduledAt ? (shipment.pickupScheduledAt | date: 'short') : 'Not scheduled' }}</td>
+                  <td>{{ shipment.lastUpdatedAt | date: 'short' }}</td>
+                </tr>
+                <tr *ngIf="officerRecentShipments.length === 0">
+                  <td colspan="5" class="empty-row">No shipment updates available.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel span-2">
+          <div class="panel-head">
+            <h2>Recent booking intake</h2>
+            <p>Newest booking requests entering the workflow.</p>
+          </div>
+
+          <div class="timeline" *ngIf="officerRecentBookings.length > 0; else noOfficerBookingTemplate">
+            <div class="timeline-item" *ngFor="let entry of officerRecentBookings; trackBy: trackByHistoryEntry">
+              <div>
+                <p class="timeline-title">Booking #{{ entry.bookingId }} • {{ entry.customerId }}</p>
+                <p class="timeline-sub">{{ entry.receiverName }} • {{ entry.deliveredAddress }}</p>
+              </div>
+              <span class="status-pill" [ngClass]="statusClass(entry.status)">{{ entry.status | titlecase }}</span>
+            </div>
+          </div>
+
+          <ng-template #noOfficerBookingTemplate>
+            <p class="empty-text">No booking intake data available for officers yet.</p>
+          </ng-template>
+        </article>
+      </section>
+    </ng-template>
+  </ng-container>
 </div>

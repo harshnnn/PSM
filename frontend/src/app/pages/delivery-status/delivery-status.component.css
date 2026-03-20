@@ -71,6 +71,12 @@ select {
   border-radius: 8px;
 }
 
+.field-error {
+  margin-top: 4px;
+  color: #fca5a5;
+  font-size: 12px;
+}
+
 .success {
   margin-top: 10px;
   color: #a7f3d0;

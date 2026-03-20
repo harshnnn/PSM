@@ -1,10 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
 :root {
 	--font-main: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
 	--bg-body: #0b1020;
 	--text-body: #e2e8f0;
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
 * {
 	box-sizing: border-box;
@@ -19,4 +19,25 @@ body {
 
 a {
 	color: inherit;
+}
+
+/* Global validation UX: every touched invalid field must be visibly highlighted. */
+input.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-touched,
+select.ng-invalid.ng-touched {
+	border-color: #ef4444 !important;
+	box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+input.ng-invalid.ng-touched:focus,
+textarea.ng-invalid.ng-touched:focus,
+select.ng-invalid.ng-touched:focus {
+	outline: none;
+	box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.3);
+}
+
+input.ng-valid.ng-touched,
+textarea.ng-valid.ng-touched,
+select.ng-valid.ng-touched {
+	border-color: #10b981;
 }

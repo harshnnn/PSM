@@ -169,9 +169,4 @@ export class PayBillComponent implements OnInit, OnDestroy {
   goInvoices(): void {
     this.router.navigate(['/invoices']);
   }
-
-  logout(): void {
-    this.sessionService.clear();
-    this.router.navigate(['/login']);
-  }
 }

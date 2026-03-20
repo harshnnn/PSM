@@ -12,6 +12,12 @@
       <div class="field">
         <label>Booking ID</label>
         <input type="text" formControlName="bookingId" placeholder="Tracking ID or original booking ID" />
+        <div class="field-error" *ngIf="searchForm.get('bookingId')?.touched && searchForm.get('bookingId')?.errors?.['required']">
+          Booking ID is required.
+        </div>
+        <div class="field-error" *ngIf="searchForm.get('bookingId')?.touched && searchForm.get('bookingId')?.errors?.['pattern']">
+          Booking ID must contain digits only.
+        </div>
       </div>
       <button class="primary" type="submit" [disabled]="loadingSearch">{{ loadingSearch ? 'Searching...' : 'Search' }}</button>
     </form>

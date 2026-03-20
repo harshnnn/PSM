@@ -1,11 +1,31 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BookingApiService, BookingRequest, DeliverySpeed, PackagingPreference, ParcelSize, PaymentMethod } from '../../services/booking-api.service';
 import { AuthApiService, ProfileResponse } from '../../services/auth-api.service';
 import { SessionData, SessionService } from '../../services/session.service';
 import { Subscription } from 'rxjs';
+import { markAndFocusFirstInvalidControl } from '../../utils/form-validation';
+
+function pickupDateTimeValidator(control: AbstractControl): ValidationErrors | null {
+  const raw = control.value;
+  if (!raw) {
+    return null;
+  }
+
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) {
+    return { invalidDateTime: true };
+  }
+
+  const minAllowed = Date.now() + 60 * 60 * 1000;
+  if (parsed.getTime() < minAllowed) {
+    return { tooSoon: true };
+  }
+
+  return null;
+}
 
 @Component({
   selector: 'app-booking',
@@ -29,6 +49,7 @@ export class BookingComponent implements OnInit, OnDestroy {
   lastBookingAmount = 0;
   private valueChangeSub?: Subscription;
   private profileSub?: Subscription;
+  private readonly personNamePattern = /^[A-Za-z][A-Za-z .'-]*$/;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -42,19 +63,19 @@ export class BookingComponent implements OnInit, OnDestroy {
     this.session = this.sessionService.get();
 
     this.form = this.fb.group({
-      senderName: ['', [Validators.required, Validators.maxLength(50)]],
-      senderAddress: ['', [Validators.required, Validators.maxLength(200)]],
+      senderName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(this.personNamePattern)]],
+      senderAddress: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(200)]],
       senderContact: ['', [Validators.required, Validators.pattern(/^\+?[0-9]{7,15}$/)]],
-      receiverName: ['', [Validators.required, Validators.maxLength(50)]],
-      receiverAddress: ['', [Validators.required, Validators.maxLength(200)]],
+      receiverName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(this.personNamePattern)]],
+      receiverAddress: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(200)]],
       receiverPinCode: ['', [Validators.required, Validators.pattern(/^\d{5,6}$/)]],
       receiverContact: ['', [Validators.required, Validators.pattern(/^\+?[0-9]{7,15}$/)]],
       parcelSize: ['SMALL' as ParcelSize, [Validators.required]],
       weightKg: [1, [Validators.required, Validators.min(0.1), Validators.max(999), Validators.pattern(/^\d{1,5}(\.\d{1,2})?$/)]],
-      contentsDescription: ['', [Validators.required, Validators.maxLength(255)]],
+      contentsDescription: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
       deliverySpeed: ['STANDARD' as DeliverySpeed, [Validators.required]],
       packagingPreference: ['STANDARD' as PackagingPreference, [Validators.required]],
-      preferredPickup: [this.defaultPickup(), [Validators.required]],
+      preferredPickup: [this.defaultPickup(), [Validators.required, pickupDateTimeValidator]],
       serviceCost: [0, [Validators.required, Validators.min(0)]],
       paymentMethod: ['CASH' as PaymentMethod, [Validators.required]],
       insuranceSelected: [false],
@@ -82,13 +103,20 @@ export class BookingComponent implements OnInit, OnDestroy {
     this.errorMessage = '';
 
     if (this.form.invalid) {
-      this.form.markAllAsTouched();
+      markAndFocusFirstInvalidControl(this.form);
       this.errorMessage = 'Fix the highlighted fields before submitting.';
       return;
     }
 
+    const formValue = this.form.getRawValue();
+
     const payload = {
-      ...(this.form.getRawValue() as BookingRequest),
+      ...(formValue as BookingRequest),
+      senderName: this.normalizeText(formValue.senderName),
+      senderAddress: this.normalizeText(formValue.senderAddress),
+      receiverName: this.normalizeText(formValue.receiverName),
+      receiverAddress: this.normalizeText(formValue.receiverAddress),
+      contentsDescription: this.normalizeText(formValue.contentsDescription),
       customerId: this.session?.username ?? 'anonymous'
     } satisfies BookingRequest;
     this.bookingApi.create(payload).subscribe({
@@ -280,5 +308,9 @@ export class BookingComponent implements OnInit, OnDestroy {
     const hh = pad(date.getHours());
     const min = pad(date.getMinutes());
     return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+  }
+
+  private normalizeText(value: unknown): string {
+    return String(value ?? '').trim().replace(/\s+/g, ' ');
   }
 }

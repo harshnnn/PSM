@@ -17,18 +17,24 @@
       <header><span>1</span><h3>Sender</h3></header>
       <div class="field">
         <label>Sender Name</label>
-        <input type="text" formControlName="senderName" [readonly]="isCustomer" />
-        <div class="error" *ngIf="form.get('senderName')?.touched && form.get('senderName')?.errors?.['required']">Required.</div>
+        <input type="text" formControlName="senderName" [readonly]="isCustomer" placeholder="e.g. Rahul Sharma" />
+        <div class="error" *ngIf="form.get('senderName')?.touched && form.get('senderName')?.errors?.['required']">Sender name is required.</div>
+        <div class="error" *ngIf="form.get('senderName')?.touched && form.get('senderName')?.errors?.['minlength']">Sender name must be at least 2 characters.</div>
+        <div class="error" *ngIf="form.get('senderName')?.touched && form.get('senderName')?.errors?.['maxlength']">Sender name must be at most 50 characters.</div>
+        <div class="error" *ngIf="form.get('senderName')?.touched && form.get('senderName')?.errors?.['pattern']">Only letters, spaces, apostrophes, dots, and hyphens are allowed.</div>
       </div>
       <div class="field">
         <label>Sender Address</label>
-        <textarea rows="2" formControlName="senderAddress"></textarea>
-        <div class="error" *ngIf="form.get('senderAddress')?.touched && form.get('senderAddress')?.errors?.['required']">Required.</div>
+        <textarea rows="2" formControlName="senderAddress" placeholder="Street, area, city"></textarea>
+        <div class="error" *ngIf="form.get('senderAddress')?.touched && form.get('senderAddress')?.errors?.['required']">Sender address is required.</div>
+        <div class="error" *ngIf="form.get('senderAddress')?.touched && form.get('senderAddress')?.errors?.['minlength']">Sender address must be at least 5 characters.</div>
+        <div class="error" *ngIf="form.get('senderAddress')?.touched && form.get('senderAddress')?.errors?.['maxlength']">Sender address must be at most 200 characters.</div>
       </div>
       <div class="field">
         <label>Sender Contact</label>
-        <input type="text" formControlName="senderContact" />
-        <div class="error" *ngIf="form.get('senderContact')?.touched && form.get('senderContact')?.errors?.['pattern']">7-15 digits, optional +.</div>
+        <input type="text" formControlName="senderContact" inputmode="tel" placeholder="e.g. +919876543210" />
+        <div class="error" *ngIf="form.get('senderContact')?.touched && form.get('senderContact')?.errors?.['required']">Sender contact is required.</div>
+        <div class="error" *ngIf="form.get('senderContact')?.touched && form.get('senderContact')?.errors?.['pattern']">Contact must be 7-15 digits, optional + prefix.</div>
       </div>
     </section>
 
@@ -36,20 +42,31 @@
       <header><span>2</span><h3>Receiver</h3></header>
       <div class="field">
         <label>Receiver Name</label>
-        <input type="text" formControlName="receiverName" />
+        <input type="text" formControlName="receiverName" placeholder="e.g. Priya Verma" />
+        <div class="error" *ngIf="form.get('receiverName')?.touched && form.get('receiverName')?.errors?.['required']">Receiver name is required.</div>
+        <div class="error" *ngIf="form.get('receiverName')?.touched && form.get('receiverName')?.errors?.['minlength']">Receiver name must be at least 2 characters.</div>
+        <div class="error" *ngIf="form.get('receiverName')?.touched && form.get('receiverName')?.errors?.['maxlength']">Receiver name must be at most 50 characters.</div>
+        <div class="error" *ngIf="form.get('receiverName')?.touched && form.get('receiverName')?.errors?.['pattern']">Receiver name cannot contain numbers or invalid symbols.</div>
       </div>
       <div class="field">
         <label>Receiver Address</label>
-        <textarea rows="2" formControlName="receiverAddress"></textarea>
+        <textarea rows="2" formControlName="receiverAddress" placeholder="Street, area, city"></textarea>
+        <div class="error" *ngIf="form.get('receiverAddress')?.touched && form.get('receiverAddress')?.errors?.['required']">Receiver address is required.</div>
+        <div class="error" *ngIf="form.get('receiverAddress')?.touched && form.get('receiverAddress')?.errors?.['minlength']">Receiver address must be at least 5 characters.</div>
+        <div class="error" *ngIf="form.get('receiverAddress')?.touched && form.get('receiverAddress')?.errors?.['maxlength']">Receiver address must be at most 200 characters.</div>
       </div>
       <div class="columns">
         <div class="field">
           <label>Pin Code</label>
-          <input type="text" formControlName="receiverPinCode" />
+          <input type="text" formControlName="receiverPinCode" inputmode="numeric" maxlength="6" placeholder="5 or 6 digits" />
+          <div class="error" *ngIf="form.get('receiverPinCode')?.touched && form.get('receiverPinCode')?.errors?.['required']">Receiver pin code is required.</div>
+          <div class="error" *ngIf="form.get('receiverPinCode')?.touched && form.get('receiverPinCode')?.errors?.['pattern']">Pin code must be 5 or 6 digits.</div>
         </div>
         <div class="field">
           <label>Receiver Contact</label>
-          <input type="text" formControlName="receiverContact" />
+          <input type="text" formControlName="receiverContact" inputmode="tel" placeholder="e.g. +919999888777" />
+          <div class="error" *ngIf="form.get('receiverContact')?.touched && form.get('receiverContact')?.errors?.['required']">Receiver contact is required.</div>
+          <div class="error" *ngIf="form.get('receiverContact')?.touched && form.get('receiverContact')?.errors?.['pattern']">Contact must be 7-15 digits, optional + prefix.</div>
         </div>
       </div>
     </section>
@@ -65,12 +82,19 @@
         </div>
         <div class="field">
           <label>Weight (kg)</label>
-          <input type="number" formControlName="weightKg" step="0.1" min="0.1" />
+          <input type="number" formControlName="weightKg" step="0.1" min="0.1" placeholder="e.g. 1.5" />
+          <div class="error" *ngIf="form.get('weightKg')?.touched && form.get('weightKg')?.errors?.['required']">Weight is required.</div>
+          <div class="error" *ngIf="form.get('weightKg')?.touched && form.get('weightKg')?.errors?.['min']">Weight must be at least 0.1 kg.</div>
+          <div class="error" *ngIf="form.get('weightKg')?.touched && form.get('weightKg')?.errors?.['max']">Weight must be 999 kg or less.</div>
+          <div class="error" *ngIf="form.get('weightKg')?.touched && form.get('weightKg')?.errors?.['pattern']">Use up to 2 decimal places only.</div>
         </div>
       </div>
       <div class="field">
         <label>Contents Description</label>
-        <textarea rows="2" formControlName="contentsDescription"></textarea>
+        <textarea rows="2" formControlName="contentsDescription" placeholder="Describe parcel contents"></textarea>
+        <div class="error" *ngIf="form.get('contentsDescription')?.touched && form.get('contentsDescription')?.errors?.['required']">Contents description is required.</div>
+        <div class="error" *ngIf="form.get('contentsDescription')?.touched && form.get('contentsDescription')?.errors?.['minlength']">Contents description must be at least 3 characters.</div>
+        <div class="error" *ngIf="form.get('contentsDescription')?.touched && form.get('contentsDescription')?.errors?.['maxlength']">Contents description must be at most 255 characters.</div>
       </div>
       <div class="columns">
         <div class="field">
@@ -89,6 +113,9 @@
       <div class="field">
         <label>Preferred Pickup / Drop-off</label>
         <input type="datetime-local" formControlName="preferredPickup" [min]="minPickup" />
+        <div class="error" *ngIf="form.get('preferredPickup')?.touched && form.get('preferredPickup')?.errors?.['required']">Preferred pickup date and time is required.</div>
+        <div class="error" *ngIf="form.get('preferredPickup')?.touched && form.get('preferredPickup')?.errors?.['invalidDateTime']">Enter a valid pickup date and time.</div>
+        <div class="error" *ngIf="form.get('preferredPickup')?.touched && form.get('preferredPickup')?.errors?.['tooSoon']">Pickup time must be at least 1 hour from now.</div>
       </div>
       <div class="columns">
         <div class="field">

@@ -1,6 +1,123 @@
-@import '../../styles/shared.css';
+.page {
+  min-height: 100vh;
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 16% 18%, rgba(59, 130, 246, 0.18), transparent 36%),
+    radial-gradient(circle at 84% 4%, rgba(34, 211, 238, 0.14), transparent 28%),
+    #070d1c;
+  color: #e2e8f0;
+}
+
+.card {
+  width: min(520px, 100%);
+  border-radius: 16px;
+  padding: 24px;
+  background: rgba(11, 18, 32, 0.9);
+  border: 1px solid #1f2e4a;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.35);
+}
+
+h1 {
+  margin-top: 0;
+  margin-bottom: 18px;
+  color: #f8fafc;
+  font-size: 2rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+label {
+  font-weight: 700;
+  margin-bottom: 6px;
+  display: block;
+  color: #dbeafe;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #22324f;
+  border-radius: 10px;
+  box-sizing: border-box;
+  background: #0a1429;
+  color: #e2e8f0;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input::placeholder {
+  color: #7f95b8;
+}
+
+input:focus {
+  outline: none;
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+}
+
+.form-row .error {
+  color: #fca5a5;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+form > .error {
+  margin-top: 12px;
+  color: #fecaca;
+  background: #3b0a0a;
+  border: 1px solid #7f1d1d;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+button {
+  border: none;
+  border-radius: 10px;
+  padding: 11px 16px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+button.primary {
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: #041022;
+  box-shadow: 0 10px 24px rgba(34, 211, 238, 0.35);
+}
+
+.link-btn {
+  background: transparent;
+  color: #67e8f9;
+  text-decoration: underline;
+  padding: 0;
+}
 
 .hint {
   margin-top: 16px;
-  color: #455a64;
+  color: #93c5fd;
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 16px;
+    align-items: flex-start;
+  }
+
+  .card {
+    padding: 16px;
+  }
 }

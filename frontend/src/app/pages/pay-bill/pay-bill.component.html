@@ -5,10 +5,6 @@
       <h1>Booking Payment</h1>
       <p class="lede">Pick an unpaid booking, confirm details, and finish payment securely.</p>
     </div>
-    <div class="user">
-      <span>Welcome {{ session.username }}</span>
-      <button class="ghost" (click)="logout()">Logout</button>
-    </div>
   </header>
 
   <section class="grid">
@@ -86,16 +82,42 @@
       <form [formGroup]="cardForm" (ngSubmit)="makePayment()" class="card-form">
         <label>Card Number</label>
         <input type="text" formControlName="cardNumber" placeholder="16 digits" />
+        <div class="field-error" *ngIf="cardForm.get('cardNumber')?.touched && cardForm.get('cardNumber')?.errors?.['required']">
+          Card number is required.
+        </div>
+        <div class="field-error" *ngIf="cardForm.get('cardNumber')?.touched && cardForm.get('cardNumber')?.errors?.['pattern']">
+          Card number must be exactly 16 digits.
+        </div>
+
         <label>Card Holder Name</label>
         <input type="text" formControlName="cardHolderName" />
+        <div class="field-error" *ngIf="cardForm.get('cardHolderName')?.touched && cardForm.get('cardHolderName')?.errors?.['required']">
+          Card holder name is required.
+        </div>
+        <div class="field-error" *ngIf="cardForm.get('cardHolderName')?.touched && cardForm.get('cardHolderName')?.errors?.['maxlength']">
+          Card holder name must be at most 60 characters.
+        </div>
+
         <div class="inline">
           <div>
             <label>Expiry (MM/YY)</label>
             <input type="text" formControlName="expiry" placeholder="MM/YY" />
+            <div class="field-error" *ngIf="cardForm.get('expiry')?.touched && cardForm.get('expiry')?.errors?.['required']">
+              Expiry is required.
+            </div>
+            <div class="field-error" *ngIf="cardForm.get('expiry')?.touched && cardForm.get('expiry')?.errors?.['pattern']">
+              Expiry must be in MM/YY format.
+            </div>
           </div>
           <div>
             <label>CVV</label>
             <input type="password" formControlName="cvv" placeholder="123" />
+            <div class="field-error" *ngIf="cardForm.get('cvv')?.touched && cardForm.get('cvv')?.errors?.['required']">
+              CVV is required.
+            </div>
+            <div class="field-error" *ngIf="cardForm.get('cvv')?.touched && cardForm.get('cvv')?.errors?.['pattern']">
+              CVV must be exactly 3 digits.
+            </div>
           </div>
         </div>
         <button class="primary" type="submit" [disabled]="loadingPayment">{{ loadingPayment ? 'Processing...' : 'Make Payment' }}</button>

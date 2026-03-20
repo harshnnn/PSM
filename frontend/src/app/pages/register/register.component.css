@@ -1,7 +1,138 @@
-@import '../../styles/shared.css';
+.page {
+  min-height: 100vh;
+  padding: 32px;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(59, 130, 246, 0.16), transparent 35%),
+    radial-gradient(circle at 88% 6%, rgba(34, 211, 238, 0.14), transparent 30%),
+    #070d1c;
+  color: #e2e8f0;
+}
+
+.card {
+  max-width: 860px;
+  margin: 0 auto;
+  border-radius: 16px;
+  padding: 24px;
+  background: rgba(11, 18, 32, 0.88);
+  border: 1px solid #1f2e4a;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.35);
+}
+
+h1 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #f8fafc;
+}
+
+h3 {
+  margin: 18px 0 12px;
+  color: #93c5fd;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+label {
+  font-weight: 700;
+  margin-bottom: 6px;
+  display: block;
+  color: #dbeafe;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #22324f;
+  border-radius: 10px;
+  box-sizing: border-box;
+  background: #0a1429;
+  color: #e2e8f0;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #7f95b8;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+}
+
+textarea {
+  resize: vertical;
+}
 
 .mobile-grid {
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 12px;
+}
+
+.error {
+  color: #fca5a5;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+button {
+  border: none;
+  border-radius: 10px;
+  padding: 11px 16px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+button.primary {
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: #041022;
+  box-shadow: 0 10px 24px rgba(34, 211, 238, 0.35);
+}
+
+button.secondary {
+  background: #14233f;
+  color: #dbeafe;
+  border: 1px solid #2b3f63;
+}
+
+.link-btn {
+  background: transparent;
+  color: #67e8f9;
+  text-decoration: underline;
+  padding: 0;
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding: 16px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .mobile-grid {
+    grid-template-columns: 1fr;
+  }
 }

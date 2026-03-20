@@ -5,20 +5,10 @@
 }
 
 .topbar {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: flex-start;
   padding: 18px;
   background: #111827;
   border: 1px solid #1f2937;
   border-radius: 12px;
-}
-
-.user {
-  display: flex;
-  gap: 10px;
-  align-items: center;
 }
 
 .ghost {
@@ -179,6 +169,12 @@ header h3 {
   background: #450a0a;
   padding: 10px;
   border-radius: 8px;
+}
+
+.field-error {
+  color: #fca5a5;
+  font-size: 12px;
+  margin-top: 4px;
 }
 
 .success {

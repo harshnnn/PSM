@@ -70,6 +70,12 @@ input {
   border-radius: 8px;
 }
 
+.field-error {
+  margin-top: 4px;
+  color: #fca5a5;
+  font-size: 12px;
+}
+
 .result {
   margin-top: 12px;
   display: grid;
