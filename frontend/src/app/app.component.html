@@ -2,15 +2,15 @@
 	<header *ngIf="session" class="navbar">
 		<div class="brand">PSM Logistics</div>
 		<nav class="links">
-			<a routerLink="/home" routerLinkActive="active">Home</a>
-			<a routerLink="/booking" routerLinkActive="active">Booking</a>
-			<a routerLink="/pay-bill" routerLinkActive="active">Pay Bill</a>
-			<a routerLink="/invoices" routerLinkActive="active">Invoices</a>
-			<a routerLink="/previous-booking" routerLinkActive="active">History</a>
-			<a routerLink="/tracking" routerLinkActive="active">Tracking</a>
-			<a *ngIf="session.role === 'OFFICER'" routerLink="/pickup-scheduling" routerLinkActive="active">Pickup Scheduling</a>
-			<a *ngIf="session.role === 'OFFICER'" routerLink="/delivery-status" routerLinkActive="active">Delivery Update</a>
-			<a routerLink="/support" routerLinkActive="active">Support</a>
+			<a [routerLink]="session.role === 'OFFICER' ? '/admin' : '/home'" routerLinkActive="active">Home</a>
+			<a *ngIf="session.role !== 'OFFICER'" routerLink="/booking" routerLinkActive="active">Booking</a>
+			<a *ngIf="session.role !== 'OFFICER'" routerLink="/pay-bill" routerLinkActive="active">Pay Bill</a>
+			<a [routerLink]="session.role === 'OFFICER' ? '/admin/invoices' : '/invoices'" routerLinkActive="active">Invoices</a>
+			<a [routerLink]="session.role === 'OFFICER' ? '/admin/previous-booking' : '/previous-booking'" routerLinkActive="active">History</a>
+			<a [routerLink]="session.role === 'OFFICER' ? '/admin/tracking' : '/tracking'" routerLinkActive="active">Tracking</a>
+			<a *ngIf="session.role === 'OFFICER'" routerLink="/admin/pickup-scheduling" routerLinkActive="active">Pickup Scheduling</a>
+			<a *ngIf="session.role === 'OFFICER'" routerLink="/admin/delivery-status" routerLinkActive="active">Delivery Update</a>
+			<a [routerLink]="session.role === 'OFFICER' ? '/admin/support' : '/support'" routerLinkActive="active">Support</a>
 		</nav>
 		<div class="user">
 			<span>{{ session.username }} ({{ session.role }})</span>

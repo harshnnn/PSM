@@ -47,7 +47,7 @@ export class LoginComponent {
     this.authApi.login(this.form.getRawValue() as { userId: string; password: string }).subscribe({
       next: (response) => {
         this.sessionService.save({ username: response.username, role: response.role });
-        this.router.navigate(['/home']);
+        this.router.navigate([response.role === 'OFFICER' ? '/admin' : '/home']);
       },
       error: (error) => {
         const payload = error?.error;

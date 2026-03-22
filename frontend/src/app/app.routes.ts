@@ -12,23 +12,36 @@ import { InvoiceListComponent } from './pages/invoice-list/invoice-list.componen
 import { TrackingComponent } from './pages/tracking/tracking.component';
 import { PickupSchedulingComponent } from './pages/pickup-scheduling/pickup-scheduling.component';
 import { DeliveryStatusComponent } from './pages/delivery-status/delivery-status.component';
-import { authGuard, officerGuard, redirectIfLoggedInGuard } from './services/auth.guard';
+import { authGuard, customerGuard, officerGuard, redirectIfLoggedInGuard } from './services/auth.guard';
 
 export const routes: Routes = [
 	{ path: '', redirectTo: 'login', pathMatch: 'full' },
 	{ path: 'login', component: LoginComponent, canActivate: [redirectIfLoggedInGuard] },
 	{ path: 'register', component: RegisterComponent, canActivate: [redirectIfLoggedInGuard] },
 	{ path: 'registration-ack', component: RegistrationAckComponent, canActivate: [redirectIfLoggedInGuard] },
+	{
+		path: 'admin',
+		canActivate: [authGuard, officerGuard],
+		children: [
+			{ path: '', component: HomeComponent },
+			{ path: 'invoices', component: InvoiceListComponent },
+			{ path: 'previous-booking', component: BookingHistoryComponent },
+			{ path: 'tracking', component: TrackingComponent },
+			{ path: 'support', component: PlaceholderComponent, data: { title: 'Contact Support' } },
+			{ path: 'delivery-status', component: DeliveryStatusComponent },
+			{ path: 'pickup-scheduling', component: PickupSchedulingComponent }
+		]
+	},
 	{ path: 'home', component: HomeComponent, canActivate: [authGuard] },
-	{ path: 'booking', component: BookingComponent, canActivate: [authGuard] },
-	{ path: 'pay-bill', component: PayBillComponent, canActivate: [authGuard] },
-	{ path: 'invoices', component: InvoiceListComponent, canActivate: [authGuard] },
-	{ path: 'invoice', component: InvoiceComponent, canActivate: [authGuard] },
-	{ path: 'tracking', component: TrackingComponent, canActivate: [authGuard] },
-	{ path: 'previous-booking', component: BookingHistoryComponent, canActivate: [authGuard] },
+	{ path: 'booking', component: BookingComponent, canActivate: [authGuard, customerGuard] },
+	{ path: 'pay-bill', component: PayBillComponent, canActivate: [authGuard, customerGuard] },
+	{ path: 'invoices', component: InvoiceListComponent, canActivate: [authGuard, customerGuard] },
+	{ path: 'invoice', component: InvoiceComponent, canActivate: [authGuard, customerGuard] },
+	{ path: 'tracking', component: TrackingComponent, canActivate: [authGuard, customerGuard] },
+	{ path: 'previous-booking', component: BookingHistoryComponent, canActivate: [authGuard, customerGuard] },
 	{ path: 'previous-bookings', redirectTo: 'previous-booking', pathMatch: 'full' },
-	{ path: 'support', component: PlaceholderComponent, canActivate: [authGuard], data: { title: 'Contact Support' } },
-	{ path: 'delivery-status', component: DeliveryStatusComponent, canActivate: [authGuard, officerGuard] },
-	{ path: 'pickup-scheduling', component: PickupSchedulingComponent, canActivate: [authGuard, officerGuard] },
+	{ path: 'support', component: PlaceholderComponent, canActivate: [authGuard, customerGuard], data: { title: 'Contact Support' } },
+	{ path: 'delivery-status', redirectTo: 'admin/delivery-status', pathMatch: 'full' },
+	{ path: 'pickup-scheduling', redirectTo: 'admin/pickup-scheduling', pathMatch: 'full' },
 	{ path: '**', redirectTo: 'home' }
 ];

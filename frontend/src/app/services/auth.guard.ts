@@ -26,13 +26,26 @@ export const officerGuard: CanActivateFn = () => {
   return router.createUrlTree(['/home']);
 };
 
-// If a user is already logged in, block access to login/register screens and push them home.
+export const customerGuard: CanActivateFn = () => {
+  const sessionService = inject(SessionService);
+  const router = inject(Router);
+  const session = sessionService.get();
+
+  if (session?.role === 'CUSTOMER') {
+    return true;
+  }
+
+  return router.createUrlTree(['/admin']);
+};
+
+// If a user is already logged in, block access to login/register and redirect to their landing page.
 export const redirectIfLoggedInGuard: CanActivateFn = () => {
   const sessionService = inject(SessionService);
   const router = inject(Router);
+  const session = sessionService.get();
 
-  if (sessionService.isLoggedIn()) {
-    return router.createUrlTree(['/home']);
+  if (session) {
+    return router.createUrlTree([session.role === 'OFFICER' ? '/admin' : '/home']);
   }
 
   return true;
