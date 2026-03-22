@@ -3,6 +3,7 @@
 		<div class="brand">PSM Logistics</div>
 		<nav class="links">
 			<a [routerLink]="session.role === 'OFFICER' ? '/admin' : '/home'" routerLinkActive="active">Home</a>
+			<a *ngIf="session.role !== 'OFFICER'" routerLink="/profile" routerLinkActive="active">Profile</a>
 			<a *ngIf="session.role !== 'OFFICER'" routerLink="/booking" routerLinkActive="active">Booking</a>
 			<a *ngIf="session.role !== 'OFFICER'" routerLink="/pay-bill" routerLinkActive="active">Pay Bill</a>
 			<a [routerLink]="session.role === 'OFFICER' ? '/admin/invoices' : '/invoices'" routerLinkActive="active">Invoices</a>
@@ -14,6 +15,28 @@
 		</nav>
 		<div class="user">
 			<span>{{ session.username }} ({{ session.role }})</span>
+			<button
+				class="ghost theme-toggle"
+				(click)="toggleTheme()"
+				[type]="'button'"
+				[attr.aria-label]="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+				[attr.title]="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+			>
+				<svg *ngIf="theme === 'dark'" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+					<circle cx="12" cy="12" r="4"></circle>
+					<path d="M12 2v2"></path>
+					<path d="M12 20v2"></path>
+					<path d="m4.93 4.93 1.41 1.41"></path>
+					<path d="m17.66 17.66 1.41 1.41"></path>
+					<path d="M2 12h2"></path>
+					<path d="M20 12h2"></path>
+					<path d="m6.34 17.66-1.41 1.41"></path>
+					<path d="m19.07 4.93-1.41 1.41"></path>
+				</svg>
+				<svg *ngIf="theme === 'light'" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+					<path d="M21 12.79A9 9 0 1 1 11.21 3c-.01.18-.01.36-.01.54A8.26 8.26 0 0 0 20.46 12c.18 0 .36 0 .54-.01Z"></path>
+				</svg>
+			</button>
 			<button class="ghost" (click)="logout()">Logout</button>
 		</div>
 	</header>

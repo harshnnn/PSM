@@ -39,6 +39,22 @@ export interface ProfileResponse {
   countryCode: string;
   mobileNumber: string;
   email: string;
+  preferences?: string;
+}
+
+export interface UpdateProfileRequest {
+  customerName: string;
+  email: string;
+  countryCode: string;
+  mobileNumber: string;
+  address: string;
+  preferences?: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -57,5 +73,13 @@ export class AuthApiService {
 
   profile(customerUsername: string): Observable<ProfileResponse> {
     return this.http.get<ProfileResponse>(`${this.baseUrl}/profile/${customerUsername}`);
+  }
+
+  updateProfile(customerUsername: string, payload: UpdateProfileRequest): Observable<ProfileResponse> {
+    return this.http.put<ProfileResponse>(`${this.baseUrl}/profile/${customerUsername}`, payload);
+  }
+
+  changePassword(customerUsername: string, payload: ChangePasswordRequest): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/profile/${customerUsername}/password`, payload);
   }
 }

@@ -4,6 +4,47 @@
 	--font-main: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
 	--bg-body: #0b1020;
 	--text-body: #e2e8f0;
+	--text-muted: #94a3b8;
+	--app-shell-bg: linear-gradient(180deg, #0b1222 0%, #0f172a 100%);
+	--navbar-bg: rgba(8, 12, 24, 0.9);
+	--navbar-border: #1f2937;
+	--brand-color: #93c5fd;
+	--link-color: #cbd5e1;
+	--link-hover-bg: #1e293b;
+	--link-hover-color: #e2e8f0;
+	--button-border: #334155;
+	--button-hover-bg: #1e293b;
+	--button-hover-border: #475569;
+	--content-bg: linear-gradient(180deg, rgba(9, 15, 30, 0.98) 0%, rgba(7, 12, 24, 0.98) 100%);
+	--panel-bg: rgba(11, 18, 32, 0.88);
+	--panel-border: #253754;
+	--input-bg: #0a1429;
+	--input-text: #e2e8f0;
+	--input-border: #22324f;
+	--table-row-bg: rgba(12, 22, 42, 0.7);
+}
+
+:root[data-theme='light'] {
+	--bg-body: #f3f6fb;
+	--text-body: #0f172a;
+	--text-muted: #475569;
+	--app-shell-bg: linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%);
+	--navbar-bg: rgba(255, 255, 255, 0.92);
+	--navbar-border: #d6dee9;
+	--brand-color: #1d4ed8;
+	--link-color: #334155;
+	--link-hover-bg: #e2e8f0;
+	--link-hover-color: #0f172a;
+	--button-border: #94a3b8;
+	--button-hover-bg: #e2e8f0;
+	--button-hover-border: #64748b;
+	--content-bg: linear-gradient(180deg, #f8fafc 0%, #eef3f9 100%);
+	--panel-bg: rgba(255, 255, 255, 0.94);
+	--panel-border: #cbd5e1;
+	--input-bg: #ffffff;
+	--input-text: #0f172a;
+	--input-border: #94a3b8;
+	--table-row-bg: rgba(248, 250, 252, 0.9);
 }
 
 * {
@@ -15,10 +56,130 @@ body {
 	font-family: var(--font-main);
 	background: var(--bg-body);
 	color: var(--text-body);
+	transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 a {
 	color: inherit;
+}
+
+.app-shell .page {
+	color: var(--text-body);
+}
+
+.app-shell .page .page,
+.app-shell .page .dashboard,
+.app-shell .page .invoice {
+	background: var(--content-bg) !important;
+	color: var(--text-body) !important;
+}
+
+.app-shell .page .panel,
+.app-shell .page .card,
+.app-shell .page .hero,
+.app-shell .page .invoice-card,
+.app-shell .page .metric-card,
+.app-shell .page .timeline-item,
+.app-shell .page .action-item,
+.app-shell .page .booking-card,
+.app-shell .page .result,
+.app-shell .page .table-wrap,
+.app-shell .page .filters,
+.app-shell .page .callout {
+	background: var(--panel-bg) !important;
+	border-color: var(--panel-border) !important;
+	color: var(--text-body) !important;
+}
+
+.app-shell .page input,
+.app-shell .page select,
+.app-shell .page textarea {
+	background: var(--input-bg) !important;
+	color: var(--input-text) !important;
+	border-color: var(--input-border) !important;
+}
+
+.app-shell .page input::placeholder,
+.app-shell .page textarea::placeholder {
+	color: var(--text-muted) !important;
+}
+
+.app-shell .page .muted,
+.app-shell .page .lede,
+.app-shell .page .subtitle,
+.app-shell .page .hint,
+.app-shell .page .label,
+.app-shell .page .meta,
+.app-shell .page .eyebrow,
+.app-shell .page .empty,
+.app-shell .page .loading,
+.app-shell .page .empty-text {
+	color: var(--text-muted) !important;
+}
+
+.app-shell .page h1,
+.app-shell .page h2,
+.app-shell .page h3,
+.app-shell .page h4,
+.app-shell .page .value,
+.app-shell .page .question,
+.app-shell .page .timeline-title,
+.app-shell .page .action-title,
+.app-shell .page .metric-value,
+.app-shell .page .dashboard-table td {
+	color: var(--text-body) !important;
+}
+
+.app-shell .page label,
+.app-shell .page .panel-head p,
+.app-shell .page .metric-label,
+.app-shell .page .metric-hint,
+.app-shell .page .status-meta,
+.app-shell .page .action-count,
+.app-shell .page .error-text,
+.app-shell .page .sample,
+.app-shell .page .answer {
+	color: var(--text-muted) !important;
+}
+
+.app-shell .page .refresh-btn,
+.app-shell .page button.secondary,
+.app-shell .page button.ghost,
+.app-shell .page .secondary,
+.app-shell .page .ghost {
+	background: var(--input-bg) !important;
+	color: var(--input-text) !important;
+	border-color: var(--input-border) !important;
+}
+
+.app-shell .page .profile-page {
+	color: var(--text-body) !important;
+}
+
+.app-shell .page .profile-card,
+.app-shell .page .password-card {
+	background: var(--panel-bg) !important;
+	border-color: var(--panel-border) !important;
+	box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08) !important;
+}
+
+:root[data-theme='light'] .app-shell .page .hero {
+	background: linear-gradient(140deg, #dbeafe 0%, #eff6ff 55%, #f8fafc 100%) !important;
+	border-color: #bfdbfe !important;
+}
+
+:root[data-theme='light'] .app-shell .page .hero::after {
+	background: radial-gradient(circle, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0)) !important;
+}
+
+.app-shell .page table th,
+.app-shell .page table td {
+	border-color: var(--panel-border) !important;
+	color: var(--text-body) !important;
+}
+
+.app-shell .page table tbody tr {
+	background: var(--table-row-bg) !important;
 }
 
 /* Global validation UX: every touched invalid field must be visibly highlighted. */

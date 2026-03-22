@@ -3,11 +3,13 @@ package com.example.auth.service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.auth.dto.ChangePasswordRequest;
 import com.example.auth.dto.LoginRequest;
 import com.example.auth.dto.LoginResponse;
 import com.example.auth.dto.ProfileResponse;
 import com.example.auth.dto.RegisterRequest;
 import com.example.auth.dto.RegisterResponse;
+import com.example.auth.dto.UpdateProfileRequest;
 import com.example.auth.entity.UserAccount;
 import com.example.auth.repository.UserAccountRepository;
 
@@ -77,6 +79,65 @@ public class AuthService {
                 user.getAddress(),
                 user.getCountryCode(),
                 user.getMobileNumber(),
-                user.getEmail());
+                user.getEmail(),
+                user.getPreferences());
+    }
+
+    public ProfileResponse updateProfile(String customerUsername, UpdateProfileRequest request) {
+        UserAccount user = userAccountRepository.findByCustomerUsername(customerUsername)
+                .orElseThrow(() -> new IllegalArgumentException("User profile not found"));
+
+        String normalizedEmail = normalizeEmail(request.getEmail());
+        if (!normalizedEmail.equalsIgnoreCase(user.getEmail()) && userAccountRepository.existsByEmail(normalizedEmail)) {
+            throw new IllegalArgumentException("Email is already registered with another account");
+        }
+
+        user.setCustomerName(normalizeText(request.getCustomerName()));
+        user.setEmail(normalizedEmail);
+        user.setCountryCode(request.getCountryCode().trim());
+        user.setMobileNumber(request.getMobileNumber().trim());
+        user.setAddress(normalizeText(request.getAddress()));
+        user.setPreferences(normalizeText(request.getPreferences()));
+
+        UserAccount saved = userAccountRepository.save(user);
+        return new ProfileResponse(
+                saved.getCustomerUsername(),
+                saved.getCustomerName(),
+                saved.getAddress(),
+                saved.getCountryCode(),
+                saved.getMobileNumber(),
+                saved.getEmail(),
+                saved.getPreferences());
+    }
+
+    public void changePassword(String customerUsername, ChangePasswordRequest request) {
+        UserAccount user = userAccountRepository.findByCustomerUsername(customerUsername)
+                .orElseThrow(() -> new IllegalArgumentException("User profile not found"));
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash())) {
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+
+        if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
+            throw new IllegalArgumentException("New Password and Confirm New Password must match");
+        }
+
+        if (request.getCurrentPassword().equals(request.getNewPassword())) {
+            throw new IllegalArgumentException("New password must be different from current password");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userAccountRepository.save(user);
+    }
+
+    private String normalizeText(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value.trim().replaceAll("\\s+", " ");
+    }
+
+    private String normalizeEmail(String email) {
+        return email == null ? "" : email.trim().toLowerCase();
     }
 }

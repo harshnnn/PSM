@@ -2,6 +2,8 @@
   <div class="card">
     <h1>Login</h1>
 
+    <div class="success" *ngIf="infoMessage">{{ infoMessage }}</div>
+
     <form [formGroup]="form" (ngSubmit)="submit()">
       <div class="form-row">
         <div>

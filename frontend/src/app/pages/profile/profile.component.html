@@ -1,0 +1,132 @@
+<div class="profile-page">
+  <section class="hero">
+    <div class="hero-content">
+      <p class="eyebrow">Customer Account</p>
+      <h1>Profile Settings</h1>
+      <p class="lede">Keep your delivery identity, contact details, and address up to date so bookings and shipment communication stay accurate.</p>
+    </div>
+    <div class="hero-badge">{{ customerUsername }}</div>
+  </section>
+
+  <section class="profile-card">
+    <div class="card-head">
+      <div>
+        <h2>Personal Details</h2>
+        <p>These details are reused in your booking and communication workflows.</p>
+      </div>
+      <button class="ghost" type="button" (click)="fetchProfile()" [disabled]="loading || saving">
+        {{ loading ? 'Refreshing...' : 'Reload' }}
+      </button>
+    </div>
+
+    <p class="banner error" *ngIf="loadError">{{ loadError }}</p>
+    <p class="banner error" *ngIf="saveError">{{ saveError }}</p>
+    <p class="banner success" *ngIf="saveSuccess">{{ saveSuccess }}</p>
+
+    <form [formGroup]="form" (ngSubmit)="saveProfile()" *ngIf="!loading" novalidate>
+      <div class="grid">
+        <div class="field">
+          <label for="customerName">Customer Name</label>
+          <input id="customerName" type="text" formControlName="customerName" placeholder="e.g. Harsh Verma" />
+          <div class="error-text" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['required']">Customer Name is required.</div>
+          <div class="error-text" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['minlength']">Customer Name must be at least 2 characters.</div>
+          <div class="error-text" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['maxlength']">Customer Name must be at most 50 characters.</div>
+          <div class="error-text" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['pattern']">Customer Name cannot include numbers or invalid symbols.</div>
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" formControlName="email" placeholder="name@example.com" />
+          <div class="error-text" *ngIf="form.controls.email.touched && form.controls.email.errors?.['required']">Email is required.</div>
+          <div class="error-text" *ngIf="form.controls.email.touched && form.controls.email.errors?.['email']">Enter a valid email.</div>
+        </div>
+
+        <div class="field split">
+          <div>
+            <label for="countryCode">Country Code</label>
+            <select id="countryCode" formControlName="countryCode">
+              <option *ngFor="let code of countryCodes" [value]="code">{{ code }}</option>
+            </select>
+          </div>
+          <div>
+            <label for="mobileNumber">Mobile Number</label>
+            <input id="mobileNumber" type="text" formControlName="mobileNumber" inputmode="numeric" maxlength="10" placeholder="9876543210" />
+            <div class="error-text" *ngIf="form.controls.mobileNumber.touched && form.controls.mobileNumber.errors?.['required']">Mobile number is required.</div>
+            <div class="error-text" *ngIf="form.controls.mobileNumber.touched && form.controls.mobileNumber.errors?.['pattern']">Enter exactly 10 digits.</div>
+          </div>
+        </div>
+
+        <div class="field full">
+          <label for="address">Address</label>
+          <textarea id="address" rows="3" formControlName="address" placeholder="House no, street, city"></textarea>
+          <div class="error-text" *ngIf="form.controls.address.touched && form.controls.address.errors?.['required']">Address is required.</div>
+          <div class="error-text" *ngIf="form.controls.address.touched && form.controls.address.errors?.['minlength']">Address must be at least 5 characters.</div>
+          <div class="error-text" *ngIf="form.controls.address.touched && form.controls.address.errors?.['maxlength']">Address is too long.</div>
+        </div>
+
+        <div class="field full">
+          <label for="preferences">Delivery / Notification Preferences</label>
+          <textarea id="preferences" rows="2" formControlName="preferences" placeholder="Optional"></textarea>
+          <div class="error-text" *ngIf="form.controls.preferences.touched && form.controls.preferences.errors?.['maxlength']">Preferences must be at most 200 characters.</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="primary" type="submit" [disabled]="saving || form.pristine">
+          {{ saving ? 'Saving...' : 'Save Changes' }}
+        </button>
+        <button class="secondary" type="button" (click)="resetChanges()" [disabled]="saving">
+          Reset
+        </button>
+      </div>
+    </form>
+
+    <section class="loading" *ngIf="loading">
+      <div class="pulse"></div>
+      <div class="pulse"></div>
+      <div class="pulse"></div>
+    </section>
+  </section>
+
+  <section class="password-card">
+    <div class="card-head">
+      <div>
+        <h2>Security</h2>
+        <p>Update your password regularly. You will be signed out after a successful change.</p>
+      </div>
+    </div>
+
+    <p class="banner error" *ngIf="passwordError">{{ passwordError }}</p>
+    <p class="banner success" *ngIf="passwordSuccess">{{ passwordSuccess }}</p>
+
+    <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" novalidate>
+      <div class="password-grid">
+        <div class="field">
+          <label for="currentPassword">Current Password</label>
+          <input id="currentPassword" type="password" formControlName="currentPassword" autocomplete="current-password" />
+          <div class="error-text" *ngIf="passwordForm.controls.currentPassword.touched && passwordForm.controls.currentPassword.errors?.['required']">Current password is required.</div>
+        </div>
+
+        <div class="field">
+          <label for="newPassword">New Password</label>
+          <input id="newPassword" type="password" formControlName="newPassword" autocomplete="new-password" />
+          <div class="error-text" *ngIf="passwordForm.controls.newPassword.touched && passwordForm.controls.newPassword.errors?.['required']">New password is required.</div>
+          <div class="error-text" *ngIf="passwordForm.controls.newPassword.touched && passwordForm.controls.newPassword.errors?.['pattern']">New password must contain upper case, lower case and special character.</div>
+        </div>
+
+        <div class="field">
+          <label for="confirmNewPassword">Confirm New Password</label>
+          <input id="confirmNewPassword" type="password" formControlName="confirmNewPassword" autocomplete="new-password" />
+          <div class="error-text" *ngIf="passwordForm.controls.confirmNewPassword.touched && passwordForm.controls.confirmNewPassword.errors?.['required']">Confirm New Password is required.</div>
+          <div class="error-text" *ngIf="(passwordForm.touched || passwordForm.controls.confirmNewPassword.touched) && passwordForm.errors?.['passwordMismatch']">New Password and Confirm New Password must match.</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="warn" type="submit" [disabled]="changingPassword">
+          {{ changingPassword ? 'Updating...' : 'Change Password' }}
+        </button>
+      </div>
+    </form>
+  </section>
+</div>

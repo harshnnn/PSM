@@ -9,6 +9,7 @@ import com.example.auth.entity.UserAccount;
 public interface UserAccountRepository extends JpaRepository<UserAccount, Long> {
     Optional<UserAccount> findByUserId(String userId);
     boolean existsByUserId(String userId);
+    boolean existsByEmail(String email);
     boolean existsByCustomerUsername(String customerUsername);
     Optional<UserAccount> findByCustomerUsername(String customerUsername);
 }

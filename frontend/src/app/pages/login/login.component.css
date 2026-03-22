@@ -27,6 +27,17 @@ h1 {
   font-size: 2rem;
 }
 
+.success {
+  margin-bottom: 12px;
+  color: #bbf7d0;
+  background: rgba(20, 83, 45, 0.28);
+  border: 1px solid #14532d;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr;
@@ -120,4 +131,33 @@ button.primary {
   .card {
     padding: 16px;
   }
+}
+
+:host-context([data-theme='light']) .page {
+  background: var(--content-bg) !important;
+  color: var(--text-body) !important;
+}
+
+:host-context([data-theme='light']) .card {
+  background: var(--panel-bg) !important;
+  border-color: var(--panel-border) !important;
+}
+
+:host-context([data-theme='light']) h1,
+:host-context([data-theme='light']) label {
+  color: var(--text-body) !important;
+}
+
+:host-context([data-theme='light']) .hint {
+  color: var(--text-muted) !important;
+}
+
+:host-context([data-theme='light']) input {
+  background: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border-color: var(--input-border) !important;
+}
+
+:host-context([data-theme='light']) input::placeholder {
+  color: var(--text-muted) !important;
 }

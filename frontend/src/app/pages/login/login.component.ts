@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { AuthApiService } from '../../services/auth-api.service';
 import { SessionService } from '../../services/session.service';
@@ -15,12 +16,14 @@ import { markAndFocusFirstInvalidControl } from '../../utils/form-validation';
 })
 export class LoginComponent {
   errorMessage = '';
+  infoMessage = '';
   readonly form;
 
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly authApi: AuthApiService,
     private readonly sessionService: SessionService,
+    private readonly route: ActivatedRoute,
     private readonly router: Router
   ) {
     this.form = this.formBuilder.group({
@@ -33,6 +36,12 @@ export class LoginComponent {
           Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{6,30}$/)
         ]
       ]
+    });
+
+    this.route.queryParamMap.subscribe((params) => {
+      this.infoMessage = params.get('passwordChanged') === '1'
+        ? 'Password changed successfully. Please login again.'
+        : '';
     });
   }
 

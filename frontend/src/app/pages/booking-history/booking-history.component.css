@@ -185,3 +185,41 @@ button:disabled {
     justify-content: center;
   }
 }
+
+:host-context([data-theme='light']) .page {
+  background: var(--content-bg) !important;
+  color: var(--text-body) !important;
+}
+
+:host-context([data-theme='light']) .card,
+:host-context([data-theme='light']) .filters,
+:host-context([data-theme='light']) .table-wrap {
+  background: var(--panel-bg) !important;
+  border-color: var(--panel-border) !important;
+}
+
+:host-context([data-theme='light']) th,
+:host-context([data-theme='light']) td,
+:host-context([data-theme='light']) .pager {
+  color: var(--text-body) !important;
+}
+
+:host-context([data-theme='light']) th {
+  background: var(--input-bg) !important;
+  border-bottom-color: var(--panel-border) !important;
+}
+
+:host-context([data-theme='light']) .eyebrow,
+:host-context([data-theme='light']) .subtitle,
+:host-context([data-theme='light']) .empty,
+:host-context([data-theme='light']) .loading,
+:host-context([data-theme='light']) .muted {
+  color: var(--text-muted) !important;
+}
+
+:host-context([data-theme='light']) input,
+:host-context([data-theme='light']) .secondary {
+  background: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border-color: var(--input-border) !important;
+}

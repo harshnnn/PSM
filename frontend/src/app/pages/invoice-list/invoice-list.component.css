@@ -153,3 +153,34 @@ button.ghost {
     font-size: 2.2rem;
   }
 }
+
+:host-context([data-theme='light']) .page {
+  background: var(--content-bg) !important;
+  color: var(--text-body) !important;
+}
+
+:host-context([data-theme='light']) .panel,
+:host-context([data-theme='light']) .invoice-card {
+  background: var(--panel-bg) !important;
+  border-color: var(--panel-border) !important;
+}
+
+:host-context([data-theme='light']) h1,
+:host-context([data-theme='light']) .invoice-card h3,
+:host-context([data-theme='light']) .meta {
+  color: var(--text-body) !important;
+}
+
+:host-context([data-theme='light']) .eyebrow,
+:host-context([data-theme='light']) .lede,
+:host-context([data-theme='light']) .muted,
+:host-context([data-theme='light']) .empty,
+:host-context([data-theme='light']) .label {
+  color: var(--text-muted) !important;
+}
+
+:host-context([data-theme='light']) button.ghost {
+  background: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border-color: var(--input-border) !important;
+}

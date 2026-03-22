@@ -83,3 +83,20 @@ input {
   padding: 10px;
   border-radius: 8px;
 }
+
+:host-context([data-theme='light']) .topbar,
+:host-context([data-theme='light']) .panel,
+:host-context([data-theme='light']) .result {
+  background: var(--panel-bg) !important;
+  border-color: var(--panel-border) !important;
+}
+
+:host-context([data-theme='light']) input {
+  background: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border-color: var(--input-border) !important;
+}
+
+:host-context([data-theme='light']) .label {
+  color: var(--text-muted) !important;
+}

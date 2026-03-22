@@ -7,14 +7,16 @@ public class ProfileResponse {
     private String countryCode;
     private String mobileNumber;
     private String email;
+    private String preferences;
 
-    public ProfileResponse(String customerUsername, String customerName, String address, String countryCode, String mobileNumber, String email) {
+    public ProfileResponse(String customerUsername, String customerName, String address, String countryCode, String mobileNumber, String email, String preferences) {
         this.customerUsername = customerUsername;
         this.customerName = customerName;
         this.address = address;
         this.countryCode = countryCode;
         this.mobileNumber = mobileNumber;
         this.email = email;
+        this.preferences = preferences;
     }
 
     public String getCustomerUsername() {
@@ -63,5 +65,13 @@ public class ProfileResponse {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPreferences() {
+        return preferences;
+    }
+
+    public void setPreferences(String preferences) {
+        this.preferences = preferences;
     }
 }

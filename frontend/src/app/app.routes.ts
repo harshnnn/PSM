@@ -12,6 +12,7 @@ import { InvoiceListComponent } from './pages/invoice-list/invoice-list.componen
 import { TrackingComponent } from './pages/tracking/tracking.component';
 import { PickupSchedulingComponent } from './pages/pickup-scheduling/pickup-scheduling.component';
 import { DeliveryStatusComponent } from './pages/delivery-status/delivery-status.component';
+import { ProfileComponent } from './pages/profile/profile.component';
 import { authGuard, customerGuard, officerGuard, redirectIfLoggedInGuard } from './services/auth.guard';
 
 export const routes: Routes = [
@@ -33,6 +34,7 @@ export const routes: Routes = [
 		]
 	},
 	{ path: 'home', component: HomeComponent, canActivate: [authGuard] },
+	{ path: 'profile', component: ProfileComponent, canActivate: [authGuard, customerGuard] },
 	{ path: 'booking', component: BookingComponent, canActivate: [authGuard, customerGuard] },
 	{ path: 'pay-bill', component: PayBillComponent, canActivate: [authGuard, customerGuard] },
 	{ path: 'invoices', component: InvoiceListComponent, canActivate: [authGuard, customerGuard] },

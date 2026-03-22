@@ -2,8 +2,8 @@
 	min-height: 100vh;
 	display: flex;
 	flex-direction: column;
-	background: linear-gradient(180deg, #0b1222 0%, #0f172a 100%);
-	color: #e2e8f0;
+	background: var(--app-shell-bg);
+	color: var(--text-body);
 }
 
 .navbar {
@@ -14,8 +14,8 @@
 	align-items: center;
 	gap: 16px;
 	padding: 14px 20px;
-	background: rgba(8, 12, 24, 0.9);
-	border-bottom: 1px solid #1f2937;
+	background: var(--navbar-bg);
+	border-bottom: 1px solid var(--navbar-border);
 	backdrop-filter: blur(6px);
 }
 
@@ -23,7 +23,7 @@
 	font-weight: 700;
 	font-size: 18px;
 	letter-spacing: 0.5px;
-	color: #93c5fd;
+	color: var(--brand-color);
 }
 
 .links {
@@ -33,7 +33,7 @@
 }
 
 .links a {
-	color: #cbd5e1;
+	color: var(--link-color);
 	text-decoration: none;
 	padding: 8px 12px;
 	border-radius: 10px;
@@ -42,8 +42,8 @@
 
 .links a.active,
 .links a:hover {
-	background: #1e293b;
-	color: #e2e8f0;
+	background: var(--link-hover-bg);
+	color: var(--link-hover-color);
 }
 
 .user {
@@ -54,8 +54,8 @@
 
 .ghost {
 	background: transparent;
-	color: #e2e8f0;
-	border: 1px solid #334155;
+	color: var(--text-body);
+	border: 1px solid var(--button-border);
 	padding: 8px 12px;
 	border-radius: 10px;
 	cursor: pointer;
@@ -63,8 +63,27 @@
 }
 
 .ghost:hover {
-	background: #1e293b;
-	border-color: #475569;
+	background: var(--button-hover-bg);
+	border-color: var(--button-hover-border);
+}
+
+.theme-toggle {
+	width: 40px;
+	height: 40px;
+	padding: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.theme-toggle svg {
+	width: 20px;
+	height: 20px;
+	stroke: currentColor;
+	fill: none;
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
 }
 
 .page {
