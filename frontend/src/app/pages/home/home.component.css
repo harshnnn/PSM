@@ -325,3 +325,42 @@ h1 {
   }
 }
 
+:host-context([data-theme='light']) .dashboard-table th {
+  color: #1e3a8a;
+}
+
+:host-context([data-theme='light']) .dashboard-table th,
+:host-context([data-theme='light']) .dashboard-table td {
+  border-bottom-color: rgba(148, 163, 184, 0.45);
+}
+
+:host-context([data-theme='light']) .status-pill {
+  color: #000;
+  border: 1px solid transparent;
+  font-weight: 800;
+}
+
+:host-context([data-theme='light']) .status-confirmed {
+  color: #000;
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+
+:host-context([data-theme='light']) .status-transit {
+  color: #000;
+  background: #ccfbf1;
+  border-color: #5eead4;
+}
+
+:host-context([data-theme='light']) .status-delivered {
+  color: #000;
+  background: #dcfce7;
+  border-color: #86efac;
+}
+
+:host-context([data-theme='light']) .status-cancelled {
+  color: #000;
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+

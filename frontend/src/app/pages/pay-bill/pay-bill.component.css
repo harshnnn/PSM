@@ -116,6 +116,11 @@ header h3 {
   flex: 1;
 }
 
+.card-number-input {
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
 .actions {
   margin-top: 14px;
   display: flex;

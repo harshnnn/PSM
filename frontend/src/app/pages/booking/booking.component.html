@@ -7,7 +7,7 @@
     </div>
     <div class="cost-card">
       <p class="label">Estimated Cost</p>
-      <h2>{{ form.get('serviceCost')?.value | currency:'USD' }}</h2>
+      <h2>{{ form.get('serviceCost')?.value | currency: 'INR' : 'symbol' : '1.2-2' }}</h2>
       <p class="hint">Auto-updates as you change parcel and shipping options.</p>
     </div>
   </div>
@@ -21,20 +21,20 @@
         <div class="error" *ngIf="form.get('senderName')?.touched && form.get('senderName')?.errors?.['required']">Sender name is required.</div>
         <div class="error" *ngIf="form.get('senderName')?.touched && form.get('senderName')?.errors?.['minlength']">Sender name must be at least 2 characters.</div>
         <div class="error" *ngIf="form.get('senderName')?.touched && form.get('senderName')?.errors?.['maxlength']">Sender name must be at most 50 characters.</div>
-        <div class="error" *ngIf="form.get('senderName')?.touched && form.get('senderName')?.errors?.['pattern']">Only letters, spaces, apostrophes, dots, and hyphens are allowed.</div>
+        <div class="error" *ngIf="form.get('senderName')?.touched && form.get('senderName')?.errors?.['pattern']">Sender name must contain letters and spaces only.</div>
       </div>
       <div class="field">
         <label>Sender Address</label>
-        <textarea rows="2" formControlName="senderAddress" placeholder="Street, area, city"></textarea>
+        <textarea rows="2" formControlName="senderAddress" [readonly]="isCustomer" placeholder="Street, area, city"></textarea>
         <div class="error" *ngIf="form.get('senderAddress')?.touched && form.get('senderAddress')?.errors?.['required']">Sender address is required.</div>
         <div class="error" *ngIf="form.get('senderAddress')?.touched && form.get('senderAddress')?.errors?.['minlength']">Sender address must be at least 5 characters.</div>
         <div class="error" *ngIf="form.get('senderAddress')?.touched && form.get('senderAddress')?.errors?.['maxlength']">Sender address must be at most 200 characters.</div>
       </div>
       <div class="field">
         <label>Sender Contact</label>
-        <input type="text" formControlName="senderContact" inputmode="tel" placeholder="e.g. +919876543210" />
+        <input type="text" formControlName="senderContact" inputmode="tel" maxlength="13" [readonly]="isCustomer" placeholder="e.g. +919876543210" />
         <div class="error" *ngIf="form.get('senderContact')?.touched && form.get('senderContact')?.errors?.['required']">Sender contact is required.</div>
-        <div class="error" *ngIf="form.get('senderContact')?.touched && form.get('senderContact')?.errors?.['pattern']">Contact must be 7-15 digits, optional + prefix.</div>
+        <div class="error" *ngIf="form.get('senderContact')?.touched && form.get('senderContact')?.errors?.['pattern']">Contact must be 10 digits, or +91 followed by 10 digits.</div>
       </div>
     </section>
 
@@ -42,11 +42,11 @@
       <header><span>2</span><h3>Receiver</h3></header>
       <div class="field">
         <label>Receiver Name</label>
-        <input type="text" formControlName="receiverName" placeholder="e.g. Priya Verma" />
+        <input type="text" formControlName="receiverName" placeholder="e.g. John Doe" />
         <div class="error" *ngIf="form.get('receiverName')?.touched && form.get('receiverName')?.errors?.['required']">Receiver name is required.</div>
         <div class="error" *ngIf="form.get('receiverName')?.touched && form.get('receiverName')?.errors?.['minlength']">Receiver name must be at least 2 characters.</div>
         <div class="error" *ngIf="form.get('receiverName')?.touched && form.get('receiverName')?.errors?.['maxlength']">Receiver name must be at most 50 characters.</div>
-        <div class="error" *ngIf="form.get('receiverName')?.touched && form.get('receiverName')?.errors?.['pattern']">Receiver name cannot contain numbers or invalid symbols.</div>
+        <div class="error" *ngIf="form.get('receiverName')?.touched && form.get('receiverName')?.errors?.['pattern']">Receiver name must contain letters and spaces only.</div>
       </div>
       <div class="field">
         <label>Receiver Address</label>
@@ -58,15 +58,16 @@
       <div class="columns">
         <div class="field">
           <label>Pin Code</label>
-          <input type="text" formControlName="receiverPinCode" inputmode="numeric" maxlength="6" placeholder="5 or 6 digits" />
+          <input type="text" formControlName="receiverPinCode" inputmode="numeric" minlength="6" maxlength="6" placeholder="6 digits" />
           <div class="error" *ngIf="form.get('receiverPinCode')?.touched && form.get('receiverPinCode')?.errors?.['required']">Receiver pin code is required.</div>
-          <div class="error" *ngIf="form.get('receiverPinCode')?.touched && form.get('receiverPinCode')?.errors?.['pattern']">Pin code must be 5 or 6 digits.</div>
+          <div class="error" *ngIf="form.get('receiverPinCode')?.touched && form.get('receiverPinCode')?.errors?.['pattern']">Pin code must be 6 digits.</div>
         </div>
         <div class="field">
           <label>Receiver Contact</label>
-          <input type="text" formControlName="receiverContact" inputmode="tel" placeholder="e.g. +919999888777" />
+          <input type="text" formControlName="receiverContact" inputmode="tel" maxlength="13" placeholder="e.g. +919999888777" (input)="normalizeContactInput('receiverContact')" />
           <div class="error" *ngIf="form.get('receiverContact')?.touched && form.get('receiverContact')?.errors?.['required']">Receiver contact is required.</div>
-          <div class="error" *ngIf="form.get('receiverContact')?.touched && form.get('receiverContact')?.errors?.['pattern']">Contact must be 7-15 digits, optional + prefix.</div>
+          <div class="error" *ngIf="form.get('receiverContact')?.touched && form.get('receiverContact')?.errors?.['pattern']">Contact must be 10 digits, or +91 followed by 10 digits.</div>
+          <div class="error" *ngIf="showContactsSameError()">Sender and receiver contact must be different.</div>
         </div>
       </div>
     </section>
@@ -76,17 +77,18 @@
       <div class="columns">
         <div class="field">
           <label>Parcel Size</label>
-          <select formControlName="parcelSize">
+          <select formControlName="parcelSize" (change)="onParcelSizeChange()">
             <option *ngFor="let size of parcelSizes" [value]="size">{{ size }}</option>
           </select>
         </div>
         <div class="field">
           <label>Weight (kg)</label>
-          <input type="number" formControlName="weightKg" step="0.1" min="0.1" placeholder="e.g. 1.5" />
+          <input type="number" formControlName="weightKg" step="0.1" min="0.1" placeholder="e.g. 1.5" (input)="onWeightChange()" />
           <div class="error" *ngIf="form.get('weightKg')?.touched && form.get('weightKg')?.errors?.['required']">Weight is required.</div>
           <div class="error" *ngIf="form.get('weightKg')?.touched && form.get('weightKg')?.errors?.['min']">Weight must be at least 0.1 kg.</div>
           <div class="error" *ngIf="form.get('weightKg')?.touched && form.get('weightKg')?.errors?.['max']">Weight must be 999 kg or less.</div>
           <div class="error" *ngIf="form.get('weightKg')?.touched && form.get('weightKg')?.errors?.['pattern']">Use up to 2 decimal places only.</div>
+          <div class="error" *ngIf="showParcelWeightLimitError()">{{ parcelWeightLimitMessage() }}</div>
         </div>
       </div>
       <div class="field">
@@ -118,21 +120,11 @@
         <div class="error" *ngIf="form.get('preferredPickup')?.touched && form.get('preferredPickup')?.errors?.['tooSoon']">Pickup time must be at least 1 hour from now.</div>
       </div>
       <div class="columns">
-        <div class="field">
+        <div class="field" *ngIf="!isCustomer">
           <label>Payment Method</label>
           <select formControlName="paymentMethod">
             <option *ngFor="let method of paymentMethods" [value]="method">{{ method }}</option>
           </select>
-        </div>
-        <div class="field toggles">
-          <label class="checkbox-row">
-            <input type="checkbox" formControlName="insuranceSelected" />
-            <span>Add Insurance</span>
-          </label>
-          <label class="checkbox-row">
-            <input type="checkbox" formControlName="trackingEnabled" />
-            <span>Enable Tracking</span>
-          </label>
         </div>
       </div>
     </section>

@@ -6,7 +6,7 @@ from reportlab.graphics.shapes import Drawing, Rect, String, Line, Polygon
 from reportlab.graphics import renderPDF
 
 
-OUTPUT_PATH = r"c:\Users\HARSH\Desktop\SpringBoot\PSM\docs\PSM_Project_Workflow_Guide.pdf"
+OUTPUT_PATH = r"c:\Users\HARSH\Desktop\SpringBoot\PMS\docs\PMS_Project_Workflow_Guide.pdf"
 
 
 def heading(text, level=1):
@@ -215,7 +215,7 @@ def add_footer(canvas, doc):
     canvas.saveState()
     canvas.setFont("Helvetica", 8)
     canvas.setFillColor(colors.HexColor("#6B7280"))
-    canvas.drawString(30, 18, "PSM Microservices Workflow Guide")
+    canvas.drawString(30, 18, "PMS Microservices Workflow Guide")
     canvas.drawRightString(A4[0] - 30, 18, f"Page {doc.page}")
     canvas.restoreState()
 
@@ -228,13 +228,13 @@ def main():
         rightMargin=28,
         topMargin=28,
         bottomMargin=28,
-        title="PSM Project Workflow Guide",
+        title="PMS Project Workflow Guide",
         author="GitHub Copilot",
     )
 
     story = []
 
-    story.append(heading("PSM Project Workflow Guide", 1))
+    story.append(heading("PMS Project Workflow Guide", 1))
     story.append(body("A simple, visual explanation of how all microservices in this project communicate and how data flows from screen to database."))
     story.append(Spacer(1, 8))
 

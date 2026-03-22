@@ -27,18 +27,19 @@
       <div class="grid">
         <div class="field">
           <label for="customerName">Customer Name</label>
-          <input id="customerName" type="text" formControlName="customerName" placeholder="e.g. Harsh Verma" />
+          <input id="customerName" type="text" formControlName="customerName" placeholder="John Doe" />
           <div class="error-text" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['required']">Customer Name is required.</div>
           <div class="error-text" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['minlength']">Customer Name must be at least 2 characters.</div>
           <div class="error-text" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['maxlength']">Customer Name must be at most 50 characters.</div>
-          <div class="error-text" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['pattern']">Customer Name cannot include numbers or invalid symbols.</div>
+          <div class="error-text" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['pattern']">Customer name must contain letters and spaces only.</div>
         </div>
 
         <div class="field">
           <label for="email">Email</label>
-          <input id="email" type="email" formControlName="email" placeholder="name@example.com" />
+          <input id="email" type="email" formControlName="email" maxlength="254" placeholder="name@example.com" />
           <div class="error-text" *ngIf="form.controls.email.touched && form.controls.email.errors?.['required']">Email is required.</div>
-          <div class="error-text" *ngIf="form.controls.email.touched && form.controls.email.errors?.['email']">Enter a valid email.</div>
+          <div class="error-text" *ngIf="form.controls.email.touched && form.controls.email.errors?.['maxlength']">Email must be at most 254 characters.</div>
+          <div class="error-text" *ngIf="form.controls.email.touched && form.controls.email.errors?.['pattern']">Enter a valid email like name&#64;example.com.</div>
         </div>
 
         <div class="field split">

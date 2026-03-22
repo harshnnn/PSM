@@ -30,6 +30,7 @@ public class PaymentRequest {
 
     @NotBlank
     @Size(max = 60)
+    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "Card holder name must contain letters and spaces only")
     private String cardHolderName;
 
     @NotBlank

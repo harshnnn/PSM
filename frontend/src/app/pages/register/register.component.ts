@@ -27,7 +27,7 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
 export class RegisterComponent {
   errorMessage = '';
   readonly form;
-  private readonly personNamePattern = /^[A-Za-z][A-Za-z .'-]*$/;
+  private readonly personNamePattern = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
   private readonly userIdPattern = /^[A-Za-z0-9._-]{5,20}$/;
 
   readonly countryCodes = ['+1', '+44', '+61', '+91'];

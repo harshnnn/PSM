@@ -30,7 +30,7 @@
       <div><p class="label">Booking ID</p><h3>{{ customerResult.bookingId }}</h3></div>
       <div><p class="label">Original Booking</p><h3>#{{ customerResult.originalBookingId }}</h3></div>
       <div><p class="label">Status</p><h3>{{ customerResult.trackingStatus }}</h3></div>
-      <div><p class="label">Amount</p><h3>{{ customerResult.amount | currency }}</h3></div>
+      <div><p class="label">Amount</p><h3>{{ customerResult.amount | currency: 'INR' : 'symbol' : '1.2-2' }}</h3></div>
       <div><p class="label">Receiver</p><h3>{{ customerResult.receiverName }}</h3></div>
       <div><p class="label">Shipped At</p><h3>{{ customerResult.shippedAt | date: 'medium' }}</h3></div>
     </div>
@@ -40,7 +40,8 @@
     <form [formGroup]="officerForm" (ngSubmit)="searchOfficer()" class="search-row officer-search">
       <div class="field">
         <label>Customer ID</label>
-        <input type="text" formControlName="customerId" placeholder="harsh" />
+        <input type="text" formControlName="customerId" placeholder="Customer ID
+" />
       </div>
       <div class="field">
         <label>Booking ID</label>
@@ -61,7 +62,7 @@
         </div>
         <p>Customer: {{ row.customerId }} | Receiver: {{ row.receiverName }}</p>
         <p>Original Booking: #{{ row.originalBookingId }}</p>
-        <p>Amount: {{ row.amount | currency }} | Shipped: {{ row.shippedAt | date: 'medium' }}</p>
+        <p>Amount: {{ row.amount | currency: 'INR' : 'symbol' : '1.2-2' }} | Shipped: {{ row.shippedAt | date: 'medium' }}</p>
       </div>
     </div>
   </section>

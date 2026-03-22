@@ -20,8 +20,8 @@ from reportlab.platypus import (
 )
 
 ROOT = Path(__file__).resolve().parent
-SOURCE_MD = ROOT / "PSM_Microservices_Detailed_Flow.md"
-OUTPUT_PDF = ROOT / "PSM_Microservices_Detailed_Flow.pdf"
+SOURCE_MD = ROOT / "PMS_Microservices_Detailed_Flow.md"
+OUTPUT_PDF = ROOT / "PMS_Microservices_Detailed_Flow.pdf"
 
 
 def fetch_mermaid_png(mermaid_text: str) -> bytes | None:
@@ -283,7 +283,7 @@ def main():
         rightMargin=14 * mm,
         topMargin=14 * mm,
         bottomMargin=14 * mm,
-        title="PSM Microservices Detailed Flow",
+        title="PMS Microservices Detailed Flow",
         author="GitHub Copilot",
     )
 

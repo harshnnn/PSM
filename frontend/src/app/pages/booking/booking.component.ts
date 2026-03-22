@@ -27,6 +27,41 @@ function pickupDateTimeValidator(control: AbstractControl): ValidationErrors | n
   return null;
 }
 
+function contactsMustDifferValidator(control: AbstractControl): ValidationErrors | null {
+  const senderRaw = control.get('senderContact')?.value;
+  const receiverRaw = control.get('receiverContact')?.value;
+
+  if (!senderRaw || !receiverRaw) {
+    return null;
+  }
+
+  const sender = String(senderRaw).replace(/\D/g, '');
+  const receiver = String(receiverRaw).replace(/\D/g, '');
+  return sender.length > 0 && sender === receiver ? { contactsSame: true } : null;
+}
+
+function parcelWeightLimitValidator(control: AbstractControl): ValidationErrors | null {
+  const parcelSize = control.get('parcelSize')?.value as ParcelSize | null;
+  const weightRaw = control.get('weightKg')?.value;
+  const weight = Number(weightRaw);
+
+  if (!parcelSize || Number.isNaN(weight) || weight <= 0) {
+    return null;
+  }
+
+  const maxBySize: Record<ParcelSize, number> = {
+    SMALL: 5,
+    MEDIUM: 20,
+    LARGE: 50,
+    CUSTOM: 999
+  };
+
+  const maxAllowed = maxBySize[parcelSize];
+  return weight > maxAllowed
+    ? { parcelWeightLimit: { parcelSize, maxAllowed } }
+    : null;
+}
+
 @Component({
   selector: 'app-booking',
   standalone: true,
@@ -49,7 +84,15 @@ export class BookingComponent implements OnInit, OnDestroy {
   lastBookingAmount = 0;
   private valueChangeSub?: Subscription;
   private profileSub?: Subscription;
-  private readonly personNamePattern = /^[A-Za-z][A-Za-z .'-]*$/;
+  private readonly personNamePattern = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
+  private readonly defaultInsuranceSelected = false;
+  private readonly defaultTrackingEnabled = true;
+  private readonly sizeDefaultWeight: Record<ParcelSize, number | null> = {
+    SMALL: 1,
+    MEDIUM: 10,
+    LARGE: 30,
+    CUSTOM: null
+  };
 
   constructor(
     private readonly fb: FormBuilder,
@@ -65,11 +108,11 @@ export class BookingComponent implements OnInit, OnDestroy {
     this.form = this.fb.group({
       senderName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(this.personNamePattern)]],
       senderAddress: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(200)]],
-      senderContact: ['', [Validators.required, Validators.pattern(/^\+?[0-9]{7,15}$/)]],
+      senderContact: ['', [Validators.required, Validators.pattern(/^(?:\+91\d{10}|\d{10})$/)]],
       receiverName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(this.personNamePattern)]],
       receiverAddress: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(200)]],
-      receiverPinCode: ['', [Validators.required, Validators.pattern(/^\d{5,6}$/)]],
-      receiverContact: ['', [Validators.required, Validators.pattern(/^\+?[0-9]{7,15}$/)]],
+      receiverPinCode: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
+      receiverContact: ['', [Validators.required, Validators.pattern(/^(?:\+91\d{10}|\d{10})$/)]],
       parcelSize: ['SMALL' as ParcelSize, [Validators.required]],
       weightKg: [1, [Validators.required, Validators.min(0.1), Validators.max(999), Validators.pattern(/^\d{1,5}(\.\d{1,2})?$/)]],
       contentsDescription: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
@@ -78,9 +121,7 @@ export class BookingComponent implements OnInit, OnDestroy {
       preferredPickup: [this.defaultPickup(), [Validators.required, pickupDateTimeValidator]],
       serviceCost: [0, [Validators.required, Validators.min(0)]],
       paymentMethod: ['CASH' as PaymentMethod, [Validators.required]],
-      insuranceSelected: [false],
-      trackingEnabled: [true]
-    });
+    }, { validators: [contactsMustDifferValidator, parcelWeightLimitValidator] });
 
     if (!this.session) {
       this.router.navigate(['/login']);
@@ -117,6 +158,8 @@ export class BookingComponent implements OnInit, OnDestroy {
       receiverName: this.normalizeText(formValue.receiverName),
       receiverAddress: this.normalizeText(formValue.receiverAddress),
       contentsDescription: this.normalizeText(formValue.contentsDescription),
+      insuranceSelected: this.defaultInsuranceSelected,
+      trackingEnabled: this.defaultTrackingEnabled,
       customerId: this.session?.username ?? 'anonymous'
     } satisfies BookingRequest;
     this.bookingApi.create(payload).subscribe({
@@ -134,8 +177,6 @@ export class BookingComponent implements OnInit, OnDestroy {
           preferredPickup: this.defaultPickup(),
           serviceCost: this.form.get('serviceCost')?.value ?? 0,
           paymentMethod: 'CASH',
-          insuranceSelected: false,
-          trackingEnabled: true
         });
       },
       error: (error) => {
@@ -175,8 +216,6 @@ export class BookingComponent implements OnInit, OnDestroy {
       preferredPickup: this.defaultPickup(),
       serviceCost: 0,
       paymentMethod: 'CASH',
-      insuranceSelected: false,
-      trackingEnabled: true
     });
   }
 
@@ -197,6 +236,82 @@ export class BookingComponent implements OnInit, OnDestroy {
     const now = new Date();
     now.setMinutes(now.getMinutes() + 60);
     return this.toDateTimeLocal(now);
+  }
+
+  normalizeContactInput(controlName: 'senderContact' | 'receiverContact'): void {
+    const control = this.form.get(controlName);
+    if (!control) {
+      return;
+    }
+
+    const normalized = this.normalizePhone(control.value);
+    if (normalized !== control.value) {
+      control.setValue(normalized);
+    }
+  }
+
+  showContactsSameError(): boolean {
+    const senderControl = this.form.get('senderContact');
+    const receiverControl = this.form.get('receiverContact');
+    if (!senderControl || !receiverControl) {
+      return false;
+    }
+
+    const eitherTouched = senderControl.touched || receiverControl.touched;
+    return eitherTouched
+      && senderControl.valid
+      && receiverControl.valid
+      && !!this.form.errors?.['contactsSame'];
+  }
+
+  onParcelSizeChange(): void {
+    const sizeControl = this.form.get('parcelSize');
+    const weightControl = this.form.get('weightKg');
+    if (!sizeControl || !weightControl) {
+      return;
+    }
+
+    const selectedSize = sizeControl.value as ParcelSize;
+    const defaultWeight = this.sizeDefaultWeight[selectedSize];
+    weightControl.setValue(defaultWeight);
+    weightControl.markAsTouched();
+  }
+
+  onWeightChange(): void {
+    const sizeControl = this.form.get('parcelSize');
+    const weightControl = this.form.get('weightKg');
+    if (!sizeControl || !weightControl) {
+      return;
+    }
+
+    const weight = Number(weightControl.value);
+    if (Number.isNaN(weight) || weight <= 0) {
+      return;
+    }
+
+    const inferredSize = this.inferParcelSizeByWeight(weight);
+    if (inferredSize !== sizeControl.value) {
+      sizeControl.setValue(inferredSize);
+    }
+  }
+
+  showParcelWeightLimitError(): boolean {
+    const sizeControl = this.form.get('parcelSize');
+    const weightControl = this.form.get('weightKg');
+    if (!sizeControl || !weightControl) {
+      return false;
+    }
+
+    return (sizeControl.touched || weightControl.touched) && !!this.form.errors?.['parcelWeightLimit'];
+  }
+
+  parcelWeightLimitMessage(): string {
+    const error = this.form.errors?.['parcelWeightLimit'] as { parcelSize?: string; maxAllowed?: number } | undefined;
+    if (!error?.parcelSize || error.maxAllowed == null) {
+      return 'Weight exceeds the limit for selected parcel size.';
+    }
+
+    return `${error.parcelSize} parcels can weigh up to ${error.maxAllowed} kg only.`;
   }
 
   private prefillSender(): void {
@@ -283,11 +398,11 @@ export class BookingComponent implements OnInit, OnDestroy {
       cost += 25;
     }
 
-    if (value.insuranceSelected) {
+    if (this.defaultInsuranceSelected) {
       cost += 25;
     }
 
-    if (value.trackingEnabled) {
+    if (this.defaultTrackingEnabled) {
       cost += 5;
     }
 
@@ -312,5 +427,29 @@ export class BookingComponent implements OnInit, OnDestroy {
 
   private normalizeText(value: unknown): string {
     return String(value ?? '').trim().replace(/\s+/g, ' ');
+  }
+
+  private normalizePhone(value: unknown): string {
+    const raw = String(value ?? '').trim();
+    if (!raw) {
+      return '';
+    }
+
+    const hasPlus = raw.startsWith('+');
+    const digits = raw.replace(/\D/g, '');
+    return hasPlus ? `+${digits}` : digits;
+  }
+
+  private inferParcelSizeByWeight(weight: number): ParcelSize {
+    if (weight <= 5) {
+      return 'SMALL';
+    }
+    if (weight <= 20) {
+      return 'MEDIUM';
+    }
+    if (weight <= 50) {
+      return 'LARGE';
+    }
+    return 'CUSTOM';
   }
 }

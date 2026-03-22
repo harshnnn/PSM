@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 public class RegisterRequest {
     @NotBlank
     @Size(max = 50)
+    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "Customer name must contain letters and spaces only")
     private String customerName;
 
     @NotBlank

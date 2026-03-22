@@ -1,4 +1,4 @@
-$Root = "C:\Users\HARSH\Desktop\SpringBoot\PSM\backend"
+$Root = "C:\Users\HARSH\Desktop\SpringBoot\PMS\backend"
 
 $ServicesInOrder = @(
     "service-registry",

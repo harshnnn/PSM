@@ -1,17 +1,32 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
+import { catchError, map, of } from 'rxjs';
+import { AuthApiService } from './auth-api.service';
 import { SessionService } from './session.service';
 
 export const authGuard: CanActivateFn = () => {
   const sessionService = inject(SessionService);
   const router = inject(Router);
+  const authApi = inject(AuthApiService);
+  const session = sessionService.get();
 
-  if (sessionService.isLoggedIn()) {
+  if (!session) {
+    return router.createUrlTree(['/login']);
+  }
+
+  // Officer account is validated at login time; customer session must still exist in auth-service after restarts.
+  if (session.role === 'OFFICER') {
     return true;
   }
 
-  router.navigate(['/login']);
-  return false;
+  return authApi.profile(session.username).pipe(
+    map(() => true),
+    catchError(() => {
+      sessionService.clear();
+      sessionStorage.removeItem('registration-profile');
+      return of(router.createUrlTree(['/login'], { queryParams: { sessionExpired: '1' } }));
+    })
+  );
 };
 
 export const officerGuard: CanActivateFn = () => {

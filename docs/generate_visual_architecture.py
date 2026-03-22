@@ -99,7 +99,7 @@ def draw_architecture():
 
 def generate_detailed_pdf():
     doc = SimpleDocTemplate(
-        "C:/Users/HARSH/Desktop/SpringBoot/PSM/docs/PSM_Interactive_Architecture_Guide.pdf",
+        "C:/Users/HARSH/Desktop/SpringBoot/PMS/docs/PMS_Interactive_Architecture_Guide.pdf",
         pagesize=landscape(letter),
         rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30
     )
@@ -111,7 +111,7 @@ def generate_detailed_pdf():
 
     elements = []
 
-    elements.append(Paragraph("Postal Service Management (PSM) - Professional Visual Architecture & Interaction Flow", title_style))
+    elements.append(Paragraph("Postal Service Management (PMS) - Professional Visual Architecture & Interaction Flow", title_style))
     elements.append(Spacer(1, 10))
     
     elements.append(Paragraph("1. System Architecture Diagram & Database Interactions", h1))
@@ -242,7 +242,7 @@ def generate_detailed_pdf():
     elements.append(draw_sequence_officer())
 
     doc.build(elements)
-    print("New Visual Architecture PDF Generation Complete: docs/PSM_Interactive_Architecture_Guide.pdf")
+    print("New Visual Architecture PDF Generation Complete: docs/PMS_Interactive_Architecture_Guide.pdf")
 
 if __name__ == "__main__":
     generate_detailed_pdf()

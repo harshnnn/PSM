@@ -1,5 +1,6 @@
 package com.example.booking.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,6 +29,11 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingResponse create(BookingRequest request) {
+        if (isSameContact(request.getSenderContact(), request.getReceiverContact())) {
+            throw new IllegalArgumentException("Sender and receiver contact must be different");
+        }
+        validateParcelWeight(request);
+
         Booking booking = new Booking();
         booking.setSenderName(request.getSenderName());
         booking.setSenderAddress(request.getSenderAddress());
@@ -49,6 +55,35 @@ public class BookingServiceImpl implements BookingService {
         booking.setTrackingEnabled(request.isTrackingEnabled());
         Booking saved = bookingRepository.save(booking);
         return toResponse(saved);
+    }
+
+    private void validateParcelWeight(BookingRequest request) {
+        if (request.getParcelSize() == null || request.getWeightKg() == null) {
+            return;
+        }
+
+        BigDecimal maxAllowed = switch (request.getParcelSize()) {
+            case SMALL -> BigDecimal.valueOf(5);
+            case MEDIUM -> BigDecimal.valueOf(20);
+            case LARGE -> BigDecimal.valueOf(50);
+            case CUSTOM -> BigDecimal.valueOf(999);
+        };
+
+        if (request.getWeightKg().compareTo(maxAllowed) > 0) {
+            throw new IllegalArgumentException(
+                "Weight exceeds allowed limit for " + request.getParcelSize() + " parcel (max " + maxAllowed + " kg)"
+            );
+        }
+    }
+
+    private boolean isSameContact(String senderContact, String receiverContact) {
+        String sender = normalizeContact(senderContact);
+        String receiver = normalizeContact(receiverContact);
+        return !sender.isBlank() && sender.equals(receiver);
+    }
+
+    private String normalizeContact(String value) {
+        return value == null ? "" : value.replaceAll("\\D", "");
     }
 
     @Override

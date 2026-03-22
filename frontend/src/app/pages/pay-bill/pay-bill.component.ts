@@ -27,6 +27,7 @@ export class PayBillComponent implements OnInit, OnDestroy {
   successMessage = '';
   errorMessage = '';
   paymentMode: PaymentMode = 'DEBIT';
+  private readonly cardHolderNamePattern = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
 
   private paySub?: Subscription;
 
@@ -47,8 +48,8 @@ export class PayBillComponent implements OnInit, OnDestroy {
     }
 
     this.cardForm = this.fb.group({
-      cardNumber: ['', [Validators.required, Validators.pattern(/^\d{16}$/)]],
-      cardHolderName: ['', [Validators.required, Validators.maxLength(60)]],
+      cardNumber: ['', [Validators.required, Validators.pattern(/^(?:\d{4}\s){3}\d{4}$/)]],
+      cardHolderName: ['', [Validators.required, Validators.maxLength(60), Validators.pattern(this.cardHolderNamePattern)]],
       expiry: ['', [Validators.required, Validators.pattern(/^(0[1-9]|1[0-2])\/\d{2}$/)]],
       cvv: ['', [Validators.required, Validators.pattern(/^\d{3}$/)]]
     });
@@ -125,11 +126,13 @@ export class PayBillComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const formValue = this.cardForm.getRawValue();
     const payload = {
       bookingId: this.bill.bookingId,
       amount: this.bill.amount,
       paymentMode: this.paymentMode,
-      ...(this.cardForm.getRawValue())
+      ...formValue,
+      cardNumber: this.toDigitsOnly(formValue.cardNumber)
     };
 
     this.loadingPayment = true;
@@ -168,5 +171,17 @@ export class PayBillComponent implements OnInit, OnDestroy {
 
   goInvoices(): void {
     this.router.navigate(['/invoices']);
+  }
+
+  onCardNumberInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const digits = this.toDigitsOnly(input.value).slice(0, 16);
+    const grouped = digits.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
+    this.cardForm.patchValue({ cardNumber: grouped }, { emitEvent: false });
+    input.value = grouped;
+  }
+
+  private toDigitsOnly(value: unknown): string {
+    return String(value ?? '').replace(/\D/g, '');
   }
 }

@@ -29,6 +29,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   readonly form;
   readonly passwordForm;
   readonly countryCodes = ['+1', '+44', '+61', '+91'];
+  private readonly emailPattern = /^(?!.*\.\.)[A-Za-z0-9](?:[A-Za-z0-9._%+-]{0,62}[A-Za-z0-9])?@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z]{2,})+$/;
 
   loading = false;
   saving = false;
@@ -50,8 +51,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private readonly router: Router
   ) {
     this.form = this.formBuilder.group({
-      customerName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(/^[A-Za-z][A-Za-z .'-]*$/)]],
-      email: ['', [Validators.required, Validators.email]],
+      customerName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(/^[A-Za-z]+(?:\s[A-Za-z]+)*$/)]],
+      email: ['', [Validators.required, Validators.maxLength(254), Validators.pattern(this.emailPattern)]],
       countryCode: ['+91', [Validators.required]],
       mobileNumber: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
       address: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(200)]],
@@ -125,9 +126,16 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
 
     const raw = this.form.getRawValue();
+    const normalizedEmail = String(raw.email ?? '').trim().toLowerCase();
+    if (!this.emailPattern.test(normalizedEmail)) {
+      this.form.controls.email.markAsTouched();
+      this.saveError = 'Please enter a valid email like name@example.com.';
+      return;
+    }
+
     const payload: UpdateProfileRequest = {
       customerName: this.normalizeText(raw.customerName),
-      email: String(raw.email ?? '').trim().toLowerCase(),
+      email: normalizedEmail,
       countryCode: String(raw.countryCode ?? '').trim(),
       mobileNumber: String(raw.mobileNumber ?? '').trim(),
       address: this.normalizeText(raw.address),

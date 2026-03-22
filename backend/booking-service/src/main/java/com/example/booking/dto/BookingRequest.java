@@ -24,6 +24,7 @@ public class BookingRequest {
     // Sender info (read-only in UI for customer scenario)
     @NotBlank
     @Size(max = 50)
+    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "Sender name must contain letters and spaces only")
     private String senderName;
 
     @NotBlank
@@ -31,12 +32,13 @@ public class BookingRequest {
     private String senderAddress;
 
     @NotBlank
-    @Pattern(regexp = "^\\+?[0-9]{7,15}$", message = "Sender contact must be 7-15 digits with optional +")
+    @Pattern(regexp = "^(?:\\+91\\d{10}|\\d{10})$", message = "Sender contact must be 10 digits, or +91 followed by 10 digits")
     private String senderContact;
 
     // Receiver info
     @NotBlank
     @Size(max = 50)
+    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "Receiver name must contain letters and spaces only")
     private String receiverName;
 
     @NotBlank
@@ -44,11 +46,11 @@ public class BookingRequest {
     private String receiverAddress;
 
     @NotBlank
-    @Pattern(regexp = "^\\d{5,6}$", message = "Pin code must be 5-6 digits")
+    @Pattern(regexp = "^\\d{6}$", message = "Pin code must be exactly 6 digits")
     private String receiverPinCode;
 
     @NotBlank
-    @Pattern(regexp = "^\\+?[0-9]{7,15}$", message = "Receiver contact must be 7-15 digits with optional +")
+    @Pattern(regexp = "^(?:\\+91\\d{10}|\\d{10})$", message = "Receiver contact must be 10 digits, or +91 followed by 10 digits")
     private String receiverContact;
 
     // Parcel details

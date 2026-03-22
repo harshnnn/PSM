@@ -1,5 +1,7 @@
 package com.example.auth.service;
 
+import java.util.regex.Pattern;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,9 @@ public class AuthService {
     private static final String OFFICER_USER_ID = "officer01";
     private static final String OFFICER_PASSWORD = "Officer@123";
     private static final String OFFICER_ROLE = "OFFICER";
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^(?!.*\\.\\.)[A-Za-z0-9](?:[A-Za-z0-9._%+-]{0,62}[A-Za-z0-9])?@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z]{2,})+$"
+    );
 
     private final UserAccountRepository userAccountRepository;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -88,6 +93,9 @@ public class AuthService {
                 .orElseThrow(() -> new IllegalArgumentException("User profile not found"));
 
         String normalizedEmail = normalizeEmail(request.getEmail());
+        if (!EMAIL_PATTERN.matcher(normalizedEmail).matches()) {
+            throw new IllegalArgumentException("Email must be in a valid format");
+        }
         if (!normalizedEmail.equalsIgnoreCase(user.getEmail()) && userAccountRepository.existsByEmail(normalizedEmail)) {
             throw new IllegalArgumentException("Email is already registered with another account");
         }

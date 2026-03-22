@@ -203,7 +203,13 @@ button.secondary {
 :host-context([data-theme='light']) .panel,
 :host-context([data-theme='light']) .hero {
   background: var(--panel-bg) !important;
-  border-color: var(--panel-border) !important;
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 16px;
+}
+
+:host-context([data-theme='light']) .hero {
+  padding: 20px;
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
 }
 
 :host-context([data-theme='light']) .eyebrow,
@@ -221,4 +227,10 @@ button.secondary {
   background: var(--input-bg) !important;
   color: var(--input-text) !important;
   border-color: var(--input-border) !important;
+}
+
+:host-context([data-theme='light']) .cost-card .label,
+:host-context([data-theme='light']) .cost-card .hint,
+:host-context([data-theme='light']) .cost-card h2 {
+  color: #f8fbff !important;
 }

@@ -20,7 +20,7 @@
         </div>
         <div>
           <p class="label">Payment</p>
-          <h3>{{ invoice.parcelServiceCost | currency }}</h3>
+          <h3>{{ invoice.parcelServiceCost | currency: 'INR' : 'symbol' : '1.2-2' }}</h3>
           <p class="muted">Paid at {{ invoice.paymentTime | date: 'medium' }}</p>
         </div>
         <div>

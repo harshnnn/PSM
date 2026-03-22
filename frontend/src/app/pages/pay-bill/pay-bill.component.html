@@ -13,7 +13,6 @@
       <div class="messages">
         <div class="error" *ngIf="listError">{{ listError }}</div>
         <div class="success" *ngIf="successMessage">{{ successMessage }}</div>
-        <div class="error" *ngIf="errorMessage && !listError">{{ errorMessage }}</div>
         <button class="link" type="button" (click)="goInvoices()">View invoices</button>
       </div>
 
@@ -27,7 +26,7 @@
           <div class="card-head">
             <div>
               <p class="label">Booking #{{ booking.id }}</p>
-              <h3>{{ booking.serviceCost | currency }}</h3>
+              <h3>{{ booking.serviceCost | currency: 'INR' : 'symbol' : '1.2-2' }}</h3>
             </div>
             <span class="pill">{{ booking.paymentStatus }}</span>
           </div>
@@ -52,7 +51,7 @@
           </div>
           <div>
             <p class="label">Amount</p>
-            <h3>{{ bill.amount | currency }}</h3>
+            <h3>{{ bill.amount | currency: 'INR' : 'symbol' : '1.2-2' }}</h3>
           </div>
           <div>
             <p class="label">Status</p>
@@ -81,7 +80,16 @@
       <p class="muted">Card details are used only for this payment.</p>
       <form [formGroup]="cardForm" (ngSubmit)="makePayment()" class="card-form">
         <label>Card Number</label>
-        <input type="text" formControlName="cardNumber" placeholder="16 digits" />
+        <input
+          type="text"
+          formControlName="cardNumber"
+          class="card-number-input"
+          inputmode="numeric"
+          autocomplete="cc-number"
+          maxlength="19"
+          placeholder="1234 5678 9012 3456"
+          (input)="onCardNumberInput($event)"
+        />
         <div class="field-error" *ngIf="cardForm.get('cardNumber')?.touched && cardForm.get('cardNumber')?.errors?.['required']">
           Card number is required.
         </div>
@@ -96,6 +104,9 @@
         </div>
         <div class="field-error" *ngIf="cardForm.get('cardHolderName')?.touched && cardForm.get('cardHolderName')?.errors?.['maxlength']">
           Card holder name must be at most 60 characters.
+        </div>
+        <div class="field-error" *ngIf="cardForm.get('cardHolderName')?.touched && cardForm.get('cardHolderName')?.errors?.['pattern']">
+          Card holder name must contain letters and spaces only.
         </div>
 
         <div class="inline">
@@ -121,6 +132,7 @@
           </div>
         </div>
         <button class="primary" type="submit" [disabled]="loadingPayment">{{ loadingPayment ? 'Processing...' : 'Make Payment' }}</button>
+        <div class="error" *ngIf="errorMessage && !listError">{{ errorMessage }}</div>
       </form>
     </div>
   </section>

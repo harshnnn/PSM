@@ -27,7 +27,7 @@ export class LoginComponent {
     private readonly router: Router
   ) {
     this.form = this.formBuilder.group({
-      userId: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(20)]],
+      userId: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(20), Validators.pattern(/^\S+$/)]],
       password: [
         '',
         [
@@ -39,21 +39,40 @@ export class LoginComponent {
     });
 
     this.route.queryParamMap.subscribe((params) => {
-      this.infoMessage = params.get('passwordChanged') === '1'
-        ? 'Password changed successfully. Please login again.'
-        : '';
+      if (params.get('passwordChanged') === '1') {
+        this.infoMessage = 'Password changed successfully. Please login again.';
+        return;
+      }
+
+      if (params.get('sessionExpired') === '1') {
+        this.infoMessage = 'Session expired after service restart. Please login again.';
+        return;
+      }
+
+      this.infoMessage = '';
     });
   }
 
   submit(): void {
     this.errorMessage = '';
+
+    const userIdControl = this.form.controls.userId;
+    const trimmedUserId = String(userIdControl.value ?? '').trim();
+    if (trimmedUserId !== userIdControl.value) {
+      userIdControl.setValue(trimmedUserId);
+    }
+
     if (this.form.invalid) {
       markAndFocusFirstInvalidControl(this.form);
       this.errorMessage = 'Please fix validation errors before login.';
       return;
     }
 
-    this.authApi.login(this.form.getRawValue() as { userId: string; password: string }).subscribe({
+    const raw = this.form.getRawValue();
+    this.authApi.login({
+      userId: String(raw.userId ?? '').trim(),
+      password: String(raw.password ?? '')
+    }).subscribe({
       next: (response) => {
         this.sessionService.save({ username: response.username, role: response.role });
         this.router.navigate([response.role === 'OFFICER' ? '/admin' : '/home']);

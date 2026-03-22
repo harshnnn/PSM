@@ -7,7 +7,7 @@ from reportlab.lib.enums import TA_CENTER, TA_LEFT
 
 def generate_pdf():
     doc = SimpleDocTemplate(
-        "C:/Users/HARSH/Desktop/SpringBoot/PSM/docs/PSM_Enterprise_Workflow_Guide.pdf",
+        "C:/Users/HARSH/Desktop/SpringBoot/PMS/docs/PMS_Enterprise_Workflow_Guide.pdf",
         pagesize=letter,
         rightMargin=50, leftMargin=50, topMargin=50, bottomMargin=50
     )
@@ -26,7 +26,7 @@ def generate_pdf():
     # --- COVER PAGE ---
     elements.append(Spacer(1, 100))
     elements.append(Paragraph("System Architecture & Workflow Document", title_style))
-    elements.append(Paragraph("Postal Service Management (PSM) Microservices", subtitle_style))
+    elements.append(Paragraph("Postal Service Management (PMS) Microservices", subtitle_style))
     elements.append(Spacer(1, 150))
     elements.append(Paragraph("Generated automatically to provide a clean, professional, and easy-to-understand overview of system architecture, customer journeys, and officer operations.", normal_style))
     elements.append(PageBreak())

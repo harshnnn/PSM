@@ -24,7 +24,7 @@
         <div class="card-head">
           <div>
             <p class="label">Invoice #{{ inv.invoiceNumber }}</p>
-            <h3>{{ inv.parcelServiceCost | currency }}</h3>
+            <h3>{{ inv.parcelServiceCost | currency: 'INR' : 'symbol' : '1.2-2' }}</h3>
           </div>
           <button class="link" type="button" (click)="viewInvoice(inv)">View</button>
         </div>

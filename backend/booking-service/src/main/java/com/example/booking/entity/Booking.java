@@ -35,6 +35,7 @@ public class Booking {
     // Sender info
     @NotBlank
     @Size(max = 50)
+    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "Sender name must contain letters and spaces only")
     @Column(nullable = false, length = 50)
     private String senderName;
 
@@ -44,13 +45,14 @@ public class Booking {
     private String senderAddress;
 
     @NotBlank
-    @Pattern(regexp = "^\\+?[0-9]{7,15}$", message = "Sender contact must be 7-15 digits with optional +")
+    @Pattern(regexp = "^(?:\\+91\\d{10}|\\d{10})$", message = "Sender contact must be 10 digits, or +91 followed by 10 digits")
     @Column(nullable = false, length = 20)
     private String senderContact;
 
     // Receiver info
     @NotBlank
     @Size(max = 50)
+    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "Receiver name must contain letters and spaces only")
     @Column(nullable = false, length = 50)
     private String receiverName;
 
@@ -60,12 +62,12 @@ public class Booking {
     private String receiverAddress;
 
     @NotBlank
-    @Pattern(regexp = "^\\d{5,6}$", message = "Pin code must be 5-6 digits")
+    @Pattern(regexp = "^\\d{6}$", message = "Pin code must be exactly 6 digits")
     @Column(nullable = false, length = 6)
     private String receiverPinCode;
 
     @NotBlank
-    @Pattern(regexp = "^\\+?[0-9]{7,15}$", message = "Receiver contact must be 7-15 digits with optional +")
+    @Pattern(regexp = "^(?:\\+91\\d{10}|\\d{10})$", message = "Receiver contact must be 10 digits, or +91 followed by 10 digits")
     @Column(nullable = false, length = 20)
     private String receiverContact;
 
@@ -166,12 +168,14 @@ public class Booking {
     }
 
     @PrePersist
+    @SuppressWarnings("unused")
     void prePersist() {
         createdAt = LocalDateTime.now();
         updatedAt = createdAt;
     }
 
     @PreUpdate
+    @SuppressWarnings("unused")
     void preUpdate() {
         updatedAt = LocalDateTime.now();
     }

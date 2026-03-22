@@ -1,11 +1,13 @@
 package com.example.payment.client;
 
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -21,19 +23,23 @@ public class TrackingClient {
     private final RestTemplate restTemplate;
     private final String trackingBaseUrl;
 
-    public TrackingClient(RestTemplate restTemplate,
-                          @Value("${tracking.service.url:http://tracking-service}") String trackingBaseUrl) {
+    public TrackingClient(
+            RestTemplate restTemplate,
+            @Value("${tracking.service.url:http://tracking-service}") String trackingBaseUrl
+    ) {
         this.restTemplate = restTemplate;
         this.trackingBaseUrl = trackingBaseUrl;
     }
 
-    public TrackingCreateResponse registerShipment(TrackingCreateRequest request) {
+    @Nullable
+    public TrackingCreateResponse registerShipment(@NonNull TrackingCreateRequest request) {
         try {
-            ResponseEntity<TrackingCreateResponse> response = restTemplate.exchange(
+            TrackingCreateRequest safeRequest = Objects.requireNonNull(request, "request");
+            ResponseEntity<TrackingCreateResponse> response = restTemplate.postForEntity(
                     trackingBaseUrl + "/api/tracking/internal/register",
-                    HttpMethod.POST,
-                    new HttpEntity<>(request),
-                    TrackingCreateResponse.class);
+                    safeRequest,
+                    TrackingCreateResponse.class
+            );
             if (!response.getStatusCode().is2xxSuccessful()) {
                 log.warn("Tracking registration failed with status {}", response.getStatusCode());
                 return null;

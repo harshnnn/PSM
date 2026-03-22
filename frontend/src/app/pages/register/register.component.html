@@ -7,11 +7,11 @@
       <div class="form-row">
         <div>
           <label>Customer Name</label>
-          <input type="text" formControlName="customerName" placeholder="e.g. Harsh Verma" />
+          <input type="text" formControlName="customerName" placeholder="e.g. John Doe" />
           <div class="error" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['required']">Customer Name is required.</div>
           <div class="error" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['minlength']">Customer Name must be at least 2 characters.</div>
           <div class="error" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['maxlength']">Customer Name must be at most 50 characters.</div>
-          <div class="error" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['pattern']">Customer Name cannot include numbers or invalid symbols.</div>
+          <div class="error" *ngIf="form.controls.customerName.touched && form.controls.customerName.errors?.['pattern']">Customer name must contain letters and spaces only.</div>
         </div>
 
         <div>

@@ -52,7 +52,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     @Transactional(readOnly = true)
     public InvoiceResponse get(Long id) {
-        Invoice invoice = repository.findById(id)
+        Long safeId = Objects.requireNonNull(id, "id");
+        Invoice invoice = repository.findById(safeId)
                 .orElseThrow(() -> new IllegalArgumentException("Invoice not found"));
         return toResponse(invoice);
     }
@@ -74,15 +75,16 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private String generateInvoiceNumber(Long bookingId) {
         String base = "INV-" + (bookingId != null ? bookingId : "NA");
-        String suffix = random.ints(6, 0, 36)
-                .mapToObj(this::toAlphanumeric)
-                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
-                .toString();
-        String candidate = base + "-" + suffix;
-        if (repository.existsByInvoiceNumber(candidate)) {
-            return generateInvoiceNumber(bookingId);
+        while (true) {
+            String suffix = random.ints(6, 0, 36)
+                    .mapToObj(this::toAlphanumeric)
+                    .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
+                    .toString();
+            String candidate = base + "-" + suffix;
+            if (!repository.existsByInvoiceNumber(candidate)) {
+                return candidate;
+            }
         }
-        return candidate;
     }
 
     private String toAlphanumeric(int value) {

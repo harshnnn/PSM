@@ -1,11 +1,13 @@
 package com.example.payment.client;
 
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -27,12 +29,13 @@ public class InvoiceClient {
         this.invoiceBaseUrl = invoiceBaseUrl;
     }
 
-    public InvoiceCreateResponse createInvoice(InvoiceCreateRequest request) {
+    @Nullable
+    public InvoiceCreateResponse createInvoice(@NonNull InvoiceCreateRequest request) {
         try {
-            ResponseEntity<InvoiceCreateResponse> response = restTemplate.exchange(
+            InvoiceCreateRequest safeRequest = Objects.requireNonNull(request, "request");
+            ResponseEntity<InvoiceCreateResponse> response = restTemplate.postForEntity(
                     invoiceBaseUrl + "/api/invoices",
-                    HttpMethod.POST,
-                    new HttpEntity<>(request),
+                    safeRequest,
                     InvoiceCreateResponse.class);
             if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
                 log.warn("Invoice creation failed with status {}", response.getStatusCode());

@@ -9,11 +9,16 @@ public class UpdateProfileRequest {
 
     @NotBlank
     @Size(max = 50)
-    @Pattern(regexp = "^[A-Za-z][A-Za-z .'-]*$", message = "Customer name cannot include numbers or invalid symbols")
+    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "Customer name must contain letters and spaces only")
     private String customerName;
 
     @NotBlank
     @Email
+    @Size(max = 254, message = "Email must be at most 254 characters")
+    @Pattern(
+        regexp = "^(?!.*\\.\\.)[A-Za-z0-9](?:[A-Za-z0-9._%+-]{0,62}[A-Za-z0-9])?@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z]{2,})+$",
+        message = "Email must be in a valid format"
+    )
     private String email;
 
     @NotBlank

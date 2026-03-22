@@ -52,7 +52,7 @@
             <td>{{ entry.bookingDate | date: 'medium' }}</td>
             <td>{{ entry.receiverName }}</td>
             <td>{{ entry.deliveredAddress }}</td>
-            <td>{{ entry.amount | currency }}</td>
+            <td>{{ entry.amount | currency: 'INR' : 'symbol' : '1.2-2' }}</td>
             <td><span class="pill">{{ entry.status }}</span></td>
           </tr>
           <tr *ngIf="!loading && entries.length === 0">

@@ -15,6 +15,9 @@
           <div class="error" *ngIf="form.controls.userId.touched && (form.controls.userId.errors?.['minlength'] || form.controls.userId.errors?.['maxlength'])">
             User ID must be between 5 and 20 characters.
           </div>
+          <div class="error" *ngIf="form.controls.userId.touched && form.controls.userId.errors?.['pattern']">
+            User ID must not contain spaces.
+          </div>
         </div>
 
         <div>
