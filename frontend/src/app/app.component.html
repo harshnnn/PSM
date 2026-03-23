@@ -12,7 +12,12 @@
 			<a [routerLink]="session.role === 'OFFICER' ? '/admin/tracking' : '/tracking'" routerLinkActive="active">Tracking</a>
 			<a *ngIf="session.role === 'OFFICER'" routerLink="/admin/pickup-scheduling" routerLinkActive="active">Pickup Scheduling</a>
 			<a *ngIf="session.role === 'OFFICER'" routerLink="/admin/delivery-status" routerLinkActive="active">Delivery Update</a>
-			<a [routerLink]="session.role === 'OFFICER' ? '/admin/support' : '/support'" routerLinkActive="active">Support</a>
+			<a [routerLink]="session.role === 'OFFICER' ? '/admin/support' : '/support'" routerLinkActive="active" class="support-link">
+				<span>Support</span>
+				<span *ngIf="session.role === 'CUSTOMER' && supportUnreadCount > 0" class="support-notification" [attr.aria-label]="supportUnreadCount + ' unread support messages'">
+					{{ supportUnreadCount > 99 ? '99+' : supportUnreadCount }}
+				</span>
+			</a>
 		</nav>
 		<div class="user">
 			<span>{{ session.role === 'OFFICER' ? session.username + ' (' + session.role + ')' : session.username }}</span>

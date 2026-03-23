@@ -57,6 +57,12 @@ spring:
             - Path=/h2/tracking/**
           filters:
             - RewritePath=/h2/tracking/?(?<segment>.*), /h2-console/$\{segment}
+        - id: support-h2-console
+          uri: lb://support-service
+          predicates:
+            - Path=/h2/support/**
+          filters:
+            - RewritePath=/h2/support/?(?<segment>.*), /h2-console/$\{segment}
         - id: auth-service
           uri: lb://auth-service
           predicates:
@@ -81,6 +87,10 @@ spring:
           uri: lb://tracking-service
           predicates:
             - Path=/api/tracking/**
+        - id: support-service
+          uri: lb://support-service
+          predicates:
+            - Path=/api/support/**
 
 eureka:
   client:

@@ -1,0 +1,96 @@
+<section class="support-page" *ngIf="session as s">
+  <header class="support-header">
+    <div>
+      <p class="eyebrow">Support</p>
+      <h1>{{ isOfficer ? 'Support Console' : 'Chat With Support' }}</h1>
+      <p class="lede" *ngIf="isOfficer">Assist customers through real-time support conversation threads.</p>
+      <p class="lede" *ngIf="!isOfficer">Describe your issue and an admin officer will reply here.</p>
+      <p class="lede">
+        Live mode: <strong>{{ websocketConnected ? 'Connected' : 'Offline fallback (DB sync)' }}</strong>
+      </p>
+    </div>
+  </header>
+
+  <p class="error-banner" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <section class="layout" [class.customer-layout]="!isOfficer">
+    <aside class="conversation-list" *ngIf="isOfficer">
+      <div class="open-convo-row">
+        <input
+          type="text"
+          [(ngModel)]="newConversationUsername"
+          placeholder="Open by customer username"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <button type="button" (click)="openConversationByUsername()">Open</button>
+      </div>
+
+      <div
+        class="conversation-item"
+        *ngFor="let convo of conversations; trackBy: trackByConversation"
+        [class.active]="convo.customerUsername === activeCustomerUsername"
+        (click)="selectConversation(convo.customerUsername)"
+      >
+        <p class="customer">{{ convo.customerUsername }}</p>
+        <p class="preview">{{ convo.lastMessage }}</p>
+        <p class="meta">{{ convo.lastUpdatedAt | date: 'short' }} • {{ convo.messageCount }} msgs</p>
+      </div>
+
+      <p class="empty" *ngIf="conversations.length === 0">No support conversations yet.</p>
+    </aside>
+
+    <article class="chat-panel">
+      <div class="chat-head">
+        <h2>
+          {{
+            activeCustomerUsername
+              ? (isOfficer ? ('Conversation: ' + activeCustomerUsername) : 'Your Conversation')
+              : 'Select a conversation'
+          }}
+        </h2>
+      </div>
+
+      <div class="messages" #messagesContainer *ngIf="activeCustomerUsername; else noSelectionTemplate">
+        <p class="empty" *ngIf="loadingMessages">Loading messages...</p>
+
+        <div
+          class="message-row"
+          *ngFor="let message of messages; trackBy: trackByMessage"
+          [class.own]="isOwnMessage(message)"
+        >
+          <div class="bubble">
+            <p class="sender">{{ message.senderUsername }} ({{ message.senderRole }})</p>
+            <p class="text">{{ message.message }}</p>
+            <p class="time">
+              {{ message.createdAt | date: 'short' }}
+              <span *ngIf="getReceiptLabel(message)"> • {{ getReceiptLabel(message) }}</span>
+            </p>
+          </div>
+        </div>
+
+        <p class="empty" *ngIf="!loadingMessages && messages.length === 0">No messages yet. Start the conversation.</p>
+
+        <div #bottomAnchor aria-hidden="true"></div>
+      </div>
+
+      <ng-template #noSelectionTemplate>
+        <div class="messages">
+          <p class="empty">Choose a conversation to start chatting.</p>
+        </div>
+      </ng-template>
+
+      <div class="composer" *ngIf="activeCustomerUsername">
+        <textarea
+          rows="2"
+          [(ngModel)]="draftMessage"
+          [ngModelOptions]="{ standalone: true }"
+          placeholder="Type your message..."
+          maxlength="1000"
+        ></textarea>
+        <button type="button" (click)="sendMessage()" [disabled]="sending || !draftMessage.trim()">
+          {{ sending ? 'Sending...' : 'Send' }}
+        </button>
+      </div>
+    </article>
+  </section>
+</section>
