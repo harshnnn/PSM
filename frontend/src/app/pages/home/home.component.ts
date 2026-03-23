@@ -303,6 +303,10 @@ export class HomeComponent implements OnInit {
     return shipment.bookingId;
   }
 
+  openUserManagement(): void {
+    this.router.navigate(['/admin/users']);
+  }
+
   private buildStatusInsights(items: Array<{ label: string; count: number }>): StatusInsight[] {
     const total = items.reduce((sum, item) => sum + item.count, 0);
     if (total === 0) {

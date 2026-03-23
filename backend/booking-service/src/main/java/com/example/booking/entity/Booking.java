@@ -45,7 +45,7 @@ public class Booking {
     private String senderAddress;
 
     @NotBlank
-    @Pattern(regexp = "^(?:\\+91\\d{10}|\\d{10})$", message = "Sender contact must be 10 digits, or +91 followed by 10 digits")
+    @Pattern(regexp = "^(?:\\+91[6-9]\\d{9}|[6-9]\\d{9})$", message = "Sender contact must be 10 digits starting with 6, 7, 8, or 9, or +91 followed by one of these")
     @Column(nullable = false, length = 20)
     private String senderContact;
 
@@ -67,7 +67,7 @@ public class Booking {
     private String receiverPinCode;
 
     @NotBlank
-    @Pattern(regexp = "^(?:\\+91\\d{10}|\\d{10})$", message = "Receiver contact must be 10 digits, or +91 followed by 10 digits")
+    @Pattern(regexp = "^(?:\\+91[6-9]\\d{9}|[6-9]\\d{9})$", message = "Receiver contact must be 10 digits starting with 6, 7, 8, or 9, or +91 followed by one of these")
     @Column(nullable = false, length = 20)
     private String receiverContact;
 

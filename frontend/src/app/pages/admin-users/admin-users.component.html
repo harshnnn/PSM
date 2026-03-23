@@ -1,0 +1,73 @@
+<section class="admin-users-page">
+  <header class="page-head">
+    <div>
+      <p class="eyebrow">Admin</p>
+      <h1>User Account Control</h1>
+      <p class="lede">Lock, unlock, and remove customer accounts from one place.</p>
+    </div>
+    <button type="button" class="refresh-btn" (click)="loadUsers()" [disabled]="loading">
+      {{ loading ? 'Refreshing...' : 'Refresh Users' }}
+    </button>
+  </header>
+
+  <p class="error-banner" *ngIf="errorMessage">{{ errorMessage }}</p>
+  <p class="success-banner" *ngIf="successMessage">{{ successMessage }}</p>
+
+  <section class="panel" *ngIf="!loading; else loadingTemplate">
+    <div class="table-wrap">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{ user.customerUsername }}</td>
+            <td>{{ user.customerName }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.countryCode }} {{ user.mobileNumber }}</td>
+            <td>
+              <span class="status-pill" [class.locked]="user.accountLocked">
+                {{ user.accountLocked ? 'Locked' : 'Active' }}
+              </span>
+            </td>
+            <td class="action-cell">
+              <button
+                type="button"
+                class="lock-btn"
+                *ngIf="!user.accountLocked"
+                (click)="lockUser(user)"
+              >
+                Lock
+              </button>
+              <button
+                type="button"
+                class="unlock-btn"
+                *ngIf="user.accountLocked"
+                (click)="unlockUser(user)"
+              >
+                Unlock
+              </button>
+              <button type="button" class="delete-btn" (click)="deleteUser(user)">Delete</button>
+            </td>
+          </tr>
+          <tr *ngIf="users.length === 0">
+            <td colspan="6" class="empty-row">No customer accounts found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <ng-template #loadingTemplate>
+    <section class="panel loading-panel">
+      <p>Loading users...</p>
+    </section>
+  </ng-template>
+</section>

@@ -17,6 +17,9 @@ import { markAndFocusFirstInvalidControl } from '../../utils/form-validation';
 export class LoginComponent {
   errorMessage = '';
   infoMessage = '';
+  accountNoticeTitle = 'Account Locked';
+  lockedAccountMessage = '';
+  lockedSupportEmail = 'support@pmslogistics.demo';
   readonly form;
 
   constructor(
@@ -39,22 +42,46 @@ export class LoginComponent {
     });
 
     this.route.queryParamMap.subscribe((params) => {
+      if (params.get('accountRestricted') === '1') {
+        const restrictionType = params.get('restrictionType');
+        this.accountNoticeTitle = restrictionType === 'deleted' ? 'Account Deleted By Admin' : 'Account Locked';
+        this.lockedAccountMessage = params.get('restrictionMessage') ||
+          (restrictionType === 'deleted'
+            ? 'Your account has been deleted by admin. Please contact support for assistance.'
+            : 'Your account has been locked. Please contact support for help.');
+        this.lockedSupportEmail = params.get('supportEmail') || 'support@pmslogistics.demo';
+        this.infoMessage = '';
+        return;
+      }
+
+      if (params.get('accountLocked') === '1') {
+        this.accountNoticeTitle = 'Account Locked';
+        this.lockedAccountMessage = params.get('lockMessage') || 'Your account has been locked. Please contact support.';
+        this.lockedSupportEmail = params.get('supportEmail') || 'support@pmslogistics.demo';
+        this.infoMessage = '';
+        return;
+      }
+
       if (params.get('passwordChanged') === '1') {
+        this.lockedAccountMessage = '';
         this.infoMessage = 'Password changed successfully. Please login again.';
         return;
       }
 
       if (params.get('sessionExpired') === '1') {
+        this.lockedAccountMessage = '';
         this.infoMessage = 'Session expired after service restart. Please login again.';
         return;
       }
 
+      this.lockedAccountMessage = '';
       this.infoMessage = '';
     });
   }
 
   submit(): void {
     this.errorMessage = '';
+    this.lockedAccountMessage = '';
 
     const userIdControl = this.form.controls.userId;
     const trimmedUserId = String(userIdControl.value ?? '').trim();
@@ -79,6 +106,20 @@ export class LoginComponent {
       },
       error: (error) => {
         const payload = error?.error;
+        if (error?.status === 423 || payload?.code === 'ACCOUNT_LOCKED') {
+          this.accountNoticeTitle = 'Account Locked';
+          this.lockedAccountMessage =
+            typeof payload?.error === 'string'
+              ? payload.error
+              : 'Your account has been locked. Please contact support.';
+          this.lockedSupportEmail =
+            typeof payload?.supportEmail === 'string' && payload.supportEmail.trim().length > 0
+              ? payload.supportEmail
+              : 'support@pmslogistics.demo';
+          this.errorMessage = '';
+          return;
+        }
+
         if (typeof payload?.error === 'string') {
           this.errorMessage = payload.error;
           return;

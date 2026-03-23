@@ -59,6 +59,22 @@ export interface ChangePasswordRequest {
   confirmNewPassword: string;
 }
 
+export interface AdminUserSummaryResponse {
+  customerUsername: string;
+  customerName: string;
+  email: string;
+  countryCode: string;
+  mobileNumber: string;
+  role: string;
+  accountLocked: boolean;
+}
+
+export interface AdminUserActionResponse {
+  message: string;
+  customerUsername: string;
+  accountLocked: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthApiService {
   private readonly baseUrl = 'http://localhost:8080/auth';
@@ -83,5 +99,21 @@ export class AuthApiService {
 
   changePassword(customerUsername: string, payload: ChangePasswordRequest): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/profile/${customerUsername}/password`, payload);
+  }
+
+  listManagedUsers(): Observable<AdminUserSummaryResponse[]> {
+    return this.http.get<AdminUserSummaryResponse[]>(`${this.baseUrl}/admin/users`);
+  }
+
+  lockUserAccount(customerUsername: string): Observable<AdminUserActionResponse> {
+    return this.http.put<AdminUserActionResponse>(`${this.baseUrl}/admin/users/${customerUsername}/lock`, {});
+  }
+
+  unlockUserAccount(customerUsername: string): Observable<AdminUserActionResponse> {
+    return this.http.put<AdminUserActionResponse>(`${this.baseUrl}/admin/users/${customerUsername}/unlock`, {});
+  }
+
+  deleteUserAccount(customerUsername: string): Observable<AdminUserActionResponse> {
+    return this.http.delete<AdminUserActionResponse>(`${this.baseUrl}/admin/users/${customerUsername}`);
   }
 }

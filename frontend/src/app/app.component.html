@@ -3,6 +3,7 @@
 		<div class="brand">PMS Logistics</div>
 		<nav class="links">
 			<a [routerLink]="session.role === 'OFFICER' ? '/admin' : '/home'" routerLinkActive="active">Home</a>
+			<a *ngIf="session.role === 'OFFICER'" routerLink="/admin/users" routerLinkActive="active">Users</a>
 			<a *ngIf="session.role !== 'OFFICER'" routerLink="/profile" routerLinkActive="active">Profile</a>
 			<a *ngIf="session.role !== 'OFFICER'" routerLink="/booking" routerLinkActive="active">Booking</a>
 			<a *ngIf="session.role !== 'OFFICER'" routerLink="/pay-bill" routerLinkActive="active">Pay Bill</a>

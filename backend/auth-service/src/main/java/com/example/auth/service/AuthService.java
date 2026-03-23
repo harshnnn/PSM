@@ -1,10 +1,14 @@
 package com.example.auth.service;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.auth.dto.AdminUserActionResponse;
+import com.example.auth.dto.AdminUserSummaryResponse;
 import com.example.auth.dto.ChangePasswordRequest;
 import com.example.auth.dto.LoginRequest;
 import com.example.auth.dto.LoginResponse;
@@ -13,6 +17,7 @@ import com.example.auth.dto.RegisterRequest;
 import com.example.auth.dto.RegisterResponse;
 import com.example.auth.dto.UpdateProfileRequest;
 import com.example.auth.entity.UserAccount;
+import com.example.auth.exception.AccountLockedException;
 import com.example.auth.repository.UserAccountRepository;
 
 @Service
@@ -20,6 +25,8 @@ public class AuthService {
     private static final String OFFICER_USER_ID = "officer01";
     private static final String OFFICER_PASSWORD = "Officer@123";
     private static final String OFFICER_ROLE = "OFFICER";
+    private static final String CUSTOMER_ROLE = "CUSTOMER";
+    private static final String SUPPORT_EMAIL = "support@pmslogistics.demo";
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "^(?!.*\\.\\.)[A-Za-z0-9](?:[A-Za-z0-9._%+-]{0,62}[A-Za-z0-9])?@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z]{2,})+$"
     );
@@ -65,9 +72,10 @@ public class AuthService {
         user.setAddress(request.getAddress());
         user.setUserId(request.getUserId());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        user.setRole("CUSTOMER");
+        user.setRole(CUSTOMER_ROLE);
         user.setPreferences(request.getPreferences());
         user.setCustomerUsername(customerUsername);
+        user.setAccountLocked(false);
 
         userAccountRepository.save(user);
         String token = jwtService.generateToken(customerUsername, user.getRole());
@@ -83,6 +91,8 @@ public class AuthService {
         UserAccount user = userAccountRepository.findByUserId(request.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user ID or password"));
 
+        ensureAccountUnlocked(user);
+
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
             throw new IllegalArgumentException("Invalid user ID or password");
         }
@@ -91,9 +101,38 @@ public class AuthService {
         return new LoginResponse("Login successful", user.getRole(), user.getCustomerUsername(), token);
     }
 
+    public List<AdminUserSummaryResponse> getManageableUsers() {
+        return userAccountRepository.findAllByRoleOrderByCustomerUsernameAsc(CUSTOMER_ROLE)
+                .stream()
+                .map(this::toAdminUserSummary)
+                .toList();
+    }
+
+    public AdminUserActionResponse lockUserAccount(String customerUsername) {
+        UserAccount user = findManageableUser(customerUsername);
+        user.setAccountLocked(true);
+        userAccountRepository.save(user);
+        return new AdminUserActionResponse("Account locked successfully", user.getCustomerUsername(), true);
+    }
+
+    public AdminUserActionResponse unlockUserAccount(String customerUsername) {
+        UserAccount user = findManageableUser(customerUsername);
+        user.setAccountLocked(false);
+        userAccountRepository.save(user);
+        return new AdminUserActionResponse("Account unlocked successfully", user.getCustomerUsername(), false);
+    }
+
+    public AdminUserActionResponse deleteUserAccount(String customerUsername) {
+        UserAccount user = findManageableUser(customerUsername);
+        userAccountRepository.deleteById(Objects.requireNonNull(user.getId()));
+        return new AdminUserActionResponse("Account deleted successfully", customerUsername, false);
+    }
+
     public ProfileResponse getProfile(String customerUsername) {
         UserAccount user = userAccountRepository.findByCustomerUsername(customerUsername)
                 .orElseThrow(() -> new IllegalArgumentException("User profile not found"));
+
+        ensureAccountUnlocked(user);
 
         return new ProfileResponse(
                 user.getCustomerUsername(),
@@ -108,6 +147,8 @@ public class AuthService {
     public ProfileResponse updateProfile(String customerUsername, UpdateProfileRequest request) {
         UserAccount user = userAccountRepository.findByCustomerUsername(customerUsername)
                 .orElseThrow(() -> new IllegalArgumentException("User profile not found"));
+
+        ensureAccountUnlocked(user);
 
         String normalizedEmail = normalizeEmail(request.getEmail());
         if (!EMAIL_PATTERN.matcher(normalizedEmail).matches()) {
@@ -139,6 +180,8 @@ public class AuthService {
         UserAccount user = userAccountRepository.findByCustomerUsername(customerUsername)
                 .orElseThrow(() -> new IllegalArgumentException("User profile not found"));
 
+        ensureAccountUnlocked(user);
+
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash())) {
             throw new IllegalArgumentException("Current password is incorrect");
         }
@@ -164,5 +207,37 @@ public class AuthService {
 
     private String normalizeEmail(String email) {
         return email == null ? "" : email.trim().toLowerCase();
+    }
+
+    private UserAccount findManageableUser(String customerUsername) {
+        UserAccount user = userAccountRepository.findByCustomerUsername(customerUsername)
+                .orElseThrow(() -> new IllegalArgumentException("User account not found"));
+
+        if (!CUSTOMER_ROLE.equalsIgnoreCase(user.getRole())) {
+            throw new IllegalArgumentException("Only customer accounts can be managed");
+        }
+
+        return user;
+    }
+
+    private AdminUserSummaryResponse toAdminUserSummary(UserAccount user) {
+        return new AdminUserSummaryResponse(
+                user.getCustomerUsername(),
+                user.getCustomerName(),
+                user.getEmail(),
+                user.getCountryCode(),
+                user.getMobileNumber(),
+                user.getRole(),
+                user.isAccountLocked()
+        );
+    }
+
+    private void ensureAccountUnlocked(UserAccount user) {
+        if (user.isAccountLocked()) {
+            throw new AccountLockedException(
+                    "Your account has been locked. Please contact support for help.",
+                    SUPPORT_EMAIL
+            );
+        }
     }
 }

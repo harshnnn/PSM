@@ -55,7 +55,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       customerName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(/^\s*[A-Za-z]+(?:\s+[A-Za-z]+)*\s*$/)]],
       email: ['', [Validators.required, Validators.maxLength(254), Validators.pattern(this.emailPattern)]],
       countryCode: ['+91', [Validators.required]],
-      mobileNumber: ['', [Validators.required, Validators.pattern(/^\d{10}$/), repeatedDigitLimitValidator(5)]],
+      mobileNumber: ['', [Validators.required, Validators.pattern(/^[6-9]\d{9}$/), repeatedDigitLimitValidator(5)]],
       address: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(200)]],
       preferences: ['', [Validators.maxLength(200)]]
     });

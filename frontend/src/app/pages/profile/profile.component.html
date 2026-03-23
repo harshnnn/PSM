@@ -53,7 +53,7 @@
             <label for="mobileNumber">Mobile Number</label>
             <input id="mobileNumber" type="text" formControlName="mobileNumber" inputmode="numeric" maxlength="10" placeholder="9876543210" />
             <div class="error-text" *ngIf="form.controls.mobileNumber.touched && form.controls.mobileNumber.errors?.['required']">Mobile number is required.</div>
-            <div class="error-text" *ngIf="form.controls.mobileNumber.touched && form.controls.mobileNumber.errors?.['pattern']">Enter exactly 10 digits.</div>
+            <div class="error-text" *ngIf="form.controls.mobileNumber.touched && form.controls.mobileNumber.errors?.['pattern']">Enter 10 digits starting with either 6, 7, 8, or 9.</div>
             <div class="error-text" *ngIf="form.controls.mobileNumber.touched && form.controls.mobileNumber.errors?.['repeatDigits']">Any digit can appear at most 5 times consecutively.</div>
           </div>
         </div>

@@ -22,7 +22,7 @@ public class RegisterRequest {
     private String countryCode;
 
     @NotBlank
-    @Pattern(regexp = "^(?!.*(\\d)\\1{5,})\\d{10}$", message = "Mobile number must be 10 digits and cannot contain any digit repeated more than 5 times consecutively")
+    @Pattern(regexp = "^(?!.*(\\d)\\1{5,})[6-9]\\d{9}$", message = "Mobile number must be 10 digits, start with 6, 7, 8, or 9, and cannot contain any digit repeated more than 5 times consecutively")
     private String mobileNumber;
 
     @NotBlank

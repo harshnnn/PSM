@@ -44,6 +44,9 @@ public class UserAccount {
     @Column(nullable = false, unique = true, length = 20)
     private String customerUsername;
 
+    @Column(nullable = false)
+    private boolean accountLocked = false;
+
     public UserAccount() {
     }
 
@@ -59,6 +62,7 @@ public class UserAccount {
         this.role = role;
         this.preferences = preferences;
         this.customerUsername = customerUsername;
+        this.accountLocked = false;
     }
 
     public Long getId() {
@@ -147,5 +151,13 @@ public class UserAccount {
 
     public void setCustomerUsername(String customerUsername) {
         this.customerUsername = customerUsername;
+    }
+
+    public boolean isAccountLocked() {
+        return accountLocked;
+    }
+
+    public void setAccountLocked(boolean accountLocked) {
+        this.accountLocked = accountLocked;
     }
 }

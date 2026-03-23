@@ -116,6 +116,16 @@ select {
   color: #e2e8f0;
 }
 
+input[type='datetime-local'] {
+  color-scheme: dark;
+}
+
+input[type='datetime-local']::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(1.6);
+  opacity: 0.95;
+  cursor: pointer;
+}
+
 textarea {
   resize: vertical;
 }
@@ -227,6 +237,14 @@ button.secondary {
   background: var(--input-bg) !important;
   color: var(--input-text) !important;
   border-color: var(--input-border) !important;
+}
+
+:host-context([data-theme='light']) input[type='datetime-local'] {
+  color-scheme: light;
+}
+
+:host-context([data-theme='light']) input[type='datetime-local']::-webkit-calendar-picker-indicator {
+  filter: none;
 }
 
 :host-context([data-theme='light']) .cost-card .label,

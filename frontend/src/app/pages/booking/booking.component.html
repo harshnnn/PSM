@@ -34,7 +34,7 @@
         <label>Sender Contact</label>
         <input type="text" formControlName="senderContact" inputmode="tel" maxlength="13" [readonly]="isCustomer" placeholder="e.g. +919876543210" />
         <div class="error" *ngIf="form.get('senderContact')?.touched && form.get('senderContact')?.errors?.['required']">Sender contact is required.</div>
-        <div class="error" *ngIf="form.get('senderContact')?.touched && form.get('senderContact')?.errors?.['pattern']">Contact must be 10 digits, or +91 followed by 10 digits.</div>
+        <div class="error" *ngIf="form.get('senderContact')?.touched && form.get('senderContact')?.errors?.['pattern']">Contact must be 10 digits starting with 6, 7, 8, or 9 (or +91 followed by one of these).</div>
         <div class="error" *ngIf="form.get('senderContact')?.touched && form.get('senderContact')?.errors?.['repeatDigits']">Any digit can appear at most 5 times consecutively.</div>
       </div>
     </section>
@@ -67,7 +67,7 @@
           <label>Receiver Contact</label>
           <input type="text" formControlName="receiverContact" inputmode="tel" maxlength="13" placeholder="e.g. +919999888777" (input)="normalizeContactInput('receiverContact')" />
           <div class="error" *ngIf="form.get('receiverContact')?.touched && form.get('receiverContact')?.errors?.['required']">Receiver contact is required.</div>
-          <div class="error" *ngIf="form.get('receiverContact')?.touched && form.get('receiverContact')?.errors?.['pattern']">Contact must be 10 digits, or +91 followed by 10 digits.</div>
+          <div class="error" *ngIf="form.get('receiverContact')?.touched && form.get('receiverContact')?.errors?.['pattern']">Contact must be 10 digits starting with 6, 7, 8, or 9 (or +91 followed by one of these).</div>
           <div class="error" *ngIf="form.get('receiverContact')?.touched && form.get('receiverContact')?.errors?.['repeatDigits']">Any digit can appear at most 5 times consecutively.</div>
           <div class="error" *ngIf="showContactsSameError()">Sender and receiver contact must be different.</div>
         </div>

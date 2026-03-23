@@ -13,6 +13,7 @@ import { TrackingComponent } from './pages/tracking/tracking.component';
 import { PickupSchedulingComponent } from './pages/pickup-scheduling/pickup-scheduling.component';
 import { DeliveryStatusComponent } from './pages/delivery-status/delivery-status.component';
 import { ProfileComponent } from './pages/profile/profile.component';
+import { AdminUsersComponent } from './pages/admin-users/admin-users.component';
 import { authGuard, customerGuard, officerGuard, redirectIfLoggedInGuard } from './services/auth.guard';
 
 export const routes: Routes = [
@@ -25,6 +26,7 @@ export const routes: Routes = [
 		canActivate: [authGuard, officerGuard],
 		children: [
 			{ path: '', component: HomeComponent },
+			{ path: 'users', component: AdminUsersComponent },
 			{ path: 'invoices', component: InvoiceListComponent },
 			{ path: 'invoice', component: InvoiceComponent },
 			{ path: 'previous-booking', component: BookingHistoryComponent },

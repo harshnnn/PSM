@@ -4,6 +4,15 @@
 
     <div class="success" *ngIf="infoMessage">{{ infoMessage }}</div>
 
+    <div class="lock-notice" *ngIf="lockedAccountMessage">
+      <p class="lock-title">{{ accountNoticeTitle }}</p>
+      <p class="lock-body">{{ lockedAccountMessage }}</p>
+      <p class="lock-body">
+        Please contact support at
+        <a [href]="'mailto:' + lockedSupportEmail">{{ lockedSupportEmail }}</a>
+      </p>
+    </div>
+
     <form [formGroup]="form" (ngSubmit)="submit()">
       <div class="form-row">
         <div>

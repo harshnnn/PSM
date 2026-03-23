@@ -32,7 +32,7 @@ public class BookingRequest {
     private String senderAddress;
 
     @NotBlank
-    @Pattern(regexp = "^(?!.*(\\d)\\1{5,})(?:\\+91\\d{10}|\\d{10})$", message = "Sender contact must be 10 digits, or +91 followed by 10 digits, and cannot contain any digit repeated more than 5 times consecutively")
+    @Pattern(regexp = "^(?!.*(\\d)\\1{5,})(?:\\+91[6-9]\\d{9}|[6-9]\\d{9})$", message = "Sender contact must be 10 digits starting with 6, 7, 8, or 9 (or +91 followed by one of these), and cannot contain any digit repeated more than 5 times consecutively")
     private String senderContact;
 
     // Receiver info
@@ -50,7 +50,7 @@ public class BookingRequest {
     private String receiverPinCode;
 
     @NotBlank
-    @Pattern(regexp = "^(?!.*(\\d)\\1{5,})(?:\\+91\\d{10}|\\d{10})$", message = "Receiver contact must be 10 digits, or +91 followed by 10 digits, and cannot contain any digit repeated more than 5 times consecutively")
+    @Pattern(regexp = "^(?!.*(\\d)\\1{5,})(?:\\+91[6-9]\\d{9}|[6-9]\\d{9})$", message = "Receiver contact must be 10 digits starting with 6, 7, 8, or 9 (or +91 followed by one of these), and cannot contain any digit repeated more than 5 times consecutively")
     private String receiverContact;
 
     // Parcel details
