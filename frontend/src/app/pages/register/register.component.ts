@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AuthApiService, RegisterResponse } from '../../services/auth-api.service';
 import { SessionService } from '../../services/session.service';
 import { markAndFocusFirstInvalidControl } from '../../utils/form-validation';
+import { repeatedDigitLimitValidator } from '../../utils/phone-validation';
 
 function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password')?.value;
@@ -29,6 +30,7 @@ export class RegisterComponent {
   readonly form;
   private readonly personNamePattern = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
   private readonly userIdPattern = /^[A-Za-z0-9._-]{5,20}$/;
+  private readonly emailPattern = /^(?!.*\.\.)[A-Za-z0-9](?:[A-Za-z0-9._%+-]{0,62}[A-Za-z0-9])?@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z]{2,})+$/;
 
   readonly countryCodes = ['+1', '+44', '+61', '+91'];
 
@@ -40,9 +42,9 @@ export class RegisterComponent {
   ) {
     this.form = this.formBuilder.group({
       customerName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(this.personNamePattern)]],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.maxLength(254), Validators.pattern(this.emailPattern)]],
       countryCode: ['+91', [Validators.required]],
-      mobileNumber: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      mobileNumber: ['', [Validators.required, Validators.pattern(/^\d{10}$/), repeatedDigitLimitValidator(5)]],
       address: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(200)]],
       userId: ['', [Validators.required, Validators.pattern(this.userIdPattern)]],
       password: [
@@ -63,12 +65,19 @@ export class RegisterComponent {
     }
 
     const raw = this.form.getRawValue();
+    const normalizedEmail = String(raw.email ?? '').trim().toLowerCase();
+    if (!this.emailPattern.test(normalizedEmail)) {
+      this.form.controls.email.markAsTouched();
+      this.errorMessage = 'Please enter a valid email like name@example.com.';
+      return;
+    }
+
     const payload = {
       ...raw,
       customerName: this.normalizeText(raw.customerName),
       address: this.normalizeText(raw.address),
       userId: String(raw.userId ?? '').trim(),
-      email: String(raw.email ?? '').trim().toLowerCase(),
+      email: normalizedEmail,
       preferences: this.normalizeText(raw.preferences)
     };
 
@@ -83,7 +92,7 @@ export class RegisterComponent {
             mobileNumber: payload.mobileNumber
           })
         );
-        this.sessionService.save({ username: response.customerUsername, role: 'CUSTOMER' });
+        this.sessionService.save({ username: response.customerUsername, role: 'CUSTOMER', token: response.token });
         sessionStorage.setItem('registration-ack', JSON.stringify(response));
         this.router.navigate(['/registration-ack']);
       },
@@ -112,6 +121,11 @@ export class RegisterComponent {
 
   backToLogin(): void {
     this.router.navigate(['/login']);
+  }
+
+  handlePasswordClipboardEvent(event: ClipboardEvent, action: 'copy' | 'paste'): void {
+    event.preventDefault();
+    this.errorMessage = action === 'copy' ? "Can't copy password." : "Can't paste password.";
   }
 
   private normalizeText(value: unknown): string {

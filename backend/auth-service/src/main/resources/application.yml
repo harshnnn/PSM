@@ -24,3 +24,9 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+
+security:
+  jwt:
+    # 32-byte base64 key for HS256 signing
+    secret: cHNtLXNlcnZpY2VzLWp3dC1zaWduaW5nLWtleS0yMDI2LTAz
+    expiration-minutes: 120

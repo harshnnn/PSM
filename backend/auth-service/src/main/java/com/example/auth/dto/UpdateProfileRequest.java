@@ -26,7 +26,7 @@ public class UpdateProfileRequest {
     private String countryCode;
 
     @NotBlank
-    @Pattern(regexp = "^\\d{10}$", message = "Mobile number must be 10 digits")
+    @Pattern(regexp = "^(?!.*(\\d)\\1{5,})\\d{10}$", message = "Mobile number must be 10 digits and cannot contain any digit repeated more than 5 times consecutively")
     private String mobileNumber;
 
     @NotBlank

@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.auth.dto.ChangePasswordRequest;
 import com.example.auth.dto.LoginRequest;
@@ -42,22 +44,42 @@ public class AuthController {
     }
 
     @GetMapping("/profile/{customerUsername}")
-    public ResponseEntity<ProfileResponse> profile(@PathVariable String customerUsername) {
+    public ResponseEntity<ProfileResponse> profile(
+            @PathVariable String customerUsername,
+            @RequestHeader(value = "X-Username", required = false) String authenticatedUsername,
+            @RequestHeader(value = "X-User-Role", required = false) String authenticatedRole) {
+        enforceSelfProfileAccess(customerUsername, authenticatedUsername, authenticatedRole);
         return ResponseEntity.ok(authService.getProfile(customerUsername));
     }
 
     @PutMapping("/profile/{customerUsername}")
     public ResponseEntity<ProfileResponse> updateProfile(
             @PathVariable String customerUsername,
+            @RequestHeader(value = "X-Username", required = false) String authenticatedUsername,
+            @RequestHeader(value = "X-User-Role", required = false) String authenticatedRole,
             @Valid @RequestBody UpdateProfileRequest request) {
+        enforceSelfProfileAccess(customerUsername, authenticatedUsername, authenticatedRole);
         return ResponseEntity.ok(authService.updateProfile(customerUsername, request));
     }
 
     @PutMapping("/profile/{customerUsername}/password")
     public ResponseEntity<Void> changePassword(
             @PathVariable String customerUsername,
+            @RequestHeader(value = "X-Username", required = false) String authenticatedUsername,
+            @RequestHeader(value = "X-User-Role", required = false) String authenticatedRole,
             @Valid @RequestBody ChangePasswordRequest request) {
+        enforceSelfProfileAccess(customerUsername, authenticatedUsername, authenticatedRole);
         authService.changePassword(customerUsername, request);
         return ResponseEntity.noContent().build();
+    }
+
+    private void enforceSelfProfileAccess(String customerUsername, String authenticatedUsername, String authenticatedRole) {
+        if (!"CUSTOMER".equalsIgnoreCase(authenticatedRole)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only authenticated customers can access profile endpoints");
+        }
+
+        if (authenticatedUsername == null || !customerUsername.equalsIgnoreCase(authenticatedUsername)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only access your own profile");
+        }
     }
 }

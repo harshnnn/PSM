@@ -5,15 +5,17 @@ public class RegisterResponse {
     private String customerUsername;
     private String customerName;
     private String email;
+    private String token;
 
     public RegisterResponse() {
     }
 
-    public RegisterResponse(String message, String customerUsername, String customerName, String email) {
+    public RegisterResponse(String message, String customerUsername, String customerName, String email, String token) {
         this.message = message;
         this.customerUsername = customerUsername;
         this.customerName = customerName;
         this.email = email;
+        this.token = token;
     }
 
     public String getMessage() {
@@ -46,5 +48,13 @@ public class RegisterResponse {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

@@ -1,6 +1,5 @@
 package com.example.auth.dto;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -12,7 +11,10 @@ public class RegisterRequest {
     private String customerName;
 
     @NotBlank
-    @Email
+        @Pattern(
+            regexp = "^(?!.*\\.\\.)[A-Za-z0-9](?:[A-Za-z0-9._%+-]{0,62}[A-Za-z0-9])?@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z]{2,})+$",
+            message = "Email must be in a valid format"
+        )
     private String email;
 
     @NotBlank
@@ -20,7 +22,7 @@ public class RegisterRequest {
     private String countryCode;
 
     @NotBlank
-    @Pattern(regexp = "^\\d{10}$", message = "Mobile number must be 10 digits")
+    @Pattern(regexp = "^(?!.*(\\d)\\1{5,})\\d{10}$", message = "Mobile number must be 10 digits and cannot contain any digit repeated more than 5 times consecutively")
     private String mobileNumber;
 
     @NotBlank

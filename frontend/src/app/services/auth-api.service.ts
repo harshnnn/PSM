@@ -19,6 +19,7 @@ export interface RegisterResponse {
   customerUsername: string;
   customerName: string;
   email: string;
+  token: string;
 }
 
 export interface LoginRequest {
@@ -30,6 +31,7 @@ export interface LoginResponse {
   message: string;
   role: 'CUSTOMER' | 'OFFICER';
   username: string;
+  token: string;
 }
 
 export interface ProfileResponse {

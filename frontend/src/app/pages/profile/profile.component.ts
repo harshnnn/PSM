@@ -6,6 +6,7 @@ import { Subscription, finalize } from 'rxjs';
 import { AuthApiService, ChangePasswordRequest, ProfileResponse, UpdateProfileRequest } from '../../services/auth-api.service';
 import { SessionService } from '../../services/session.service';
 import { markAndFocusFirstInvalidControl } from '../../utils/form-validation';
+import { repeatedDigitLimitValidator } from '../../utils/phone-validation';
 
 function confirmPasswordValidator(control: AbstractControl): ValidationErrors | null {
   const newPassword = control.get('newPassword')?.value;
@@ -51,10 +52,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private readonly router: Router
   ) {
     this.form = this.formBuilder.group({
-      customerName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(/^[A-Za-z]+(?:\s[A-Za-z]+)*$/)]],
+      customerName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(/^\s*[A-Za-z]+(?:\s+[A-Za-z]+)*\s*$/)]],
       email: ['', [Validators.required, Validators.maxLength(254), Validators.pattern(this.emailPattern)]],
       countryCode: ['+91', [Validators.required]],
-      mobileNumber: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      mobileNumber: ['', [Validators.required, Validators.pattern(/^\d{10}$/), repeatedDigitLimitValidator(5)]],
       address: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(200)]],
       preferences: ['', [Validators.maxLength(200)]]
     });
@@ -118,6 +119,20 @@ export class ProfileComponent implements OnInit, OnDestroy {
   saveProfile(): void {
     this.saveError = '';
     this.saveSuccess = '';
+
+    const normalizedCustomerName = this.normalizeText(this.form.controls.customerName.value);
+    const normalizedAddress = this.normalizeText(this.form.controls.address.value);
+    const normalizedPreferences = this.normalizeText(this.form.controls.preferences.value);
+
+    if (normalizedCustomerName !== this.form.controls.customerName.value) {
+      this.form.controls.customerName.setValue(normalizedCustomerName);
+    }
+    if (normalizedAddress !== this.form.controls.address.value) {
+      this.form.controls.address.setValue(normalizedAddress);
+    }
+    if (normalizedPreferences !== this.form.controls.preferences.value) {
+      this.form.controls.preferences.setValue(normalizedPreferences);
+    }
 
     if (this.form.invalid) {
       markAndFocusFirstInvalidControl(this.form);
@@ -246,6 +261,12 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.passwordError = 'Unable to change password right now. Please try again.';
         }
       });
+  }
+
+  handlePasswordClipboardEvent(event: ClipboardEvent, action: 'copy' | 'paste'): void {
+    event.preventDefault();
+    this.passwordSuccess = '';
+    this.passwordError = action === 'copy' ? "Can't copy password." : "Can't paste password.";
   }
 
   private normalizeText(value: unknown): string {

@@ -74,7 +74,7 @@ export class LoginComponent {
       password: String(raw.password ?? '')
     }).subscribe({
       next: (response) => {
-        this.sessionService.save({ username: response.username, role: response.role });
+        this.sessionService.save({ username: response.username, role: response.role, token: response.token });
         this.router.navigate([response.role === 'OFFICER' ? '/admin' : '/home']);
       },
       error: (error) => {
@@ -97,5 +97,10 @@ export class LoginComponent {
 
   goToRegister(): void {
     this.router.navigate(['/register']);
+  }
+
+  handlePasswordClipboardEvent(event: ClipboardEvent, action: 'copy' | 'paste'): void {
+    event.preventDefault();
+    this.errorMessage = action === 'copy' ? "Can't copy password." : "Can't paste password.";
   }
 }

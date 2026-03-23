@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 export interface SessionData {
   username: string;
   role: 'CUSTOMER' | 'OFFICER';
+  token: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -15,7 +16,17 @@ export class SessionService {
 
   get(): SessionData | null {
     const raw = localStorage.getItem(this.key);
-    return raw ? (JSON.parse(raw) as SessionData) : null;
+    if (!raw) {
+      return null;
+    }
+
+    const parsed = JSON.parse(raw) as Partial<SessionData>;
+    if (!parsed?.username || !parsed?.role || !parsed?.token) {
+      this.clear();
+      return null;
+    }
+
+    return parsed as SessionData;
   }
 
   clear(): void {

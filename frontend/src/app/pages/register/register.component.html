@@ -18,7 +18,8 @@
           <label>Email</label>
           <input type="email" formControlName="email" placeholder="name@example.com" />
           <div class="error" *ngIf="form.controls.email.touched && form.controls.email.errors?.['required']">Email is required.</div>
-          <div class="error" *ngIf="form.controls.email.touched && form.controls.email.errors?.['email']">Enter a valid email.</div>
+          <div class="error" *ngIf="form.controls.email.touched && form.controls.email.errors?.['maxlength']">Email must be at most 254 characters.</div>
+          <div class="error" *ngIf="form.controls.email.touched && form.controls.email.errors?.['pattern']">Please enter a valid email like name&#64;example.com.</div>
         </div>
 
         <div class="mobile-grid">
@@ -33,6 +34,7 @@
             <input type="text" formControlName="mobileNumber" inputmode="numeric" maxlength="10" placeholder="9876543210" />
             <div class="error" *ngIf="form.controls.mobileNumber.touched && form.controls.mobileNumber.errors?.['required']">Mobile number is required.</div>
             <div class="error" *ngIf="form.controls.mobileNumber.touched && form.controls.mobileNumber.errors?.['pattern']">Enter exactly 10 digits.</div>
+            <div class="error" *ngIf="form.controls.mobileNumber.touched && form.controls.mobileNumber.errors?.['repeatDigits']">Any digit can appear at most 5 times consecutively.</div>
           </div>
         </div>
 
@@ -56,7 +58,12 @@
 
         <div>
           <label>Password</label>
-          <input type="password" formControlName="password" />
+          <input
+            type="password"
+            formControlName="password"
+            (copy)="handlePasswordClipboardEvent($event, 'copy')"
+            (paste)="handlePasswordClipboardEvent($event, 'paste')"
+          />
           <div class="error" *ngIf="form.controls.password.touched && form.controls.password.errors?.['required']">Password is required.</div>
           <div class="error" *ngIf="form.controls.password.touched && form.controls.password.errors?.['minlength']">Password must be at least 6 characters.</div>
           <div class="error" *ngIf="form.controls.password.touched && form.controls.password.errors?.['maxlength']">Password must be at most 30 characters.</div>
@@ -65,7 +72,12 @@
 
         <div>
           <label>Confirm Password</label>
-          <input type="password" formControlName="confirmPassword" />
+          <input
+            type="password"
+            formControlName="confirmPassword"
+            (copy)="handlePasswordClipboardEvent($event, 'copy')"
+            (paste)="handlePasswordClipboardEvent($event, 'paste')"
+          />
           <div class="error" *ngIf="form.controls.confirmPassword.touched && form.controls.confirmPassword.errors?.['required']">Confirm Password is required.</div>
           <div class="error" *ngIf="form.controls.confirmPassword.touched && form.controls.confirmPassword.errors?.['minlength']">Confirm Password must be at least 6 characters.</div>
           <div class="error" *ngIf="(form.touched || form.controls.confirmPassword.touched) && form.errors?.['passwordMismatch']">Password and Confirm Password must match.</div>

@@ -16,6 +16,7 @@ export class InvoiceComponent implements OnInit {
   loading = false;
   errorMessage = '';
   trackingNumber = '';
+  isCustomer = false;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -35,6 +36,7 @@ export class InvoiceComponent implements OnInit {
 
     this.loading = true;
     const session = this.sessionService.get();
+    this.isCustomer = session?.role === 'CUSTOMER';
     const customerId = session?.role === 'CUSTOMER' ? session.username : undefined;
     this.invoiceApi.get(invoiceId).subscribe({
       next: (inv) => {
@@ -54,11 +56,11 @@ export class InvoiceComponent implements OnInit {
   }
 
   goHome(): void {
-    this.router.navigate(['/home']);
+    this.router.navigate([this.isCustomer ? '/home' : '/admin']);
   }
 
   viewHistory(): void {
-    this.router.navigate(['/previous-booking']);
+    this.router.navigate([this.isCustomer ? '/previous-booking' : '/admin/previous-booking']);
   }
 
   print(): void {
@@ -66,7 +68,7 @@ export class InvoiceComponent implements OnInit {
   }
 
   openTracking(): void {
-    this.router.navigate(['/tracking'], {
+    this.router.navigate([this.isCustomer ? '/tracking' : '/admin/tracking'], {
       queryParams: this.trackingNumber ? { bookingId: this.trackingNumber } : undefined
     });
   }

@@ -7,6 +7,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class InvoiceRequest {
@@ -32,6 +33,10 @@ public class InvoiceRequest {
 
     @NotBlank
     @Size(max = 20)
+        @Pattern(
+            regexp = "^(?!.*(\\d)\\1{5,})(?:\\+91\\d{10}|\\d{10})$",
+            message = "Receiver mobile must be 10 digits, or +91 followed by 10 digits, and cannot contain any digit repeated more than 5 times consecutively"
+        )
     private String receiverMobile;
 
     @NotNull

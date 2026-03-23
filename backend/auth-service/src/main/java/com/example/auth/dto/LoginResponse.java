@@ -4,14 +4,16 @@ public class LoginResponse {
     private String message;
     private String role;
     private String username;
+    private String token;
 
     public LoginResponse() {
     }
 
-    public LoginResponse(String message, String role, String username) {
+    public LoginResponse(String message, String role, String username, String token) {
         this.message = message;
         this.role = role;
         this.username = username;
+        this.token = token;
     }
 
     public String getMessage() {
@@ -36,5 +38,13 @@ public class LoginResponse {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

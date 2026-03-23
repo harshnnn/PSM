@@ -26,6 +26,7 @@ export const routes: Routes = [
 		children: [
 			{ path: '', component: HomeComponent },
 			{ path: 'invoices', component: InvoiceListComponent },
+			{ path: 'invoice', component: InvoiceComponent },
 			{ path: 'previous-booking', component: BookingHistoryComponent },
 			{ path: 'tracking', component: TrackingComponent },
 			{ path: 'support', component: PlaceholderComponent, data: { title: 'Contact Support' } },

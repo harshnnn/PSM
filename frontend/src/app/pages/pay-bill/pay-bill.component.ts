@@ -181,6 +181,11 @@ export class PayBillComponent implements OnInit, OnDestroy {
     input.value = grouped;
   }
 
+  handlePasswordClipboardEvent(event: ClipboardEvent, action: 'copy' | 'paste'): void {
+    event.preventDefault();
+    this.errorMessage = action === 'copy' ? "Can't copy password." : "Can't paste password.";
+  }
+
   private toDigitsOnly(value: unknown): string {
     return String(value ?? '').replace(/\D/g, '');
   }

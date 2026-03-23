@@ -14,7 +14,7 @@
 			<a [routerLink]="session.role === 'OFFICER' ? '/admin/support' : '/support'" routerLinkActive="active">Support</a>
 		</nav>
 		<div class="user">
-			<span>{{ session.username }} ({{ session.role }})</span>
+			<span>{{ session.role === 'OFFICER' ? session.username + ' (' + session.role + ')' : session.username }}</span>
 			<button
 				class="ghost theme-toggle"
 				(click)="toggleTheme()"

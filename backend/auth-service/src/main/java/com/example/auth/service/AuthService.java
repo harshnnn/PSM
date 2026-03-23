@@ -26,10 +26,15 @@ public class AuthService {
 
     private final UserAccountRepository userAccountRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public AuthService(UserAccountRepository userAccountRepository, BCryptPasswordEncoder passwordEncoder) {
+    public AuthService(
+            UserAccountRepository userAccountRepository,
+            BCryptPasswordEncoder passwordEncoder,
+            JwtService jwtService) {
         this.userAccountRepository = userAccountRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public RegisterResponse register(RegisterRequest request) {
@@ -37,15 +42,24 @@ public class AuthService {
             throw new IllegalArgumentException("Password and Confirm Password must match");
         }
 
+        String normalizedEmail = normalizeEmail(request.getEmail());
+        if (!EMAIL_PATTERN.matcher(normalizedEmail).matches()) {
+            throw new IllegalArgumentException("Email must be in a valid format");
+        }
+
         if (userAccountRepository.existsByUserId(request.getUserId())) {
             throw new IllegalArgumentException("User ID already exists");
+        }
+
+        if (userAccountRepository.existsByEmail(normalizedEmail)) {
+            throw new IllegalArgumentException("Email is already registered with another account");
         }
 
         String customerUsername = request.getUserId();
 
         UserAccount user = new UserAccount();
-        user.setCustomerName(request.getCustomerName());
-        user.setEmail(request.getEmail());
+        user.setCustomerName(normalizeText(request.getCustomerName()));
+        user.setEmail(normalizedEmail);
         user.setCountryCode(request.getCountryCode());
         user.setMobileNumber(request.getMobileNumber());
         user.setAddress(request.getAddress());
@@ -56,12 +70,14 @@ public class AuthService {
         user.setCustomerUsername(customerUsername);
 
         userAccountRepository.save(user);
-        return new RegisterResponse("Registration successful", customerUsername, user.getCustomerName(), user.getEmail());
+        String token = jwtService.generateToken(customerUsername, user.getRole());
+        return new RegisterResponse("Registration successful", customerUsername, user.getCustomerName(), user.getEmail(), token);
     }
 
     public LoginResponse login(LoginRequest request) {
         if (OFFICER_USER_ID.equals(request.getUserId()) && OFFICER_PASSWORD.equals(request.getPassword())) {
-            return new LoginResponse("Login successful", OFFICER_ROLE, OFFICER_USER_ID);
+            String token = jwtService.generateToken(OFFICER_USER_ID, OFFICER_ROLE);
+            return new LoginResponse("Login successful", OFFICER_ROLE, OFFICER_USER_ID, token);
         }
 
         UserAccount user = userAccountRepository.findByUserId(request.getUserId())
@@ -71,7 +87,8 @@ public class AuthService {
             throw new IllegalArgumentException("Invalid user ID or password");
         }
 
-        return new LoginResponse("Login successful", user.getRole(), user.getCustomerUsername());
+        String token = jwtService.generateToken(user.getCustomerUsername(), user.getRole());
+        return new LoginResponse("Login successful", user.getRole(), user.getCustomerUsername(), token);
     }
 
     public ProfileResponse getProfile(String customerUsername) {
@@ -80,7 +97,7 @@ public class AuthService {
 
         return new ProfileResponse(
                 user.getCustomerUsername(),
-                user.getCustomerName(),
+            normalizeText(user.getCustomerName()),
                 user.getAddress(),
                 user.getCountryCode(),
                 user.getMobileNumber(),

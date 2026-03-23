@@ -51,11 +51,12 @@ export class InvoiceListComponent implements OnInit {
   }
 
   viewInvoice(inv: InvoiceResponse): void {
-    this.router.navigate(['/invoice'], { queryParams: { invoiceId: inv.id, invoiceNumber: inv.invoiceNumber } });
+    const target = this.isCustomer ? '/invoice' : '/admin/invoice';
+    this.router.navigate([target], { queryParams: { invoiceId: inv.id, invoiceNumber: inv.invoiceNumber } });
   }
 
   backToPayments(): void {
-    this.router.navigate(['/pay-bill']);
+    this.router.navigate([this.isCustomer ? '/pay-bill' : '/admin']);
   }
 
   trackById(_index: number, item: InvoiceResponse): number {

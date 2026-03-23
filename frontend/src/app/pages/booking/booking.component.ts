@@ -7,6 +7,7 @@ import { AuthApiService, ProfileResponse } from '../../services/auth-api.service
 import { SessionData, SessionService } from '../../services/session.service';
 import { Subscription } from 'rxjs';
 import { markAndFocusFirstInvalidControl } from '../../utils/form-validation';
+import { repeatedDigitLimitValidator } from '../../utils/phone-validation';
 
 function pickupDateTimeValidator(control: AbstractControl): ValidationErrors | null {
   const raw = control.value;
@@ -108,11 +109,11 @@ export class BookingComponent implements OnInit, OnDestroy {
     this.form = this.fb.group({
       senderName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(this.personNamePattern)]],
       senderAddress: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(200)]],
-      senderContact: ['', [Validators.required, Validators.pattern(/^(?:\+91\d{10}|\d{10})$/)]],
+      senderContact: ['', [Validators.required, Validators.pattern(/^(?:\+91\d{10}|\d{10})$/), repeatedDigitLimitValidator(5)]],
       receiverName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(this.personNamePattern)]],
       receiverAddress: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(200)]],
       receiverPinCode: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
-      receiverContact: ['', [Validators.required, Validators.pattern(/^(?:\+91\d{10}|\d{10})$/)]],
+      receiverContact: ['', [Validators.required, Validators.pattern(/^(?:\+91\d{10}|\d{10})$/), repeatedDigitLimitValidator(5)]],
       parcelSize: ['SMALL' as ParcelSize, [Validators.required]],
       weightKg: [1, [Validators.required, Validators.min(0.1), Validators.max(999), Validators.pattern(/^\d{1,5}(\.\d{1,2})?$/)]],
       contentsDescription: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],

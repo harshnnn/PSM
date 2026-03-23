@@ -54,6 +54,7 @@
             <input id="mobileNumber" type="text" formControlName="mobileNumber" inputmode="numeric" maxlength="10" placeholder="9876543210" />
             <div class="error-text" *ngIf="form.controls.mobileNumber.touched && form.controls.mobileNumber.errors?.['required']">Mobile number is required.</div>
             <div class="error-text" *ngIf="form.controls.mobileNumber.touched && form.controls.mobileNumber.errors?.['pattern']">Enter exactly 10 digits.</div>
+            <div class="error-text" *ngIf="form.controls.mobileNumber.touched && form.controls.mobileNumber.errors?.['repeatDigits']">Any digit can appear at most 5 times consecutively.</div>
           </div>
         </div>
 
@@ -104,20 +105,41 @@
       <div class="password-grid">
         <div class="field">
           <label for="currentPassword">Current Password</label>
-          <input id="currentPassword" type="password" formControlName="currentPassword" autocomplete="current-password" />
+          <input
+            id="currentPassword"
+            type="password"
+            formControlName="currentPassword"
+            autocomplete="current-password"
+            (copy)="handlePasswordClipboardEvent($event, 'copy')"
+            (paste)="handlePasswordClipboardEvent($event, 'paste')"
+          />
           <div class="error-text" *ngIf="passwordForm.controls.currentPassword.touched && passwordForm.controls.currentPassword.errors?.['required']">Current password is required.</div>
         </div>
 
         <div class="field">
           <label for="newPassword">New Password</label>
-          <input id="newPassword" type="password" formControlName="newPassword" autocomplete="new-password" />
+          <input
+            id="newPassword"
+            type="password"
+            formControlName="newPassword"
+            autocomplete="new-password"
+            (copy)="handlePasswordClipboardEvent($event, 'copy')"
+            (paste)="handlePasswordClipboardEvent($event, 'paste')"
+          />
           <div class="error-text" *ngIf="passwordForm.controls.newPassword.touched && passwordForm.controls.newPassword.errors?.['required']">New password is required.</div>
           <div class="error-text" *ngIf="passwordForm.controls.newPassword.touched && passwordForm.controls.newPassword.errors?.['pattern']">New password must contain upper case, lower case and special character.</div>
         </div>
 
         <div class="field">
           <label for="confirmNewPassword">Confirm New Password</label>
-          <input id="confirmNewPassword" type="password" formControlName="confirmNewPassword" autocomplete="new-password" />
+          <input
+            id="confirmNewPassword"
+            type="password"
+            formControlName="confirmNewPassword"
+            autocomplete="new-password"
+            (copy)="handlePasswordClipboardEvent($event, 'copy')"
+            (paste)="handlePasswordClipboardEvent($event, 'paste')"
+          />
           <div class="error-text" *ngIf="passwordForm.controls.confirmNewPassword.touched && passwordForm.controls.confirmNewPassword.errors?.['required']">Confirm New Password is required.</div>
           <div class="error-text" *ngIf="(passwordForm.touched || passwordForm.controls.confirmNewPassword.touched) && passwordForm.errors?.['passwordMismatch']">New Password and Confirm New Password must match.</div>
         </div>

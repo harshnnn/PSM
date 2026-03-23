@@ -22,7 +22,13 @@
 
         <div>
           <label>Password</label>
-          <input type="password" formControlName="password" placeholder="Enter Password" />
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="Enter Password"
+            (copy)="handlePasswordClipboardEvent($event, 'copy')"
+            (paste)="handlePasswordClipboardEvent($event, 'paste')"
+          />
           <div class="error" *ngIf="form.controls.password.touched && form.controls.password.errors?.['required']">
             Password is required.
           </div>
