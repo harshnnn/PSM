@@ -1,6 +1,9 @@
 package com.example.support.config;
 
+import java.util.Objects;
+
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
@@ -18,8 +21,8 @@ public class SupportWebSocketConfig implements WebSocketConfigurer {
     }
 
     @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(realtimeRegistry, "/ws/support")
+    public void registerWebSocketHandlers(@NonNull WebSocketHandlerRegistry registry) {
+        registry.addHandler(Objects.requireNonNull(realtimeRegistry), "/ws/support")
                 .setAllowedOrigins("*");
     }
 }

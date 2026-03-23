@@ -6,7 +6,9 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -32,13 +34,13 @@ public class SupportRealtimeSessionRegistry extends TextWebSocketHandler {
     }
 
     @Override
-    public synchronized void afterConnectionEstablished(WebSocketSession session) {
+    public synchronized void afterConnectionEstablished(@NonNull WebSocketSession session) {
         Map<String, String> query = parseQuery(session.getUri());
         String username = normalize(query.get("username"));
         String role = normalizeRole(query.get("role"));
 
         if (username.isBlank() || (!ROLE_CUSTOMER.equals(role) && !ROLE_OFFICER.equals(role))) {
-            closeQuietly(session, CloseStatus.BAD_DATA);
+            closeQuietly(session, Objects.requireNonNull(CloseStatus.BAD_DATA));
             return;
         }
 
@@ -46,18 +48,17 @@ public class SupportRealtimeSessionRegistry extends TextWebSocketHandler {
         client.setSession(session);
         client.setUsername(username);
         client.setRole(role);
-        client.setActiveCustomerUsername(ROLE_CUSTOMER.equals(role) ? username : normalize(query.get("customer")));
 
         connectedClients.put(session.getId(), client);
     }
 
     @Override
-    public synchronized void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+    public synchronized void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus status) {
         connectedClients.remove(session.getId());
     }
 
     @Override
-    protected synchronized void handleTextMessage(WebSocketSession session, TextMessage message) {
+    protected synchronized void handleTextMessage(@NonNull WebSocketSession session, @NonNull TextMessage message) {
         ConnectedClient client = connectedClients.get(session.getId());
         if (client == null) {
             return;
@@ -71,9 +72,10 @@ public class SupportRealtimeSessionRegistry extends TextWebSocketHandler {
 
             String activeCustomer = normalize(payload.path("activeCustomerUsername").asText(""));
             if (ROLE_CUSTOMER.equals(client.getRole())) {
-                client.setActiveCustomerUsername(client.getUsername());
+                // Customer presence does not need per-conversation state.
             } else {
-                client.setActiveCustomerUsername(activeCustomer);
+                // Officer may send active customer in presence payload for future use.
+                Objects.requireNonNull(activeCustomer);
             }
         } catch (IOException ignored) {
             // Ignore malformed realtime client payloads.
@@ -116,24 +118,24 @@ public class SupportRealtimeSessionRegistry extends TextWebSocketHandler {
 
         for (ConnectedClient client : connectedClients.values()) {
             if (ROLE_OFFICER.equals(client.getRole()) || customerUsername.equalsIgnoreCase(client.getUsername())) {
-                sendQuietly(client.getSession(), json);
+                sendQuietly(Objects.requireNonNull(client.getSession()), Objects.requireNonNull(json));
             }
         }
     }
 
-    private void sendQuietly(WebSocketSession session, String payload) {
+    private void sendQuietly(@NonNull WebSocketSession session, @NonNull String payload) {
         try {
             if (session.isOpen()) {
-                session.sendMessage(new TextMessage(payload));
+                session.sendMessage(new TextMessage(Objects.requireNonNull(payload)));
             }
         } catch (IOException ignored) {
             // Connection may have dropped between lookup and send.
         }
     }
 
-    private void closeQuietly(WebSocketSession session, CloseStatus status) {
+    private void closeQuietly(@NonNull WebSocketSession session, @NonNull CloseStatus status) {
         try {
-            session.close(status);
+            session.close(Objects.requireNonNull(status));
         } catch (IOException ignored) {
             // No-op.
         }
@@ -167,7 +169,6 @@ public class SupportRealtimeSessionRegistry extends TextWebSocketHandler {
         private WebSocketSession session;
         private String username;
         private String role;
-        private String activeCustomerUsername;
 
         public WebSocketSession getSession() {
             return session;
@@ -191,14 +192,6 @@ public class SupportRealtimeSessionRegistry extends TextWebSocketHandler {
 
         public void setRole(String role) {
             this.role = role;
-        }
-
-        public String getActiveCustomerUsername() {
-            return activeCustomerUsername;
-        }
-
-        public void setActiveCustomerUsername(String activeCustomerUsername) {
-            this.activeCustomerUsername = activeCustomerUsername;
         }
     }
 }

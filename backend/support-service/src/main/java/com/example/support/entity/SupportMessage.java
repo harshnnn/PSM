@@ -41,6 +41,7 @@ public class SupportMessage {
     private String readByUsername;
 
     @PrePersist
+    @SuppressWarnings("unused")
     void prePersist() {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();

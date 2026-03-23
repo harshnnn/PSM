@@ -1,11 +1,11 @@
 package com.example.support.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,15 +40,11 @@ public class SupportChatServiceImpl implements SupportChatService {
     public SupportMessageResponse sendMessage(String authenticatedUsername, String authenticatedRole, SendSupportMessageRequest request) {
         String normalizedRole = normalizeRole(authenticatedRole);
         String normalizedAuthUsername = normalizeUsername(authenticatedUsername);
-        String targetCustomerUsername;
-
-        if (ROLE_CUSTOMER.equals(normalizedRole)) {
-            targetCustomerUsername = normalizedAuthUsername;
-        } else if (ROLE_OFFICER.equals(normalizedRole)) {
-            targetCustomerUsername = normalizeUsername(request.getCustomerUsername());
-        } else {
-            throw new IllegalArgumentException("Unsupported role");
-        }
+        String targetCustomerUsername = switch (normalizedRole) {
+            case ROLE_CUSTOMER -> normalizedAuthUsername;
+            case ROLE_OFFICER -> normalizeUsername(request.getCustomerUsername());
+            default -> throw new IllegalArgumentException("Unsupported role");
+        };
 
         if (targetCustomerUsername.isBlank()) {
             throw new IllegalArgumentException("Customer username is required");
